@@ -1,7 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import Initial from './pages/Initial';
 import Counter from './pages/Counter';
-import './App.css';
 
 function App() {
   return (
