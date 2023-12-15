@@ -4,5 +4,5 @@ CREATE TABLE accounts (
     last_name VARCHAR(50) NOT NULL,
     balance DECIMAL(10,2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    admin BOOLEAN NOT NULL
+    admin BOOLEAN NOT NULL DEFAULT false
 );

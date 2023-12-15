@@ -4,12 +4,16 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gofiber/fiber/v2"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/ricardoraposo/gopherbank/internal/server"
 )
 
 func main() {
-	app := fiber.New()
+	app := server.New()
+	app.RegisterRoutes()
 
-	app.Listen(fmt.Sprintf(":%s", os.Getenv("APP_PORT")))
+	port := fmt.Sprintf(":%s", os.Getenv("APP_PORT"))
+	if err := app.Listen(port); err != nil {
+		panic(err)
+	}
 }

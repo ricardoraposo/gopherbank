@@ -12,6 +12,4 @@ services:
       - .env
     volumes:
       - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
-      - ./data:/var/lib/mysql
-
-
+      # - ./data:/var/lib/mysql

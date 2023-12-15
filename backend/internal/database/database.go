@@ -12,11 +12,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-type Store interface {
-	Health() map[string]string
-}
-
-type store struct {
+type Store struct {
 	db *sql.DB
 }
 
@@ -28,16 +24,16 @@ var (
 	host     = os.Getenv("DB_HOST")
 )
 
-func New() Store {
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, dbport, dbname))
+func New() *Store {
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", username, password, host, dbport, dbname))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &store{db}
+	return &Store{db}
 }
 
-func (s *store) Health() map[string]string {
+func (s *Store) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
