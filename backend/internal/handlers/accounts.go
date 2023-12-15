@@ -1,10 +1,13 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/ricardoraposo/gopherbank/internal/database"
+	"github.com/ricardoraposo/gopherbank/internal/utils"
 	"github.com/ricardoraposo/gopherbank/models"
 )
 
@@ -22,10 +25,15 @@ func (a *AccountHandler) CreateAccount(c *fiber.Ctx) error {
 		return err
 	}
 
+	num := utils.GenerateAccountNumber()
+	fmt.Println(num)
+	account.Number = num
 	acc, err := a.store.CreateAccount(&account)
 	if err != nil {
 		return err
 	}
+
+	account.CreatedAt = time.Now()
 	return c.JSON(acc)
 }
 

@@ -1,6 +1,10 @@
 package database
 
-import "github.com/ricardoraposo/gopherbank/models"
+import (
+	"database/sql"
+
+	"github.com/ricardoraposo/gopherbank/models"
+)
 
 type AccountStore interface {
 	CreateAccount(*models.Account) (*models.Account, error)
@@ -16,9 +20,10 @@ func NewAccountStore(store *Store) AccountStore {
 }
 
 func (a *accountStore) CreateAccount(acc *models.Account) (*models.Account, error) {
-	query := "INSERT INTO accounts (first_name, last_name, balance) VALUES (?, ?, ?)"
+	query := `INSERT INTO accounts (first_name, last_name, password, number)
+    VALUES (?, ?, ?, ?)`
 
-	_, err := a.store.db.Exec(query, acc.FirstName, acc.LastName, acc.Balance)
+	_, err := a.store.db.Exec(query, acc.FirstName, acc.LastName, acc.Password, acc.Number)
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +39,21 @@ func (a *accountStore) GetAllAccounts() ([]*models.Account, error) {
 
 	accounts := []*models.Account{}
 	for rows.Next() {
-		var account models.Account
-		err := rows.Scan(&account.ID, &account.FirstName, &account.LastName, &account.Balance, &account.CreatedAt, &account.Admin)
+        account, err := scanRow(rows)
 		if err != nil {
 			return nil, err
 		}
-		accounts = append(accounts, &account)
+		accounts = append(accounts, account)
 	}
 
 	return accounts, nil
+}
+
+func scanRow(row *sql.Rows) (*models.Account, error) {
+	var account models.Account
+	err := row.Scan(&account.ID, &account.FirstName, &account.LastName, &account.Number, &account.Password, &account.Balance, &account.CreatedAt, &account.Admin)
+	if err != nil {
+		return nil, err
+	}
+	return &account, nil
 }
