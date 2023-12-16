@@ -45,3 +45,21 @@ func (a *AccountHandler) GetAllAccounts(c *fiber.Ctx) error {
 
 	return c.Status(http.StatusOK).JSON(accounts)
 }
+
+func (a *AccountHandler) GetAccountByNumber(c *fiber.Ctx) error {
+	number := c.Params("id")
+	acc, err := a.store.GetAccountByNumber(number)
+	if err != nil {
+		return err
+	}
+	return c.JSON(acc)
+}
+
+func (a *AccountHandler) DeleteAccount(c *fiber.Ctx) error {
+	number := c.Params("id")
+	if err := a.store.DeleteAccount(number); err != nil {
+		return err
+	}
+
+	return c.JSON(map[string]string{"Message": "Account removed successfully"})
+}

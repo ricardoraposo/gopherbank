@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/ricardoraposo/gopherbank/models"
 )
@@ -9,6 +10,8 @@ import (
 type AccountStore interface {
 	CreateAccount(*models.Account) (*models.Account, error)
 	GetAllAccounts() ([]*models.Account, error)
+	GetAccountByNumber(number string) (*models.Account, error)
+	DeleteAccount(number string) error
 }
 
 type accountStore struct {
@@ -31,6 +34,20 @@ func (a *accountStore) CreateAccount(acc *models.Account) (*models.Account, erro
 	return acc, nil
 }
 
+func (a *accountStore) GetAccountByNumber(number string) (*models.Account, error) {
+	res, err := a.store.db.Query("SELECT * FROM accounts WHERE number = ?", number)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Close()
+
+	for res.Next() {
+		return scanRow(res)
+	}
+
+	return nil, fmt.Errorf(fmt.Sprintf("Account number %s not found", number))
+}
+
 func (a *accountStore) GetAllAccounts() ([]*models.Account, error) {
 	rows, err := a.store.db.Query("SELECT * FROM accounts")
 	if err != nil {
@@ -39,7 +56,7 @@ func (a *accountStore) GetAllAccounts() ([]*models.Account, error) {
 
 	accounts := []*models.Account{}
 	for rows.Next() {
-        account, err := scanRow(rows)
+		account, err := scanRow(rows)
 		if err != nil {
 			return nil, err
 		}
@@ -47,6 +64,23 @@ func (a *accountStore) GetAllAccounts() ([]*models.Account, error) {
 	}
 
 	return accounts, nil
+}
+
+func (a *accountStore) DeleteAccount (number string) error {
+    res, err := a.store.db.Exec("DELETE FROM accounts WHERE number = ?", number)
+    if err != nil {
+        return err
+    }
+
+    rows, err := res.RowsAffected()
+    if err != nil {
+        return err
+    }
+    if rows < 1 {
+        return fmt.Errorf("Account %s not found", number)
+    }
+
+    return nil
 }
 
 func scanRow(row *sql.Rows) (*models.Account, error) {

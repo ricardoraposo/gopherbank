@@ -16,8 +16,11 @@ func (s *FiberServer) RegisterRoutes() {
 
 	api := s.App.Group("/api")
 
+    // accounts routes
 	api.Get("/accounts", accountsHandler.GetAllAccounts)
+	api.Get("/accounts/:id", accountsHandler.GetAccountByNumber)
 	api.Post("/accounts", accountsHandler.CreateAccount)
+    api.Delete("/accounts/:id", accountsHandler.DeleteAccount)
 
 	s.Get("/health", s.getHealth)
 }
