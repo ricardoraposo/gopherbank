@@ -1,9 +1,7 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/ricardoraposo/gopherbank/internal/database"
@@ -20,21 +18,29 @@ func NewAccountHandler(store database.AccountStore) *AccountHandler {
 }
 
 func (a *AccountHandler) CreateAccount(c *fiber.Ctx) error {
-	var account models.Account
+	var account models.NewAccountParams
 	if err := c.BodyParser(&account); err != nil {
 		return err
 	}
 
+	if err := account.Validate(); err != nil {
+		return err
+	}
+
 	num := utils.GenerateAccountNumber()
-	fmt.Println(num)
-	account.Number = num
-	acc, err := a.store.CreateAccount(&account)
+	encryptedPassword, err := utils.EncryptPassword(account.Password)
 	if err != nil {
 		return err
 	}
 
-	account.CreatedAt = time.Now()
-	return c.JSON(acc)
+	account.Number = num
+	account.Password = encryptedPassword
+
+	if err := a.store.CreateAccount(&account); err != nil {
+		return err
+	}
+
+	return c.JSON(account)
 }
 
 func (a *AccountHandler) GetAllAccounts(c *fiber.Ctx) error {

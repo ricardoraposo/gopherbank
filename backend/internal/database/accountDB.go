@@ -8,7 +8,7 @@ import (
 )
 
 type AccountStore interface {
-	CreateAccount(*models.Account) (*models.Account, error)
+	CreateAccount(*models.NewAccountParams) error
 	GetAllAccounts() ([]*models.Account, error)
 	GetAccountByNumber(number string) (*models.Account, error)
 	DeleteAccount(number string) error
@@ -22,16 +22,16 @@ func NewAccountStore(store *Store) AccountStore {
 	return &accountStore{store: store}
 }
 
-func (a *accountStore) CreateAccount(acc *models.Account) (*models.Account, error) {
+func (a *accountStore) CreateAccount(acc *models.NewAccountParams) error {
 	query := `INSERT INTO accounts (first_name, last_name, password, number)
     VALUES (?, ?, ?, ?)`
 
 	_, err := a.store.db.Exec(query, acc.FirstName, acc.LastName, acc.Password, acc.Number)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return acc, nil
+	return nil
 }
 
 func (a *accountStore) GetAccountByNumber(number string) (*models.Account, error) {
@@ -66,21 +66,21 @@ func (a *accountStore) GetAllAccounts() ([]*models.Account, error) {
 	return accounts, nil
 }
 
-func (a *accountStore) DeleteAccount (number string) error {
-    res, err := a.store.db.Exec("DELETE FROM accounts WHERE number = ?", number)
-    if err != nil {
-        return err
-    }
+func (a *accountStore) DeleteAccount(number string) error {
+	res, err := a.store.db.Exec("DELETE FROM accounts WHERE number = ?", number)
+	if err != nil {
+		return err
+	}
 
-    rows, err := res.RowsAffected()
-    if err != nil {
-        return err
-    }
-    if rows < 1 {
-        return fmt.Errorf("Account %s not found", number)
-    }
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows < 1 {
+		return fmt.Errorf("Account %s not found", number)
+	}
 
-    return nil
+	return nil
 }
 
 func scanRow(row *sql.Rows) (*models.Account, error) {
