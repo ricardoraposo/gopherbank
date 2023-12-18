@@ -56,11 +56,10 @@ func (h *AuthHandler) Authenticate(c *fiber.Ctx) error {
 }
 
 func createTokenFromUser(user *models.Account) string {
-	expires := time.Now().Add(time.Hour * 4).Unix()
 	claims := jwt.MapClaims{
 		"number":  user.Number,
 		"admin":   user.Admin,
-		"expires": expires,
+		"expires": time.Now().Add(time.Hour * 4).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

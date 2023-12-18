@@ -17,6 +17,7 @@ func (s *FiberServer) RegisterRoutes() {
 	authHandler := handlers.NewAuthHandler(accountStore)
 
 	api := s.App.Group("/api")
+	api.Use(middlewares.JWTAuthentication)
 
 	// accounts routes
 	api.Get("/accounts", accountsHandler.GetAllAccounts)
@@ -24,8 +25,9 @@ func (s *FiberServer) RegisterRoutes() {
 	api.Post("/accounts", middlewares.ValidateNewAccountParams, accountsHandler.CreateAccount)
 	api.Delete("/accounts/:id", accountsHandler.DeleteAccount)
 
-    //auth routes
-    api.Post("/auth", authHandler.Authenticate)
+	//auth routes
+	auth := s.App.Group("/auth")
+	auth.Post("/", authHandler.Authenticate)
 
 	s.Get("/health", s.getHealth)
 }

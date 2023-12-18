@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -44,6 +45,9 @@ func (a *AccountHandler) GetAllAccounts(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
+
+	claims := c.Context().Value("claims")
+	fmt.Println(claims)
 
 	return c.Status(http.StatusOK).JSON(accounts)
 }
