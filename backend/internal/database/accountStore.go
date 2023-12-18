@@ -12,6 +12,8 @@ type AccountStore interface {
 	GetAllAccounts() ([]*models.Account, error)
 	GetAccountByNumber(number string) (*models.Account, error)
 	DeleteAccount(number string) error
+	AddToAccount(number string, amount float64) error
+	RemoveFromAccount(number string, amount float64) error
 }
 
 type accountStore struct {
@@ -20,6 +22,42 @@ type accountStore struct {
 
 func NewAccountStore(store *Store) AccountStore {
 	return &accountStore{store: store}
+}
+
+func (a *accountStore) AddToAccount(number string, amount float64) error {
+	query := `UPDATE accounts SET balance = balance + ? WHERE number = ?`
+	res, err := a.store.db.Exec(query, amount, number)
+	if err != nil {
+		return err
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows < 1 {
+		return fmt.Errorf("Account %s not found", number)
+	}
+
+	return nil
+}
+
+func (a *accountStore) RemoveFromAccount(number string, amount float64) error {
+    query := `UPDATE accounts SET balance = balance - ? WHERE number = ?`
+    res, err := a.store.db.Exec(query, amount, number)
+    if err != nil {
+        return err
+    }
+
+    rows, err := res.RowsAffected()
+    if err != nil {
+        return err
+    }
+    if rows < 1 {
+        return fmt.Errorf("Account %s not found", number)
+    }
+
+    return nil
 }
 
 func (a *accountStore) CreateAccount(acc *models.NewAccountParams) error {

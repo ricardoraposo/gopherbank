@@ -6,18 +6,18 @@ import (
 
 type Account struct {
 	ID        int       `json:"-"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
+	FirstName string    `json:"firstName"`
+	LastName  string    `json:"lastName"`
 	Number    string    `json:"number"`
 	Password  string    `json:"password"`
 	Balance   float64   `json:"balance"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
 	Admin     bool      `json:"-"`
 }
 
 type NewAccountParams struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
 	Password  string `json:"password"`
 	Number    string `json:"number"`
 }
