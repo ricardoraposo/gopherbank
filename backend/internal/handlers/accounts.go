@@ -23,10 +23,6 @@ func (a *AccountHandler) CreateAccount(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := account.Validate(); err != nil {
-		return err
-	}
-
 	num := utils.GenerateAccountNumber()
 	encryptedPassword, err := utils.EncryptPassword(account.Password)
 	if err != nil {

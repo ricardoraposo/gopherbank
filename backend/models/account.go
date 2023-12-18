@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"github.com/go-playground/validator/v10"
 )
 
 type Account struct {
@@ -18,13 +16,8 @@ type Account struct {
 }
 
 type NewAccountParams struct {
-	FirstName string `json:"first_name" validate:"required"`
-	LastName  string `json:"last_name" validate:"required"`
-	Password  string `json:"password" validate:"required,min=8"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Password  string `json:"password"`
 	Number    string `json:"number"`
-}
-
-func (a *NewAccountParams) Validate() error {
-    validate := validator.New()
-    return validate.Struct(a)
 }
