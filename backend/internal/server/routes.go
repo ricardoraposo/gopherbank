@@ -28,7 +28,8 @@ func (s *FiberServer) RegisterRoutes() {
 	api.Delete("/accounts/:id", accountsHandler.DeleteAccount)
 
     // transactions routes
-    api.Post("/transactions", transactionHandler.CreateTransaction)
+    api.Post("/transfer", transactionHandler.Transfer)
+    api.Post("/deposit", transactionHandler.Deposit)
 
 	//auth routes
 	auth := s.App.Group("/auth")

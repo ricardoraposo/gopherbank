@@ -13,7 +13,7 @@ CREATE TABLE transactions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     amount DECIMAL(10, 2) NOT NULL,
     transfered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    from_account_number VARCHAR(8) NOT NULL,
+    from_account_number VARCHAR(8) DEFAULT null,
     to_account_number VARCHAR(8) NOT NULL,
     FOREIGN KEY (from_account_number) REFERENCES accounts (number),
     FOREIGN KEY (to_account_number) REFERENCES accounts (number)

@@ -14,6 +14,7 @@ type AccountStore interface {
 	DeleteAccount(number string) error
 	AddToAccount(number string, amount float64) error
 	RemoveFromAccount(number string, amount float64) error
+    Transfer(from, to string, amount float64) error
 }
 
 type accountStore struct {
@@ -22,6 +23,27 @@ type accountStore struct {
 
 func NewAccountStore(store *Store) AccountStore {
 	return &accountStore{store: store}
+}
+
+func (a *accountStore) Transfer(from, to string, amount float64) error {
+    tx, err := a.store.db.Begin()
+    if err != nil {
+        return err
+    }
+
+    err = a.RemoveFromAccount(from, amount)
+    if err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    err = a.AddToAccount(to, amount)
+    if err != nil {
+        tx.Rollback()
+        return err
+    }
+
+    return tx.Commit()
 }
 
 func (a *accountStore) AddToAccount(number string, amount float64) error {
@@ -43,21 +65,21 @@ func (a *accountStore) AddToAccount(number string, amount float64) error {
 }
 
 func (a *accountStore) RemoveFromAccount(number string, amount float64) error {
-    query := `UPDATE accounts SET balance = balance - ? WHERE number = ?`
-    res, err := a.store.db.Exec(query, amount, number)
-    if err != nil {
-        return err
-    }
+	query := `UPDATE accounts SET balance = balance - ? WHERE number = ?`
+	res, err := a.store.db.Exec(query, amount, number)
+	if err != nil {
+		return fmt.Errorf("Not enough funds to conclude transaction")
+	}
 
-    rows, err := res.RowsAffected()
-    if err != nil {
-        return err
-    }
-    if rows < 1 {
-        return fmt.Errorf("Account %s not found", number)
-    }
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows < 1 {
+		return fmt.Errorf("Account %s not found", number)
+	}
 
-    return nil
+	return nil
 }
 
 func (a *accountStore) CreateAccount(acc *models.NewAccountParams) error {

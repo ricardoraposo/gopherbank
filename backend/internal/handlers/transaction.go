@@ -14,15 +14,28 @@ func NewTransactionHandler(store database.TransactionStore) *TransactionHandler 
 	return &TransactionHandler{store: store}
 }
 
-func (h *TransactionHandler) CreateTransaction(c *fiber.Ctx) error {
-	params := &models.TransactionParams{}
+func (h *TransactionHandler) Transfer(c *fiber.Ctx) error {
+	params := &models.TransferParams{}
 	if err := c.BodyParser(params); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse request body")
 	}
 
-	if err := h.store.CreateTransaction(params); err != nil {
+	if err := h.store.CreateTransferTransaction(params); err != nil {
 		return err
 	}
 
-	return c.JSON(fiber.Map{"message": "Transaction ocurred successfully"})
+	return c.JSON(fiber.Map{"message": "Transfer ocurred successfully"})
+}
+
+func (h *TransactionHandler) Deposit(c *fiber.Ctx) error {
+	params := &models.DepositParams{}
+	if err := c.BodyParser(params); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse request body")
+	}
+
+	if err := h.store.CreateDepositTransaction(params); err != nil {
+		return err
+	}
+
+	return c.JSON(fiber.Map{"message": "Deposit ocurred successfully"})
 }

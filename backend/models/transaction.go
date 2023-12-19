@@ -8,8 +8,18 @@ type Transaction struct {
 	ToAccountNumber   string  `json:"toAccountNumber"`
 }
 
-type TransactionParams struct {
+type TransferParams struct {
 	FromAccountNumber string  `json:"fromAccountNumber"`
+	ToAccountNumber   string  `json:"toAccountNumber"`
+	Amount            float64 `json:"amount"`
+}
+
+type DepositParams struct {
+	ToAccountNumber   string  `json:"toAccountNumber"`
+	Amount            float64 `json:"amount"`
+}
+
+type WithdrawParams struct {
 	ToAccountNumber   string  `json:"toAccountNumber"`
 	Amount            float64 `json:"amount"`
 }
