@@ -15,11 +15,11 @@ type TransferParams struct {
 }
 
 type DepositParams struct {
-	ToAccountNumber   string  `json:"toAccountNumber"`
-	Amount            float64 `json:"amount"`
+	ToAccountNumber string  `json:"toAccountNumber"`
+	Amount          float64 `json:"amount"`
 }
 
 type WithdrawParams struct {
-	ToAccountNumber   string  `json:"toAccountNumber"`
-	Amount            float64 `json:"amount"`
+	FromAccountNumber string  `json:"toAccountNumber"`
+	Amount          float64 `json:"amount"`
 }
