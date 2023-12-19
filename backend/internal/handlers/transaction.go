@@ -39,3 +39,16 @@ func (h *TransactionHandler) Deposit(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"message": "Deposit ocurred successfully"})
 }
+
+func (h *TransactionHandler) Withdraw(c *fiber.Ctx) error {
+	params := &models.WithdrawParams{}
+	if err := c.BodyParser(params); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse request body")
+	}
+
+	if err := h.store.CreateWithdrawTransaction(params); err != nil {
+		return err
+	}
+
+    return c.JSON(fiber.Map{"message": "Withdraw ocurred successfully"})
+}

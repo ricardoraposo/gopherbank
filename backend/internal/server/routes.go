@@ -30,6 +30,7 @@ func (s *FiberServer) RegisterRoutes() {
     // transactions routes
     api.Post("/transfer", transactionHandler.Transfer)
     api.Post("/deposit", transactionHandler.Deposit)
+    api.Post("/withdraw", transactionHandler.Withdraw)
 
 	//auth routes
 	auth := s.App.Group("/auth")
