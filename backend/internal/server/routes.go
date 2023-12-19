@@ -22,7 +22,7 @@ func (s *FiberServer) RegisterRoutes() {
 	api.Use(middlewares.JWTAuthentication)
 
 	// accounts routes
-	api.Get("/accounts", accountsHandler.GetAllAccounts)
+	api.Get("/accounts", middlewares.IsAdmin, accountsHandler.GetAllAccounts)
 	api.Get("/accounts/:id", accountsHandler.GetAccountByNumber)
 	api.Post("/accounts", middlewares.ValidateNewAccountParams, accountsHandler.CreateAccount)
 	api.Delete("/accounts/:id", accountsHandler.DeleteAccount)

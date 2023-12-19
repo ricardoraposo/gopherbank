@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt"
 	"github.com/ricardoraposo/gopherbank/internal/database"
 	"github.com/ricardoraposo/gopherbank/internal/utils"
 	"github.com/ricardoraposo/gopherbank/models"
@@ -54,6 +55,17 @@ func (a *AccountHandler) GetAllAccounts(c *fiber.Ctx) error {
 
 func (a *AccountHandler) GetAccountByNumber(c *fiber.Ctx) error {
 	number := c.Params("id")
+    
+    claims, ok := c.Context().Value("claims").(jwt.MapClaims)
+    if !ok {
+        return fiber.NewError(fiber.StatusUnauthorized, "Failed to parse token")
+    }
+
+    if claims["number"] != number {
+        return fiber.NewError(fiber.StatusUnauthorized, "Not enough credentials")
+    }
+
+
 	acc, err := a.store.GetAccountByNumber(number)
 	if err != nil {
 		return err
