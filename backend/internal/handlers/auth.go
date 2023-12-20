@@ -7,7 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/ricardoraposo/gopherbank/internal/database"
+	"github.com/ricardoraposo/gopherbank/internal/db"
 	"github.com/ricardoraposo/gopherbank/internal/utils"
 	"github.com/ricardoraposo/gopherbank/models"
 
@@ -20,15 +20,15 @@ type AuthParams struct {
 }
 
 type AuthResponse struct {
-	Account *models.Account `json:"number"`
+	Account *models.DisplayAccount `json:"number"`
 	Token   string          `json:"token"`
 }
 
 type AuthHandler struct {
-	store database.AccountStore
+	store db.AccountDB
 }
 
-func NewAuthHandler(store database.AccountStore) *AuthHandler {
+func NewAuthHandler(store db.AccountDB) *AuthHandler {
 	return &AuthHandler{store: store}
 }
 
@@ -55,7 +55,7 @@ func (h *AuthHandler) Authenticate(c *fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
-func createTokenFromUser(user *models.Account) string {
+func createTokenFromUser(user *models.DisplayAccount) string {
 	claims := jwt.MapClaims{
 		"number":  user.Number,
 		"admin":   user.Admin,

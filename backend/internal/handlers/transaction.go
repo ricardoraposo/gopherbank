@@ -1,19 +1,17 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/ricardoraposo/gopherbank/internal/database"
+	"github.com/ricardoraposo/gopherbank/internal/db"
 	"github.com/ricardoraposo/gopherbank/models"
 )
 
 type TransactionHandler struct {
-	store database.TransactionStore
+	store db.TransactionDB
 }
 
-func NewTransactionHandler(store database.TransactionStore) *TransactionHandler {
+func NewTransactionHandler(store db.TransactionDB) *TransactionHandler {
 	return &TransactionHandler{store: store}
 }
 
@@ -28,11 +26,11 @@ func (h *TransactionHandler) Transfer(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "Failed to parse token")
 	}
 
-    fmt.Println("claims", claims)
 	if claims["number"] != params.FromAccountNumber {
 		return fiber.NewError(fiber.StatusUnauthorized, "Not enough credentials")
 	}
 
+	params.Type = "transfer"
 	if err := h.store.CreateTransferTransaction(params); err != nil {
 		return err
 	}
@@ -46,6 +44,7 @@ func (h *TransactionHandler) Deposit(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse request body")
 	}
 
+	params.Type = "deposit"
 	if err := h.store.CreateDepositTransaction(params); err != nil {
 		return err
 	}
@@ -68,6 +67,7 @@ func (h *TransactionHandler) Withdraw(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "Not enough credentials")
 	}
 
+	params.Type = "withdraw"
 	if err := h.store.CreateWithdrawTransaction(params); err != nil {
 		return err
 	}

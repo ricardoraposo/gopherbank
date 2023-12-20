@@ -2,17 +2,17 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/ricardoraposo/gopherbank/internal/database"
+	"github.com/ricardoraposo/gopherbank/internal/db"
 )
 
 type FiberServer struct {
 	*fiber.App
-	db *database.Store
+	db *db.DB
 }
 
 func New() *FiberServer {
 	return &FiberServer{
 		App: fiber.New(),
-		db:  database.New(),
+		db:  db.New(),
 	}
 }

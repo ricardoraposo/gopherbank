@@ -1,4 +1,4 @@
-package database
+package db
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
-type Store struct {
+type DB struct {
 	db *sql.DB
 }
 
@@ -24,16 +24,16 @@ var (
 	host     = os.Getenv("DB_HOST")
 )
 
-func New() *Store {
+func New() *DB {
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", username, password, host, dbport, dbname))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &Store{db}
+	return &DB{db}
 }
 
-func (s *Store) Health() map[string]string {
+func (s *DB) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
