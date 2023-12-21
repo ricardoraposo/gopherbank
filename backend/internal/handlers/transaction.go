@@ -11,8 +11,9 @@ type TransactionHandler struct {
 	store db.TransactionDB
 }
 
-func NewTransactionHandler(store db.TransactionDB) *TransactionHandler {
-	return &TransactionHandler{store: store}
+func NewTransactionHandler(client *db.DB) *TransactionHandler {
+	transactionDB := db.NewTransactionDB(client)
+	return &TransactionHandler{store: transactionDB}
 }
 
 func (h *TransactionHandler) Transfer(c *fiber.Ctx) error {

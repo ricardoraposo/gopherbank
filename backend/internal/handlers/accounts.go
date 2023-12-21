@@ -16,7 +16,9 @@ type AccountHandler struct {
 	userDB    db.UserDB
 }
 
-func NewAccountHandler(accountDB db.AccountDB, userDB db.UserDB) *AccountHandler {
+func NewAccountHandler(client *db.DB) *AccountHandler {
+    accountDB := db.NewAccountStore(client)
+    userDB := db.NewUserDB(client)
 	return &AccountHandler{
 		accountDB: accountDB,
 		userDB:    userDB,

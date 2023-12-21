@@ -13,8 +13,9 @@ type transactionDB struct {
 	accountStore AccountDB
 }
 
-func NewTransactionStore(store *DB, accountDB AccountDB) TransactionDB {
-	return &transactionDB{store, accountDB}
+func NewTransactionDB(client *DB) TransactionDB {
+    accountDB := NewAccountStore(client)
+	return &transactionDB{client, accountDB}
 }
 
 func (t *transactionDB) CreateTransferTransaction(params *models.TransferParams) error {

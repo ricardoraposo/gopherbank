@@ -28,8 +28,9 @@ type AuthHandler struct {
 	store db.AccountDB
 }
 
-func NewAuthHandler(store db.AccountDB) *AuthHandler {
-	return &AuthHandler{store: store}
+func NewAuthHandler(client *db.DB) *AuthHandler {
+    accountDB := db.NewAccountStore(client)
+	return &AuthHandler{store: accountDB}
 }
 
 func (h *AuthHandler) Authenticate(c *fiber.Ctx) error {

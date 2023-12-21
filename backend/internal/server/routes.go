@@ -2,7 +2,6 @@ package server
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/ricardoraposo/gopherbank/internal/db"
 	"github.com/ricardoraposo/gopherbank/internal/handlers"
 	"github.com/ricardoraposo/gopherbank/internal/middlewares"
 )
@@ -12,15 +11,10 @@ func (s *FiberServer) getHealth(c *fiber.Ctx) error {
 }
 
 func (s *FiberServer) RegisterRoutes() {
-    // db stores
-	accountDB := db.NewAccountStore(s.db)
-	userDB := db.NewUserDB(s.db)
-	transactionDB := db.NewTransactionStore(s.db, accountDB)
-
-    // handlers
-	accountsHandler := handlers.NewAccountHandler(accountDB, userDB)
-	transactionHandler := handlers.NewTransactionHandler(transactionDB)
-	authHandler := handlers.NewAuthHandler(accountDB)
+	// handlers
+	accountsHandler := handlers.NewAccountHandler(s.db)
+	transactionHandler := handlers.NewTransactionHandler(s.db)
+	authHandler := handlers.NewAuthHandler(s.db)
 
 	api := s.App.Group("/api")
 	api.Use(middlewares.JWTAuthentication)
@@ -38,7 +32,7 @@ func (s *FiberServer) RegisterRoutes() {
 	auth.Post("/", authHandler.Authenticate)
 	auth.Post("/new", middlewares.ValidateNewAccountParams, accountsHandler.CreateAccount)
 
-    // admin routes
+	// admin routes
 	api.Get("/accounts", middlewares.IsAdmin, accountsHandler.GetAllAccounts)
 	api.Post("/deposit", middlewares.IsAdmin, transactionHandler.Deposit)
 
