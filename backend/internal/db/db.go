@@ -9,14 +9,14 @@ import (
 )
 
 type DB struct {
-	db *ent.Client
+	client *ent.Client
 }
 
 func New() *DB {
-	db, err := ent.Open("mysql", c.ConnString())
+	client, err := ent.Open("mysql", c.ConnString())
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &DB{db}
+	return &DB{client}
 }

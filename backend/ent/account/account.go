@@ -45,6 +45,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultBalance holds the default value on creation for the "balance" field.
+	DefaultBalance float64
 	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultAdmin holds the default value on creation for the "admin" field.

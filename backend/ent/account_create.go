@@ -32,6 +32,14 @@ func (ac *AccountCreate) SetBalance(f float64) *AccountCreate {
 	return ac
 }
 
+// SetNillableBalance sets the "balance" field if the given value is not nil.
+func (ac *AccountCreate) SetNillableBalance(f *float64) *AccountCreate {
+	if f != nil {
+		ac.SetBalance(*f)
+	}
+	return ac
+}
+
 // SetCreatedAt sets the "createdAt" field.
 func (ac *AccountCreate) SetCreatedAt(t time.Time) *AccountCreate {
 	ac.mutation.SetCreatedAt(t)
@@ -101,6 +109,10 @@ func (ac *AccountCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ac *AccountCreate) defaults() {
+	if _, ok := ac.mutation.Balance(); !ok {
+		v := account.DefaultBalance
+		ac.mutation.SetBalance(v)
+	}
 	if _, ok := ac.mutation.CreatedAt(); !ok {
 		v := account.DefaultCreatedAt()
 		ac.mutation.SetCreatedAt(v)

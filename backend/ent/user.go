@@ -16,7 +16,7 @@ import (
 type User struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID string `json:"account"`
 	// FirstName holds the value of the "first_name" field.
 	FirstName string `json:"first_name"`
 	// LastName holds the value of the "last_name" field.
@@ -33,7 +33,7 @@ type User struct {
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
 	// Account holds the value of the account edge.
-	Account *Account `json:"account"`
+	Account *Account `json:"account,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -57,9 +57,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID:
-			values[i] = new(sql.NullInt64)
-		case user.FieldFirstName, user.FieldLastName, user.FieldEmail:
+		case user.FieldID, user.FieldFirstName, user.FieldLastName, user.FieldEmail:
 			values[i] = new(sql.NullString)
 		case user.ForeignKeys[0]: // user_account
 			values[i] = new(sql.NullString)
@@ -79,11 +77,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case user.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value.Valid {
+				u.ID = value.String
 			}
-			u.ID = int(value.Int64)
 		case user.FieldFirstName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field first_name", values[i])

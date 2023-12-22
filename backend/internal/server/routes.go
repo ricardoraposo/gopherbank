@@ -2,28 +2,31 @@ package server
 
 import (
 	"github.com/ricardoraposo/gopherbank/internal/handlers"
+	"github.com/ricardoraposo/gopherbank/internal/middlewares"
 )
 
 func (s *FiberServer) RegisterRoutes() {
 	// handlers
 	accountsHandler := handlers.NewAccountHandler(s.db)
 	// transactionHandler := handlers.NewTransactionHandler(s.db)
-	// authHandler := handlers.NewAuthHandler(s.db)
+	authHandler := handlers.NewAuthHandler(s.db)
 
 	api := s.App.Group("/api")
-	// api.Use(middlewares.JWTAuthentication)
+	api.Use(middlewares.JWTAuthentication)
 
 	// accounts routes
 	api.Get("/accounts/:id", accountsHandler.GetAccountByNumber)
-	// api.Delete("/accounts/:id", accountsHandler.DeleteAccount)
-	//
-	// // transactions routes
+	api.Get("accounts", accountsHandler.GetAllAccounts)
+	api.Delete("/accounts/:id", accountsHandler.DeleteAccount)
+	
+	// transactions routes
 	// api.Post("/transfer", transactionHandler.Transfer)
 	// api.Post("/withdraw", transactionHandler.Withdraw)
 	//
-	// // auth routes
-	// auth := s.App.Group("/auth")
-	// auth.Post("/", authHandler.Authenticate)
+	// auth routes
+	auth := s.App.Group("/auth")
+	auth.Post("/", authHandler.Authenticate)
+	auth.Post("/new", accountsHandler.CreateAccount)
 	// auth.Post("/new", middlewares.ValidateNewAccountParams, accountsHandler.CreateAccount)
 	//
 	// // admin routes

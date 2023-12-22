@@ -17,6 +17,10 @@ import (
 func init() {
 	accountFields := schema.Account{}.Fields()
 	_ = accountFields
+	// accountDescBalance is the schema descriptor for balance field.
+	accountDescBalance := accountFields[2].Descriptor()
+	// account.DefaultBalance holds the default value on creation for the balance field.
+	account.DefaultBalance = accountDescBalance.Default.(float64)
 	// accountDescCreatedAt is the schema descriptor for createdAt field.
 	accountDescCreatedAt := accountFields[3].Descriptor()
 	// account.DefaultCreatedAt holds the default value on creation for the createdAt field.
@@ -38,11 +42,11 @@ func init() {
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescFirstName is the schema descriptor for first_name field.
-	userDescFirstName := userFields[0].Descriptor()
+	userDescFirstName := userFields[1].Descriptor()
 	// user.FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
 	user.FirstNameValidator = userDescFirstName.Validators[0].(func(string) error)
 	// userDescLastName is the schema descriptor for last_name field.
-	userDescLastName := userFields[1].Descriptor()
+	userDescLastName := userFields[2].Descriptor()
 	// user.LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
 	user.LastNameValidator = userDescLastName.Validators[0].(func(string) error)
 }

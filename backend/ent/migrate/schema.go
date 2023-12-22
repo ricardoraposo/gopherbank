@@ -12,7 +12,7 @@ var (
 	AccountsColumns = []*schema.Column{
 		{Name: "number", Type: field.TypeString, Unique: true},
 		{Name: "password", Type: field.TypeString},
-		{Name: "balance", Type: field.TypeFloat64},
+		{Name: "balance", Type: field.TypeFloat64, Default: 0},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "admin", Type: field.TypeBool, Default: false},
 	}
@@ -71,11 +71,10 @@ var (
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "user_account", Type: field.TypeString},
 		{Name: "first_name", Type: field.TypeString, Size: 50},
 		{Name: "last_name", Type: field.TypeString, Size: 50},
 		{Name: "email", Type: field.TypeString},
-		{Name: "user_account", Type: field.TypeString, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -85,9 +84,9 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "users_accounts_account",
-				Columns:    []*schema.Column{UsersColumns[4]},
+				Columns:    []*schema.Column{UsersColumns[0]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
