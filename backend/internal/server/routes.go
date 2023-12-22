@@ -8,7 +8,7 @@ import (
 func (s *FiberServer) RegisterRoutes() {
 	// handlers
 	accountsHandler := handlers.NewAccountHandler(s.db)
-	// transactionHandler := handlers.NewTransactionHandler(s.db)
+	transactionHandler := handlers.NewTransactionHandler(s.db)
 	authHandler := handlers.NewAuthHandler(s.db)
 
 	api := s.App.Group("/api")
@@ -18,11 +18,12 @@ func (s *FiberServer) RegisterRoutes() {
 	api.Get("/accounts/:id", accountsHandler.GetAccountByNumber)
 	api.Get("accounts", accountsHandler.GetAllAccounts)
 	api.Delete("/accounts/:id", accountsHandler.DeleteAccount)
-	
+
 	// transactions routes
-	// api.Post("/transfer", transactionHandler.Transfer)
-	// api.Post("/withdraw", transactionHandler.Withdraw)
-	//
+	api.Post("/transfer", transactionHandler.Transfer)
+	api.Post("/withdraw", transactionHandler.Withdraw)
+	api.Post("/deposit", transactionHandler.Deposit)
+	
 	// auth routes
 	auth := s.App.Group("/auth")
 	auth.Post("/", authHandler.Authenticate)

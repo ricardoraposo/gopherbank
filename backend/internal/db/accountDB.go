@@ -50,6 +50,7 @@ func (a *accountDB) Transfer(ctx context.Context, from, to string, amount float6
 
 func (a *accountDB) AddToAccount(ctx context.Context, number string, amount float64) error {
 	rows, err := a.store.client.Account.Update().Where(account.ID(number)).AddBalance(amount).Save(ctx)
+    fmt.Println(rows)
 	if err != nil {
 		return err
 	}
