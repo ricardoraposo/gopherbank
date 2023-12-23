@@ -26,5 +26,4 @@ dist-ssr
 
 bin
 .env
-*.http
 data

@@ -1,11 +1,15 @@
 package db
 
-import "github.com/ricardoraposo/gopherbank/models"
+import (
+	"context"
+
+	"github.com/ricardoraposo/gopherbank/models"
+)
 
 type TransactionDB interface {
-	CreateTransferTransaction(params *models.TransferParams) error
-	CreateDepositTransaction(params *models.DepositParams) error
-	CreateWithdrawTransaction(params *models.WithdrawParams) error
+	CreateTransferTransaction(context.Context, *models.TransferParams) error
+	CreateDepositTransaction(context.Context, *models.DepositParams) error
+	CreateWithdrawTransaction(context.Context, *models.WithdrawParams) error
 }
 
 type transactionDB struct {
@@ -14,28 +18,50 @@ type transactionDB struct {
 }
 
 func NewTransactionDB(client *DB) TransactionDB {
-    accountDB := NewAccountStore(client)
+	accountDB := NewAccountStore(client)
 	return &transactionDB{client, accountDB}
 }
 
-func (t *transactionDB) CreateTransferTransaction(params *models.TransferParams) error {
-	if err := t.accountStore.Transfer(params.FromAccountNumber, params.ToAccountNumber, params.Amount); err != nil {
+func (t *transactionDB) CreateTransferTransaction(ctx context.Context, params *models.TransferParams) error {
+	if err := t.accountStore.Transfer(ctx, params.FromAccountNumber, params.ToAccountNumber, params.Amount); err != nil {
 		return err
 	}
 
-	query := "INSERT INTO transactions (from_account_number, to_account_number) VALUES (?, ?)"
-	res, err := t.store.db.Exec(query, params.FromAccountNumber, params.ToAccountNumber)
+	fromAccount, err := t.store.client.Account.Get(ctx, params.FromAccountNumber)
+	if err != nil {
+		return err
+	}
+	toAccount, err := t.store.client.Account.Get(ctx, params.ToAccountNumber)
+	if err != nil {
+		return err
+	}
+	transaction, err := t.store.client.Transaction.Create().SetFromAccount(fromAccount).SetToAccount(toAccount).Save(ctx)
 	if err != nil {
 		return err
 	}
 
-	query = "INSERT INTO transaction_details (transaction_id, amount, type) VALUES (?, ?, ?)"
-	transactionID, err := res.LastInsertId()
+	err = t.store.client.TransactionDetail.Create().SetTransactionID(transaction.ID).SetAmount(params.Amount).SetType(params.Type).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *transactionDB) CreateDepositTransaction(ctx context.Context, params *models.DepositParams) error {
+	if err := t.accountStore.AddToAccount(ctx, params.ToAccountNumber, params.Amount); err != nil {
+		return err
+	}
+
+	toAccount, err := t.store.client.Account.Get(ctx, params.ToAccountNumber)
+	if err != nil {
+		return err
+	}
+	transaction, err := t.store.client.Transaction.Create().SetToAccount(toAccount).Save(ctx)
 	if err != nil {
 		return err
 	}
 
-	_, err = t.store.db.Exec(query, transactionID, params.Amount, params.Type)
+	err = t.store.client.TransactionDetail.Create().SetTransactionID(transaction.ID).SetAmount(params.Amount).SetType(params.Type).Exec(ctx)
 	if err != nil {
 		return err
 	}
@@ -43,48 +69,22 @@ func (t *transactionDB) CreateTransferTransaction(params *models.TransferParams)
 	return nil
 }
 
-func (t *transactionDB) CreateDepositTransaction(params *models.DepositParams) error {
-	if err := t.accountStore.AddToAccount(params.ToAccountNumber, params.Amount); err != nil {
+func (t *transactionDB) CreateWithdrawTransaction(ctx context.Context, params *models.WithdrawParams) error {
+	if err := t.accountStore.RemoveFromAccount(ctx, params.FromAccountNumber, params.Amount); err != nil {
 		return err
 	}
 
-	query := "INSERT INTO transactions (to_account_number) VALUES (?)"
-	res, err := t.store.db.Exec(query, params.ToAccountNumber)
+	fromAccount, err := t.store.client.Account.Get(ctx, params.FromAccountNumber)
 	if err != nil {
 		return err
 	}
 
-	transactionID, err := res.LastInsertId()
+	transaction, err := t.store.client.Transaction.Create().SetFromAccount(fromAccount).Save(ctx)
 	if err != nil {
 		return err
 	}
 
-	query = "INSERT INTO transaction_details (transaction_id, amount, type) VALUES (?, ?, ?)"
-	_, err = t.store.db.Exec(query, transactionID, params.Amount, params.Type)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (t *transactionDB) CreateWithdrawTransaction(params *models.WithdrawParams) error {
-	if err := t.accountStore.RemoveFromAccount(params.FromAccountNumber, params.Amount); err != nil {
-		return err
-	}
-
-	query := "INSERT INTO transactions (from_account_number) VALUES (?)"
-	res, err := t.store.db.Exec(query, params.FromAccountNumber)
-	if err != nil {
-		return err
-	}
-
-	transactionID, err := res.LastInsertId()
-	if err != nil {
-		return err
-	}
-	query = "INSERT INTO transaction_details (transaction_id, amount, type) VALUES (?, ?, ?)"
-	_, err = t.store.db.Exec(query, transactionID, params.Amount, params.Type)
+	err = t.store.client.TransactionDetail.Create().SetTransactionID(transaction.ID).SetAmount(params.Amount).SetType(params.Type).Exec(ctx)
 	if err != nil {
 		return err
 	}

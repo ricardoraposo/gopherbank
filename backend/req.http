@@ -1,0 +1,54 @@
+GET http://localhost:5432/api/accounts
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGlyZXMiOjE3MDM0MjI1MDcsIm51bWJlciI6IjA1ODk4MTU1In0.3ZC95xJg2VJ0Ds2Hl3ErX1yHglXuwBble_5m3KCWc-U
+
+GET http://localhost:5432/api/accounts/05898155
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGlyZXMiOjE3MDM0MjI1MDcsIm51bWJlciI6IjA1ODk4MTU1In0.3ZC95xJg2VJ0Ds2Hl3ErX1yHglXuwBble_5m3KCWc-U
+
+DELETE http://localhost:5432/api/accounts/03483281
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGlyZXMiOjE3MDMzNjg4MjMsIm51bWJlciI6IjAzNDgzMjgxIn0.-HujP6FnEq2Nt2i69LQjlp8lot5q-i4LBx5vkXhho6s
+
+POST http://localhost:5432/auth
+Content-Type: application/json
+
+{
+    "number": "05898155",
+    "password": "eusouumcachorro"
+}
+
+POST http://localhost:5432/auth/new
+Content-Type: application/json
+
+{
+    "firstName": "Benjamin",
+    "lastName": "Raposo",
+    "password": "eusouumcachorro",
+    "email": "benji@rick.com"
+}
+
+POST http://localhost:5432/api/deposit
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGlyZXMiOjE3MDM0MjAyMTYsIm51bWJlciI6IjAzMzA1NzA2In0.vG-gNroL56vKPevptpmrk2RmHVp8z5TnoaJlLjSW7qI
+Content-Type: application/json
+
+{
+    "toAccountNumber": "03305706",
+    "amount": 1000
+}
+
+POST http://localhost:5432/api/withdraw
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGlyZXMiOjE3MDM0MjAyMTYsIm51bWJlciI6IjAzMzA1NzA2In0.vG-gNroL56vKPevptpmrk2RmHVp8z5TnoaJlLjSW7qI
+Content-Type: application/json
+
+{
+    "fromAccountNumber": "03305706",
+    "amount": 10
+}
+
+POST http://localhost:5432/api/transfer
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGlyZXMiOjE3MDM0MjAyMTYsIm51bWJlciI6IjAzMzA1NzA2In0.vG-gNroL56vKPevptpmrk2RmHVp8z5TnoaJlLjSW7qI
+Content-Type: application/json
+
+{
+    "fromAccountNumber": "03305706",
+    "toAccountNumber": "07571829",
+    "amount": 10
+}

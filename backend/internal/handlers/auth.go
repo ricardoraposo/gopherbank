@@ -7,9 +7,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/ricardoraposo/gopherbank/ent"
 	"github.com/ricardoraposo/gopherbank/internal/db"
 	"github.com/ricardoraposo/gopherbank/internal/utils"
-	"github.com/ricardoraposo/gopherbank/models"
 
 	_ "github.com/joho/godotenv/autoload"
 )
@@ -20,8 +20,8 @@ type AuthParams struct {
 }
 
 type AuthResponse struct {
-	Account *models.DisplayAccount `json:"number"`
-	Token   string          `json:"token"`
+	Account *ent.Account `json:"number"`
+	Token   string       `json:"token"`
 }
 
 type AuthHandler struct {
@@ -29,7 +29,7 @@ type AuthHandler struct {
 }
 
 func NewAuthHandler(client *db.DB) *AuthHandler {
-    accountDB := db.NewAccountStore(client)
+	accountDB := db.NewAccountStore(client)
 	return &AuthHandler{store: accountDB}
 }
 
@@ -39,7 +39,7 @@ func (h *AuthHandler) Authenticate(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Invalid request")
 	}
 
-	account, err := h.store.GetAccountByNumber(params.AccountNumber)
+	account, err := h.store.GetAccountByNumber(c.Context(), params.AccountNumber)
 	if err != nil {
 		return fiber.NewError(fiber.StatusNotFound, "Account not found")
 	}
@@ -56,9 +56,9 @@ func (h *AuthHandler) Authenticate(c *fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
-func createTokenFromUser(user *models.DisplayAccount) string {
+func createTokenFromUser(user *ent.Account) string {
 	claims := jwt.MapClaims{
-		"number":  user.Number,
+		"number":  user.ID,
 		"admin":   user.Admin,
 		"expires": time.Now().Add(time.Hour * 24).Unix(),
 	}

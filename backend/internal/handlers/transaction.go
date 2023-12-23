@@ -32,7 +32,7 @@ func (h *TransactionHandler) Transfer(c *fiber.Ctx) error {
 	}
 
 	params.Type = "transfer"
-	if err := h.store.CreateTransferTransaction(params); err != nil {
+	if err := h.store.CreateTransferTransaction(c.Context(), params); err != nil {
 		return err
 	}
 
@@ -46,7 +46,7 @@ func (h *TransactionHandler) Deposit(c *fiber.Ctx) error {
 	}
 
 	params.Type = "deposit"
-	if err := h.store.CreateDepositTransaction(params); err != nil {
+	if err := h.store.CreateDepositTransaction(c.Context(), params); err != nil {
 		return err
 	}
 
@@ -69,7 +69,7 @@ func (h *TransactionHandler) Withdraw(c *fiber.Ctx) error {
 	}
 
 	params.Type = "withdraw"
-	if err := h.store.CreateWithdrawTransaction(params); err != nil {
+	if err := h.store.CreateWithdrawTransaction(c.Context(), params); err != nil {
 		return err
 	}
 
