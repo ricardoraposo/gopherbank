@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -48,7 +49,7 @@ func (a *AccountHandler) CreateAccount(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{"message": "Account created successfully"})
+	return c.JSON(fiber.Map{"message": fmt.Sprintf("Account created successfully with number %s", num)})
 }
 
 func (a *AccountHandler) GetAllAccounts(c *fiber.Ctx) error {

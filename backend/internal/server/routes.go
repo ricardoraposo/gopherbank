@@ -16,21 +16,20 @@ func (s *FiberServer) RegisterRoutes() {
 
 	// accounts routes
 	api.Get("/accounts/:id", accountsHandler.GetAccountByNumber)
-	api.Get("accounts", accountsHandler.GetAllAccounts)
 	api.Delete("/accounts/:id", accountsHandler.DeleteAccount)
+	// api.Get("accounts", accountsHandler.GetAllAccounts)
 
 	// transactions routes
 	api.Post("/transfer", transactionHandler.Transfer)
 	api.Post("/withdraw", transactionHandler.Withdraw)
-	api.Post("/deposit", transactionHandler.Deposit)
-	
+	// api.Post("/deposit", transactionHandler.Deposit)
+
 	// auth routes
 	auth := s.App.Group("/auth")
 	auth.Post("/", authHandler.Authenticate)
-	auth.Post("/new", accountsHandler.CreateAccount)
-	// auth.Post("/new", middlewares.ValidateNewAccountParams, accountsHandler.CreateAccount)
-	//
-	// // admin routes
-	// api.Get("/accounts", middlewares.IsAdmin, accountsHandler.GetAllAccounts)
-	// api.Post("/deposit", middlewares.IsAdmin, transactionHandler.Deposit)
+	auth.Post("/new", middlewares.ValidateNewAccountParams, accountsHandler.CreateAccount)
+	
+	// admin routes
+	api.Get("/accounts", middlewares.IsAdmin, accountsHandler.GetAllAccounts)
+	api.Post("/deposit", middlewares.IsAdmin, transactionHandler.Deposit)
 }
