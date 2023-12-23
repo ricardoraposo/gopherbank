@@ -14,7 +14,7 @@ type AccountDB interface {
 	GetAllAccounts(context.Context) ([]*ent.Account, error)
 	GetAccountByNumber(context.Context, string) (*ent.Account, error)
 	DeleteAccount(context.Context, string) error
-    AddToAccount(ctx context.Context, to string, amount float64) error
+	AddToAccount(ctx context.Context, to string, amount float64) error
 	RemoveFromAccount(ctx context.Context, from string, amount float64) error
 	Transfer(ctx context.Context, from string, to string, amount float64) error
 }
@@ -50,7 +50,6 @@ func (a *accountDB) Transfer(ctx context.Context, from, to string, amount float6
 
 func (a *accountDB) AddToAccount(ctx context.Context, number string, amount float64) error {
 	rows, err := a.store.client.Account.Update().Where(account.ID(number)).AddBalance(amount).Save(ctx)
-    fmt.Println(rows)
 	if err != nil {
 		return err
 	}
@@ -63,13 +62,17 @@ func (a *accountDB) AddToAccount(ctx context.Context, number string, amount floa
 }
 
 func (a *accountDB) RemoveFromAccount(ctx context.Context, number string, amount float64) error {
-	rows, err := a.store.client.Account.Update().Where(account.ID(number)).AddBalance(-amount).Save(ctx)
+	acc, err := a.store.client.Account.Get(ctx, number)
 	if err != nil {
+		return fmt.Errorf("Account %s not found", number)
+	}
+	if acc.Balance-amount < 0 {
 		return fmt.Errorf("Not enough funds to conclude transaction")
 	}
 
-	if rows < 1 {
-		return fmt.Errorf("Account %s not found", number)
+	err = a.store.client.Account.Update().Where(account.ID(number)).AddBalance(-amount).Exec(ctx)
+	if err != nil {
+		return err
 	}
 
 	return nil

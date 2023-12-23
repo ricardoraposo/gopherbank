@@ -49,7 +49,6 @@ func (t *transactionDB) CreateTransferTransaction(ctx context.Context, params *m
 }
 
 func (t *transactionDB) CreateDepositTransaction(ctx context.Context, params *models.DepositParams) error {
-	fmt.Println("params.ToAccountNumber", params.ToAccountNumber)
 	if err := t.accountStore.AddToAccount(ctx, params.ToAccountNumber, params.Amount); err != nil {
 		return err
 	}

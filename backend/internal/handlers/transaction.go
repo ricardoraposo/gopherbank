@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/ricardoraposo/gopherbank/internal/db"
@@ -44,7 +42,6 @@ func (h *TransactionHandler) Transfer(c *fiber.Ctx) error {
 func (h *TransactionHandler) Deposit(c *fiber.Ctx) error {
 	params := &models.DepositParams{}
 	if err := c.BodyParser(params); err != nil {
-        fmt.Println(err)
 		return fiber.NewError(fiber.StatusBadRequest, "Failed to parse request body")
 	}
 

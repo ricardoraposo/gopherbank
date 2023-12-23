@@ -17,7 +17,7 @@ func (Account) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").StorageKey("number").Unique().StructTag(`json:"number"`),
 		field.String("password").StructTag(`json:"password"`),
-		field.Float("balance").Default(0.0).StructTag(`json:"balance"`),
+		field.Float("balance").Default(0).StructTag(`json:"balance"`),
 		field.Time("createdAt").Default(time.Now).Immutable().StructTag(`json:"createdAt"`),
 		field.Bool("admin").Default(false).StructTag(`json:"admin"`),
 	}

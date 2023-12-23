@@ -10,3 +10,7 @@ gen:
 	@echo "Generating..."
 	@go mod tidy
 	@go generate ./ent/
+
+migrate: gen
+	@echo "Migrating..."
+	@go run cmd/migration/migrate.go
