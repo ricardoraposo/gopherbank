@@ -13,4 +13,8 @@ gen:
 
 migrate: gen
 	@echo "Migrating..."
-	@go run cmd/migration/migrate.go
+	@go run cmd/migration/main.go
+
+seed:
+	@echo "Seeding..."
+	@go run cmd/seed/main.go

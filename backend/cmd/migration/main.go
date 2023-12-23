@@ -15,6 +15,7 @@ func main() {
 	}
 
 	ctx := context.Background()
+
 	if err := client.Schema.Create(ctx); err != nil {
 		panic(err)
 	}
