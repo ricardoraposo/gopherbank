@@ -10,11 +10,11 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
-	"github.com/ricardoraposo/gopherbank/ent/transactiondetail"
+	"github.com/ricardoraposo/gopherbank/ent/transactiondetails"
 )
 
-// TransactionDetail is the model entity for the TransactionDetail schema.
-type TransactionDetail struct {
+// TransactionDetails is the model entity for the TransactionDetails schema.
+type TransactionDetails struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"transactionId"`
@@ -25,16 +25,16 @@ type TransactionDetail struct {
 	// TransactedAt holds the value of the "transacted_at" field.
 	TransactedAt time.Time `json:"transactedAt"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the TransactionDetailQuery when eager-loading is set.
-	Edges          TransactionDetailEdges `json:"edges"`
+	// The values are being populated by the TransactionDetailsQuery when eager-loading is set.
+	Edges          TransactionDetailsEdges `json:"edges"`
 	transaction_id *int
 	selectValues   sql.SelectValues
 }
 
-// TransactionDetailEdges holds the relations/edges for other nodes in the graph.
-type TransactionDetailEdges struct {
+// TransactionDetailsEdges holds the relations/edges for other nodes in the graph.
+type TransactionDetailsEdges struct {
 	// Transaction holds the value of the transaction edge.
-	Transaction *Transaction `json:"transactionId"`
+	Transaction *Transaction `json:"transaction,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -42,7 +42,7 @@ type TransactionDetailEdges struct {
 
 // TransactionOrErr returns the Transaction value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e TransactionDetailEdges) TransactionOrErr() (*Transaction, error) {
+func (e TransactionDetailsEdges) TransactionOrErr() (*Transaction, error) {
 	if e.loadedTypes[0] {
 		if e.Transaction == nil {
 			// Edge was loaded but was not found.
@@ -54,19 +54,19 @@ func (e TransactionDetailEdges) TransactionOrErr() (*Transaction, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*TransactionDetail) scanValues(columns []string) ([]any, error) {
+func (*TransactionDetails) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case transactiondetail.FieldAmount:
+		case transactiondetails.FieldAmount:
 			values[i] = new(sql.NullFloat64)
-		case transactiondetail.FieldID:
+		case transactiondetails.FieldID:
 			values[i] = new(sql.NullInt64)
-		case transactiondetail.FieldType:
+		case transactiondetails.FieldType:
 			values[i] = new(sql.NullString)
-		case transactiondetail.FieldTransactedAt:
+		case transactiondetails.FieldTransactedAt:
 			values[i] = new(sql.NullTime)
-		case transactiondetail.ForeignKeys[0]: // transaction_id
+		case transactiondetails.ForeignKeys[0]: // transaction_id
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -76,38 +76,38 @@ func (*TransactionDetail) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the TransactionDetail fields.
-func (td *TransactionDetail) assignValues(columns []string, values []any) error {
+// to the TransactionDetails fields.
+func (td *TransactionDetails) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case transactiondetail.FieldID:
+		case transactiondetails.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			td.ID = int(value.Int64)
-		case transactiondetail.FieldAmount:
+		case transactiondetails.FieldAmount:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field amount", values[i])
 			} else if value.Valid {
 				td.Amount = value.Float64
 			}
-		case transactiondetail.FieldType:
+		case transactiondetails.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				td.Type = value.String
 			}
-		case transactiondetail.FieldTransactedAt:
+		case transactiondetails.FieldTransactedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field transacted_at", values[i])
 			} else if value.Valid {
 				td.TransactedAt = value.Time
 			}
-		case transactiondetail.ForeignKeys[0]:
+		case transactiondetails.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field transaction_id", value)
 			} else if value.Valid {
@@ -121,39 +121,39 @@ func (td *TransactionDetail) assignValues(columns []string, values []any) error 
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the TransactionDetail.
+// Value returns the ent.Value that was dynamically selected and assigned to the TransactionDetails.
 // This includes values selected through modifiers, order, etc.
-func (td *TransactionDetail) Value(name string) (ent.Value, error) {
+func (td *TransactionDetails) Value(name string) (ent.Value, error) {
 	return td.selectValues.Get(name)
 }
 
-// QueryTransaction queries the "transaction" edge of the TransactionDetail entity.
-func (td *TransactionDetail) QueryTransaction() *TransactionQuery {
-	return NewTransactionDetailClient(td.config).QueryTransaction(td)
+// QueryTransaction queries the "transaction" edge of the TransactionDetails entity.
+func (td *TransactionDetails) QueryTransaction() *TransactionQuery {
+	return NewTransactionDetailsClient(td.config).QueryTransaction(td)
 }
 
-// Update returns a builder for updating this TransactionDetail.
-// Note that you need to call TransactionDetail.Unwrap() before calling this method if this TransactionDetail
+// Update returns a builder for updating this TransactionDetails.
+// Note that you need to call TransactionDetails.Unwrap() before calling this method if this TransactionDetails
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (td *TransactionDetail) Update() *TransactionDetailUpdateOne {
-	return NewTransactionDetailClient(td.config).UpdateOne(td)
+func (td *TransactionDetails) Update() *TransactionDetailsUpdateOne {
+	return NewTransactionDetailsClient(td.config).UpdateOne(td)
 }
 
-// Unwrap unwraps the TransactionDetail entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the TransactionDetails entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (td *TransactionDetail) Unwrap() *TransactionDetail {
+func (td *TransactionDetails) Unwrap() *TransactionDetails {
 	_tx, ok := td.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: TransactionDetail is not a transactional entity")
+		panic("ent: TransactionDetails is not a transactional entity")
 	}
 	td.config.driver = _tx.drv
 	return td
 }
 
 // String implements the fmt.Stringer.
-func (td *TransactionDetail) String() string {
+func (td *TransactionDetails) String() string {
 	var builder strings.Builder
-	builder.WriteString("TransactionDetail(")
+	builder.WriteString("TransactionDetails(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", td.ID))
 	builder.WriteString("amount=")
 	builder.WriteString(fmt.Sprintf("%v", td.Amount))
@@ -167,5 +167,5 @@ func (td *TransactionDetail) String() string {
 	return builder.String()
 }
 
-// TransactionDetails is a parsable slice of TransactionDetail.
-type TransactionDetails []*TransactionDetail
+// TransactionDetailsSlice is a parsable slice of TransactionDetails.
+type TransactionDetailsSlice []*TransactionDetails

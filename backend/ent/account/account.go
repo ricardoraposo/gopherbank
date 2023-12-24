@@ -26,12 +26,32 @@ const (
 	EdgeFavoriteds = "favoriteds"
 	// EdgeFavorites holds the string denoting the favorites edge name in mutations.
 	EdgeFavorites = "favorites"
+	// EdgeFromAccount holds the string denoting the from_account edge name in mutations.
+	EdgeFromAccount = "from_account"
+	// EdgeToAccount holds the string denoting the to_account edge name in mutations.
+	EdgeToAccount = "to_account"
+	// TransactionFieldID holds the string denoting the ID field of the Transaction.
+	TransactionFieldID = "id"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
 	// FavoritedsTable is the table that holds the favoriteds relation/edge. The primary key declared below.
 	FavoritedsTable = "account_favorites"
 	// FavoritesTable is the table that holds the favorites relation/edge. The primary key declared below.
 	FavoritesTable = "account_favorites"
+	// FromAccountTable is the table that holds the from_account relation/edge.
+	FromAccountTable = "transactions"
+	// FromAccountInverseTable is the table name for the Transaction entity.
+	// It exists in this package in order to avoid circular dependency with the "transaction" package.
+	FromAccountInverseTable = "transactions"
+	// FromAccountColumn is the table column denoting the from_account relation/edge.
+	FromAccountColumn = "from_account"
+	// ToAccountTable is the table that holds the to_account relation/edge.
+	ToAccountTable = "transactions"
+	// ToAccountInverseTable is the table name for the Transaction entity.
+	// It exists in this package in order to avoid circular dependency with the "transaction" package.
+	ToAccountInverseTable = "transactions"
+	// ToAccountColumn is the table column denoting the to_account relation/edge.
+	ToAccountColumn = "to_account"
 )
 
 // Columns holds all SQL columns for account fields.
@@ -126,6 +146,34 @@ func ByFavorites(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newFavoritesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByFromAccountCount orders the results by from_account count.
+func ByFromAccountCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFromAccountStep(), opts...)
+	}
+}
+
+// ByFromAccount orders the results by from_account terms.
+func ByFromAccount(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFromAccountStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByToAccountCount orders the results by to_account count.
+func ByToAccountCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newToAccountStep(), opts...)
+	}
+}
+
+// ByToAccount orders the results by to_account terms.
+func ByToAccount(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newToAccountStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newFavoritedsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -138,5 +186,19 @@ func newFavoritesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, FavoritesTable, FavoritesPrimaryKey...),
+	)
+}
+func newFromAccountStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FromAccountInverseTable, TransactionFieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, FromAccountTable, FromAccountColumn),
+	)
+}
+func newToAccountStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ToAccountInverseTable, TransactionFieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ToAccountTable, ToAccountColumn),
 	)
 }

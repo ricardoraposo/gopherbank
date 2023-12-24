@@ -7,7 +7,7 @@ import (
 
 	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/ent/schema"
-	"github.com/ricardoraposo/gopherbank/ent/transactiondetail"
+	"github.com/ricardoraposo/gopherbank/ent/transactiondetails"
 	"github.com/ricardoraposo/gopherbank/ent/user"
 )
 
@@ -29,16 +29,16 @@ func init() {
 	accountDescAdmin := accountFields[4].Descriptor()
 	// account.DefaultAdmin holds the default value on creation for the admin field.
 	account.DefaultAdmin = accountDescAdmin.Default.(bool)
-	transactiondetailFields := schema.TransactionDetail{}.Fields()
-	_ = transactiondetailFields
-	// transactiondetailDescType is the schema descriptor for type field.
-	transactiondetailDescType := transactiondetailFields[2].Descriptor()
-	// transactiondetail.TypeValidator is a validator for the "type" field. It is called by the builders before save.
-	transactiondetail.TypeValidator = transactiondetailDescType.Validators[0].(func(string) error)
-	// transactiondetailDescTransactedAt is the schema descriptor for transacted_at field.
-	transactiondetailDescTransactedAt := transactiondetailFields[3].Descriptor()
-	// transactiondetail.DefaultTransactedAt holds the default value on creation for the transacted_at field.
-	transactiondetail.DefaultTransactedAt = transactiondetailDescTransactedAt.Default.(func() time.Time)
+	transactiondetailsFields := schema.TransactionDetails{}.Fields()
+	_ = transactiondetailsFields
+	// transactiondetailsDescType is the schema descriptor for type field.
+	transactiondetailsDescType := transactiondetailsFields[2].Descriptor()
+	// transactiondetails.TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	transactiondetails.TypeValidator = transactiondetailsDescType.Validators[0].(func(string) error)
+	// transactiondetailsDescTransactedAt is the schema descriptor for transacted_at field.
+	transactiondetailsDescTransactedAt := transactiondetailsFields[3].Descriptor()
+	// transactiondetails.DefaultTransactedAt holds the default value on creation for the transacted_at field.
+	transactiondetails.DefaultTransactedAt = transactiondetailsDescTransactedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescFirstName is the schema descriptor for first_name field.

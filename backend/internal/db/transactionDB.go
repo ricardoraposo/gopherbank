@@ -35,16 +35,18 @@ func (t *transactionDB) CreateTransferTransaction(ctx context.Context, params *m
 	if err != nil {
 		return err
 	}
-	transaction, err := t.store.client.Transaction.Create().SetFromAccount(fromAccount).SetToAccount(toAccount).Save(ctx)
-	if err != nil {
-		return err
-	}
 
-	err = t.store.client.TransactionDetail.Create().SetTransactionID(transaction.ID).SetAmount(params.Amount).SetType(params.Type).Exec(ctx)
-	if err != nil {
-		return err
-	}
-	return nil
+	transaction, err := t.store.client.Transaction.
+		Create().
+		SetToAccount(toAccount).
+		SetFromAccount(fromAccount).
+		Save(ctx)
+
+	return t.store.client.TransactionDetails.Create().
+		SetType(params.Type).
+		SetAmount(params.Amount).
+		SetTransaction(transaction).
+		Exec(ctx)
 }
 
 func (t *transactionDB) CreateDepositTransaction(ctx context.Context, params *models.DepositParams) error {
@@ -56,17 +58,14 @@ func (t *transactionDB) CreateDepositTransaction(ctx context.Context, params *mo
 	if err != nil {
 		return err
 	}
+
 	transaction, err := t.store.client.Transaction.Create().SetToAccount(toAccount).Save(ctx)
-	if err != nil {
-		return err
-	}
 
-	err = t.store.client.TransactionDetail.Create().SetTransactionID(transaction.ID).SetAmount(params.Amount).SetType(params.Type).Exec(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return t.store.client.TransactionDetails.Create().
+		SetType(params.Type).
+		SetAmount(params.Amount).
+		SetTransaction(transaction).
+		Exec(ctx)
 }
 
 func (t *transactionDB) CreateWithdrawTransaction(ctx context.Context, params *models.WithdrawParams) error {
@@ -84,10 +83,9 @@ func (t *transactionDB) CreateWithdrawTransaction(ctx context.Context, params *m
 		return err
 	}
 
-	err = t.store.client.TransactionDetail.Create().SetTransactionID(transaction.ID).SetAmount(params.Amount).SetType(params.Type).Exec(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return t.store.client.TransactionDetails.Create().
+		SetType(params.Type).
+		SetAmount(params.Amount).
+		SetTransaction(transaction).
+		Exec(ctx)
 }

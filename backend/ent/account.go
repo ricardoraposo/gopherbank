@@ -37,9 +37,13 @@ type AccountEdges struct {
 	Favoriteds []*Account `json:"favoriteds,omitempty"`
 	// Favorites holds the value of the favorites edge.
 	Favorites []*Account `json:"favorites,omitempty"`
+	// FromAccount holds the value of the from_account edge.
+	FromAccount []*Transaction `json:"from_account,omitempty"`
+	// ToAccount holds the value of the to_account edge.
+	ToAccount []*Transaction `json:"to_account,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [4]bool
 }
 
 // FavoritedsOrErr returns the Favoriteds value or an error if the edge
@@ -58,6 +62,24 @@ func (e AccountEdges) FavoritesOrErr() ([]*Account, error) {
 		return e.Favorites, nil
 	}
 	return nil, &NotLoadedError{edge: "favorites"}
+}
+
+// FromAccountOrErr returns the FromAccount value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) FromAccountOrErr() ([]*Transaction, error) {
+	if e.loadedTypes[2] {
+		return e.FromAccount, nil
+	}
+	return nil, &NotLoadedError{edge: "from_account"}
+}
+
+// ToAccountOrErr returns the ToAccount value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) ToAccountOrErr() ([]*Transaction, error) {
+	if e.loadedTypes[3] {
+		return e.ToAccount, nil
+	}
+	return nil, &NotLoadedError{edge: "to_account"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -139,6 +161,16 @@ func (a *Account) QueryFavoriteds() *AccountQuery {
 // QueryFavorites queries the "favorites" edge of the Account entity.
 func (a *Account) QueryFavorites() *AccountQuery {
 	return NewAccountClient(a.config).QueryFavorites(a)
+}
+
+// QueryFromAccount queries the "from_account" edge of the Account entity.
+func (a *Account) QueryFromAccount() *TransactionQuery {
+	return NewAccountClient(a.config).QueryFromAccount(a)
+}
+
+// QueryToAccount queries the "to_account" edge of the Account entity.
+func (a *Account) QueryToAccount() *TransactionQuery {
+	return NewAccountClient(a.config).QueryToAccount(a)
 }
 
 // Update returns a builder for updating this Account.

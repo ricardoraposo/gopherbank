@@ -12,8 +12,8 @@ type Account func(*sql.Selector)
 // Transaction is the predicate function for transaction builders.
 type Transaction func(*sql.Selector)
 
-// TransactionDetail is the predicate function for transactiondetail builders.
-type TransactionDetail func(*sql.Selector)
+// TransactionDetails is the predicate function for transactiondetails builders.
+type TransactionDetails func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

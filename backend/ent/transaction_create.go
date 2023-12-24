@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
-	"github.com/ricardoraposo/gopherbank/ent/transactiondetail"
+	"github.com/ricardoraposo/gopherbank/ent/transactiondetails"
 )
 
 // TransactionCreate is the builder for creating a Transaction entity.
@@ -58,13 +58,13 @@ func (tc *TransactionCreate) SetToAccount(a *Account) *TransactionCreate {
 	return tc.SetToAccountID(a.ID)
 }
 
-// SetDetailID sets the "detail" edge to the TransactionDetail entity by ID.
+// SetDetailID sets the "detail" edge to the TransactionDetails entity by ID.
 func (tc *TransactionCreate) SetDetailID(id int) *TransactionCreate {
 	tc.mutation.SetDetailID(id)
 	return tc
 }
 
-// SetNillableDetailID sets the "detail" edge to the TransactionDetail entity by ID if the given value is not nil.
+// SetNillableDetailID sets the "detail" edge to the TransactionDetails entity by ID if the given value is not nil.
 func (tc *TransactionCreate) SetNillableDetailID(id *int) *TransactionCreate {
 	if id != nil {
 		tc = tc.SetDetailID(*id)
@@ -72,8 +72,8 @@ func (tc *TransactionCreate) SetNillableDetailID(id *int) *TransactionCreate {
 	return tc
 }
 
-// SetDetail sets the "detail" edge to the TransactionDetail entity.
-func (tc *TransactionCreate) SetDetail(t *TransactionDetail) *TransactionCreate {
+// SetDetail sets the "detail" edge to the TransactionDetails entity.
+func (tc *TransactionCreate) SetDetail(t *TransactionDetails) *TransactionCreate {
 	return tc.SetDetailID(t.ID)
 }
 
@@ -140,7 +140,7 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 	if nodes := tc.mutation.FromAccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   transaction.FromAccountTable,
 			Columns: []string{transaction.FromAccountColumn},
 			Bidi:    false,
@@ -151,13 +151,13 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.from_account_number = &nodes[0]
+		_node.from_account = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := tc.mutation.ToAccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   transaction.ToAccountTable,
 			Columns: []string{transaction.ToAccountColumn},
 			Bidi:    false,
@@ -168,7 +168,7 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.to_account_number = &nodes[0]
+		_node.to_account = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := tc.mutation.DetailIDs(); len(nodes) > 0 {
@@ -179,7 +179,7 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 			Columns: []string{transaction.DetailColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(transactiondetail.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(transactiondetails.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -58,7 +58,7 @@ func HasFromAccount() predicate.Transaction {
 	return predicate.Transaction(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, FromAccountTable, FromAccountColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, FromAccountTable, FromAccountColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -81,7 +81,7 @@ func HasToAccount() predicate.Transaction {
 	return predicate.Transaction(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, ToAccountTable, ToAccountColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, ToAccountTable, ToAccountColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -111,7 +111,7 @@ func HasDetail() predicate.Transaction {
 }
 
 // HasDetailWith applies the HasEdge predicate on the "detail" edge with a given conditions (other predicates).
-func HasDetailWith(preds ...predicate.TransactionDetail) predicate.Transaction {
+func HasDetailWith(preds ...predicate.TransactionDetails) predicate.Transaction {
 	return predicate.Transaction(func(s *sql.Selector) {
 		step := newDetailStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

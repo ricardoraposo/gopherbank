@@ -28,5 +28,7 @@ func (Account) Fields() []ent.Field {
 func (Account) Edges() []ent.Edge {
 	return []ent.Edge{
         edge.To("favorites", Account.Type).From("favoriteds"),
+        edge.To("from_account", Transaction.Type).StorageKey(edge.Column("from_account")),
+        edge.To("to_account", Transaction.Type).StorageKey(edge.Column("to_account")),
     }
 }

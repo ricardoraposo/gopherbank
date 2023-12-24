@@ -13,7 +13,7 @@ import (
 	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/ent/predicate"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
-	"github.com/ricardoraposo/gopherbank/ent/transactiondetail"
+	"github.com/ricardoraposo/gopherbank/ent/transactiondetails"
 )
 
 // TransactionUpdate is the builder for updating Transaction entities.
@@ -67,13 +67,13 @@ func (tu *TransactionUpdate) SetToAccount(a *Account) *TransactionUpdate {
 	return tu.SetToAccountID(a.ID)
 }
 
-// SetDetailID sets the "detail" edge to the TransactionDetail entity by ID.
+// SetDetailID sets the "detail" edge to the TransactionDetails entity by ID.
 func (tu *TransactionUpdate) SetDetailID(id int) *TransactionUpdate {
 	tu.mutation.SetDetailID(id)
 	return tu
 }
 
-// SetNillableDetailID sets the "detail" edge to the TransactionDetail entity by ID if the given value is not nil.
+// SetNillableDetailID sets the "detail" edge to the TransactionDetails entity by ID if the given value is not nil.
 func (tu *TransactionUpdate) SetNillableDetailID(id *int) *TransactionUpdate {
 	if id != nil {
 		tu = tu.SetDetailID(*id)
@@ -81,8 +81,8 @@ func (tu *TransactionUpdate) SetNillableDetailID(id *int) *TransactionUpdate {
 	return tu
 }
 
-// SetDetail sets the "detail" edge to the TransactionDetail entity.
-func (tu *TransactionUpdate) SetDetail(t *TransactionDetail) *TransactionUpdate {
+// SetDetail sets the "detail" edge to the TransactionDetails entity.
+func (tu *TransactionUpdate) SetDetail(t *TransactionDetails) *TransactionUpdate {
 	return tu.SetDetailID(t.ID)
 }
 
@@ -103,7 +103,7 @@ func (tu *TransactionUpdate) ClearToAccount() *TransactionUpdate {
 	return tu
 }
 
-// ClearDetail clears the "detail" edge to the TransactionDetail entity.
+// ClearDetail clears the "detail" edge to the TransactionDetails entity.
 func (tu *TransactionUpdate) ClearDetail() *TransactionUpdate {
 	tu.mutation.ClearDetail()
 	return tu
@@ -148,7 +148,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if tu.mutation.FromAccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   transaction.FromAccountTable,
 			Columns: []string{transaction.FromAccountColumn},
 			Bidi:    false,
@@ -161,7 +161,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := tu.mutation.FromAccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   transaction.FromAccountTable,
 			Columns: []string{transaction.FromAccountColumn},
 			Bidi:    false,
@@ -177,7 +177,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if tu.mutation.ToAccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   transaction.ToAccountTable,
 			Columns: []string{transaction.ToAccountColumn},
 			Bidi:    false,
@@ -190,7 +190,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := tu.mutation.ToAccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   transaction.ToAccountTable,
 			Columns: []string{transaction.ToAccountColumn},
 			Bidi:    false,
@@ -211,7 +211,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{transaction.DetailColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(transactiondetail.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(transactiondetails.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -224,7 +224,7 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{transaction.DetailColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(transactiondetail.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(transactiondetails.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -290,13 +290,13 @@ func (tuo *TransactionUpdateOne) SetToAccount(a *Account) *TransactionUpdateOne 
 	return tuo.SetToAccountID(a.ID)
 }
 
-// SetDetailID sets the "detail" edge to the TransactionDetail entity by ID.
+// SetDetailID sets the "detail" edge to the TransactionDetails entity by ID.
 func (tuo *TransactionUpdateOne) SetDetailID(id int) *TransactionUpdateOne {
 	tuo.mutation.SetDetailID(id)
 	return tuo
 }
 
-// SetNillableDetailID sets the "detail" edge to the TransactionDetail entity by ID if the given value is not nil.
+// SetNillableDetailID sets the "detail" edge to the TransactionDetails entity by ID if the given value is not nil.
 func (tuo *TransactionUpdateOne) SetNillableDetailID(id *int) *TransactionUpdateOne {
 	if id != nil {
 		tuo = tuo.SetDetailID(*id)
@@ -304,8 +304,8 @@ func (tuo *TransactionUpdateOne) SetNillableDetailID(id *int) *TransactionUpdate
 	return tuo
 }
 
-// SetDetail sets the "detail" edge to the TransactionDetail entity.
-func (tuo *TransactionUpdateOne) SetDetail(t *TransactionDetail) *TransactionUpdateOne {
+// SetDetail sets the "detail" edge to the TransactionDetails entity.
+func (tuo *TransactionUpdateOne) SetDetail(t *TransactionDetails) *TransactionUpdateOne {
 	return tuo.SetDetailID(t.ID)
 }
 
@@ -326,7 +326,7 @@ func (tuo *TransactionUpdateOne) ClearToAccount() *TransactionUpdateOne {
 	return tuo
 }
 
-// ClearDetail clears the "detail" edge to the TransactionDetail entity.
+// ClearDetail clears the "detail" edge to the TransactionDetails entity.
 func (tuo *TransactionUpdateOne) ClearDetail() *TransactionUpdateOne {
 	tuo.mutation.ClearDetail()
 	return tuo
@@ -401,7 +401,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 	if tuo.mutation.FromAccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   transaction.FromAccountTable,
 			Columns: []string{transaction.FromAccountColumn},
 			Bidi:    false,
@@ -414,7 +414,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 	if nodes := tuo.mutation.FromAccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   transaction.FromAccountTable,
 			Columns: []string{transaction.FromAccountColumn},
 			Bidi:    false,
@@ -430,7 +430,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 	if tuo.mutation.ToAccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   transaction.ToAccountTable,
 			Columns: []string{transaction.ToAccountColumn},
 			Bidi:    false,
@@ -443,7 +443,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 	if nodes := tuo.mutation.ToAccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   transaction.ToAccountTable,
 			Columns: []string{transaction.ToAccountColumn},
 			Bidi:    false,
@@ -464,7 +464,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Columns: []string{transaction.DetailColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(transactiondetail.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(transactiondetails.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -477,7 +477,7 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 			Columns: []string{transaction.DetailColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(transactiondetail.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(transactiondetails.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

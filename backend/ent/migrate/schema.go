@@ -25,8 +25,8 @@ var (
 	// TransactionsColumns holds the columns for the "transactions" table.
 	TransactionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "from_account_number", Type: field.TypeString, Nullable: true},
-		{Name: "to_account_number", Type: field.TypeString, Nullable: true},
+		{Name: "from_account", Type: field.TypeString, Nullable: true},
+		{Name: "to_account", Type: field.TypeString, Nullable: true},
 	}
 	// TransactionsTable holds the schema information for the "transactions" table.
 	TransactionsTable = &schema.Table{
@@ -52,7 +52,7 @@ var (
 	TransactionDetailsColumns = []*schema.Column{
 		{Name: "transaction_id", Type: field.TypeInt, Increment: true},
 		{Name: "amount", Type: field.TypeFloat64},
-		{Name: "type", Type: field.TypeString, Size: 20},
+		{Name: "type", Type: field.TypeString},
 		{Name: "transacted_at", Type: field.TypeTime},
 	}
 	// TransactionDetailsTable holds the schema information for the "transaction_details" table.

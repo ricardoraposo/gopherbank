@@ -14,7 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
-	"github.com/ricardoraposo/gopherbank/ent/transactiondetail"
+	"github.com/ricardoraposo/gopherbank/ent/transactiondetails"
 	"github.com/ricardoraposo/gopherbank/ent/user"
 )
 
@@ -76,10 +76,10 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			account.Table:           account.ValidColumn,
-			transaction.Table:       transaction.ValidColumn,
-			transactiondetail.Table: transactiondetail.ValidColumn,
-			user.Table:              user.ValidColumn,
+			account.Table:            account.ValidColumn,
+			transaction.Table:        transaction.ValidColumn,
+			transactiondetails.Table: transactiondetails.ValidColumn,
+			user.Table:               user.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

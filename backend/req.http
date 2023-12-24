@@ -11,7 +11,7 @@ POST http://localhost:5432/auth
 Content-Type: application/json
 
 {
-    "number": "01164856",
+    "number": "02954920",
     "password": "eusouoadmin"
 }
 
@@ -26,30 +26,30 @@ Content-Type: application/json
 }
 
 POST http://localhost:5432/api/deposit
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzQzNjkxNSwibnVtYmVyIjoiMDEyMzE4MzIifQ.yKUTvsm80CASRaHIMv-7U2XwQ-HIHQhBLkMKFbFyPS4
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzUyNzIyNywibnVtYmVyIjoiMDI5NTQ5MjAifQ.EPzNCbnyTyeeFotpxyy6FtrsVXvpugoOpQoHUPKlfKE
 Content-Type: application/json
 
 {
-    "toAccountNumber": "01664171",
+    "toAccountNumber": "02954920",
     "amount": 1000
 }
 
 POST http://localhost:5432/api/withdraw
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGlyZXMiOjE3MDM0MjAyMTYsIm51bWJlciI6IjAzMzA1NzA2In0.vG-gNroL56vKPevptpmrk2RmHVp8z5TnoaJlLjSW7qI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzUyNzIyNywibnVtYmVyIjoiMDI5NTQ5MjAifQ.EPzNCbnyTyeeFotpxyy6FtrsVXvpugoOpQoHUPKlfKE
 Content-Type: application/json
 
 {
-    "fromAccountNumber": "03305706",
+    "fromAccountNumber": "02954920",
     "amount": 10
 }
 
 POST http://localhost:5432/api/transfer
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGlyZXMiOjE3MDM0MjAyMTYsIm51bWJlciI6IjAzMzA1NzA2In0.vG-gNroL56vKPevptpmrk2RmHVp8z5TnoaJlLjSW7qI
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzUyNzIyNywibnVtYmVyIjoiMDI5NTQ5MjAifQ.EPzNCbnyTyeeFotpxyy6FtrsVXvpugoOpQoHUPKlfKE
 Content-Type: application/json
 
 {
-    "fromAccountNumber": "03305706",
-    "toAccountNumber": "07571829",
+    "fromAccountNumber": "02954920",
+    "toAccountNumber": "02918553",
     "amount": 10
 }
 

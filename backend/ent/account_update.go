@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/ent/predicate"
+	"github.com/ricardoraposo/gopherbank/ent/transaction"
 )
 
 // AccountUpdate is the builder for updating Account entities.
@@ -106,6 +107,36 @@ func (au *AccountUpdate) AddFavorites(a ...*Account) *AccountUpdate {
 	return au.AddFavoriteIDs(ids...)
 }
 
+// AddFromAccountIDs adds the "from_account" edge to the Transaction entity by IDs.
+func (au *AccountUpdate) AddFromAccountIDs(ids ...int) *AccountUpdate {
+	au.mutation.AddFromAccountIDs(ids...)
+	return au
+}
+
+// AddFromAccount adds the "from_account" edges to the Transaction entity.
+func (au *AccountUpdate) AddFromAccount(t ...*Transaction) *AccountUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return au.AddFromAccountIDs(ids...)
+}
+
+// AddToAccountIDs adds the "to_account" edge to the Transaction entity by IDs.
+func (au *AccountUpdate) AddToAccountIDs(ids ...int) *AccountUpdate {
+	au.mutation.AddToAccountIDs(ids...)
+	return au
+}
+
+// AddToAccount adds the "to_account" edges to the Transaction entity.
+func (au *AccountUpdate) AddToAccount(t ...*Transaction) *AccountUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return au.AddToAccountIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
@@ -151,6 +182,48 @@ func (au *AccountUpdate) RemoveFavorites(a ...*Account) *AccountUpdate {
 		ids[i] = a[i].ID
 	}
 	return au.RemoveFavoriteIDs(ids...)
+}
+
+// ClearFromAccount clears all "from_account" edges to the Transaction entity.
+func (au *AccountUpdate) ClearFromAccount() *AccountUpdate {
+	au.mutation.ClearFromAccount()
+	return au
+}
+
+// RemoveFromAccountIDs removes the "from_account" edge to Transaction entities by IDs.
+func (au *AccountUpdate) RemoveFromAccountIDs(ids ...int) *AccountUpdate {
+	au.mutation.RemoveFromAccountIDs(ids...)
+	return au
+}
+
+// RemoveFromAccount removes "from_account" edges to Transaction entities.
+func (au *AccountUpdate) RemoveFromAccount(t ...*Transaction) *AccountUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return au.RemoveFromAccountIDs(ids...)
+}
+
+// ClearToAccount clears all "to_account" edges to the Transaction entity.
+func (au *AccountUpdate) ClearToAccount() *AccountUpdate {
+	au.mutation.ClearToAccount()
+	return au
+}
+
+// RemoveToAccountIDs removes the "to_account" edge to Transaction entities by IDs.
+func (au *AccountUpdate) RemoveToAccountIDs(ids ...int) *AccountUpdate {
+	au.mutation.RemoveToAccountIDs(ids...)
+	return au
+}
+
+// RemoveToAccount removes "to_account" edges to Transaction entities.
+func (au *AccountUpdate) RemoveToAccount(t ...*Transaction) *AccountUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return au.RemoveToAccountIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -291,6 +364,96 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.FromAccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FromAccountTable,
+			Columns: []string{account.FromAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedFromAccountIDs(); len(nodes) > 0 && !au.mutation.FromAccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FromAccountTable,
+			Columns: []string{account.FromAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.FromAccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FromAccountTable,
+			Columns: []string{account.FromAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.ToAccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ToAccountTable,
+			Columns: []string{account.ToAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedToAccountIDs(); len(nodes) > 0 && !au.mutation.ToAccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ToAccountTable,
+			Columns: []string{account.ToAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.ToAccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ToAccountTable,
+			Columns: []string{account.ToAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{account.Label}
@@ -390,6 +553,36 @@ func (auo *AccountUpdateOne) AddFavorites(a ...*Account) *AccountUpdateOne {
 	return auo.AddFavoriteIDs(ids...)
 }
 
+// AddFromAccountIDs adds the "from_account" edge to the Transaction entity by IDs.
+func (auo *AccountUpdateOne) AddFromAccountIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.AddFromAccountIDs(ids...)
+	return auo
+}
+
+// AddFromAccount adds the "from_account" edges to the Transaction entity.
+func (auo *AccountUpdateOne) AddFromAccount(t ...*Transaction) *AccountUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return auo.AddFromAccountIDs(ids...)
+}
+
+// AddToAccountIDs adds the "to_account" edge to the Transaction entity by IDs.
+func (auo *AccountUpdateOne) AddToAccountIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.AddToAccountIDs(ids...)
+	return auo
+}
+
+// AddToAccount adds the "to_account" edges to the Transaction entity.
+func (auo *AccountUpdateOne) AddToAccount(t ...*Transaction) *AccountUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return auo.AddToAccountIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
@@ -435,6 +628,48 @@ func (auo *AccountUpdateOne) RemoveFavorites(a ...*Account) *AccountUpdateOne {
 		ids[i] = a[i].ID
 	}
 	return auo.RemoveFavoriteIDs(ids...)
+}
+
+// ClearFromAccount clears all "from_account" edges to the Transaction entity.
+func (auo *AccountUpdateOne) ClearFromAccount() *AccountUpdateOne {
+	auo.mutation.ClearFromAccount()
+	return auo
+}
+
+// RemoveFromAccountIDs removes the "from_account" edge to Transaction entities by IDs.
+func (auo *AccountUpdateOne) RemoveFromAccountIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.RemoveFromAccountIDs(ids...)
+	return auo
+}
+
+// RemoveFromAccount removes "from_account" edges to Transaction entities.
+func (auo *AccountUpdateOne) RemoveFromAccount(t ...*Transaction) *AccountUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return auo.RemoveFromAccountIDs(ids...)
+}
+
+// ClearToAccount clears all "to_account" edges to the Transaction entity.
+func (auo *AccountUpdateOne) ClearToAccount() *AccountUpdateOne {
+	auo.mutation.ClearToAccount()
+	return auo
+}
+
+// RemoveToAccountIDs removes the "to_account" edge to Transaction entities by IDs.
+func (auo *AccountUpdateOne) RemoveToAccountIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.RemoveToAccountIDs(ids...)
+	return auo
+}
+
+// RemoveToAccount removes "to_account" edges to Transaction entities.
+func (auo *AccountUpdateOne) RemoveToAccount(t ...*Transaction) *AccountUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return auo.RemoveToAccountIDs(ids...)
 }
 
 // Where appends a list predicates to the AccountUpdate builder.
@@ -598,6 +833,96 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.FromAccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FromAccountTable,
+			Columns: []string{account.FromAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedFromAccountIDs(); len(nodes) > 0 && !auo.mutation.FromAccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FromAccountTable,
+			Columns: []string{account.FromAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.FromAccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FromAccountTable,
+			Columns: []string{account.FromAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.ToAccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ToAccountTable,
+			Columns: []string{account.ToAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedToAccountIDs(); len(nodes) > 0 && !auo.mutation.ToAccountCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ToAccountTable,
+			Columns: []string{account.ToAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.ToAccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ToAccountTable,
+			Columns: []string{account.ToAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

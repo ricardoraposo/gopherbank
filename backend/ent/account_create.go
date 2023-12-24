@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ricardoraposo/gopherbank/ent/account"
+	"github.com/ricardoraposo/gopherbank/ent/transaction"
 )
 
 // AccountCreate is the builder for creating a Account entity.
@@ -102,6 +103,36 @@ func (ac *AccountCreate) AddFavorites(a ...*Account) *AccountCreate {
 		ids[i] = a[i].ID
 	}
 	return ac.AddFavoriteIDs(ids...)
+}
+
+// AddFromAccountIDs adds the "from_account" edge to the Transaction entity by IDs.
+func (ac *AccountCreate) AddFromAccountIDs(ids ...int) *AccountCreate {
+	ac.mutation.AddFromAccountIDs(ids...)
+	return ac
+}
+
+// AddFromAccount adds the "from_account" edges to the Transaction entity.
+func (ac *AccountCreate) AddFromAccount(t ...*Transaction) *AccountCreate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return ac.AddFromAccountIDs(ids...)
+}
+
+// AddToAccountIDs adds the "to_account" edge to the Transaction entity by IDs.
+func (ac *AccountCreate) AddToAccountIDs(ids ...int) *AccountCreate {
+	ac.mutation.AddToAccountIDs(ids...)
+	return ac
+}
+
+// AddToAccount adds the "to_account" edges to the Transaction entity.
+func (ac *AccountCreate) AddToAccount(t ...*Transaction) *AccountCreate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return ac.AddToAccountIDs(ids...)
 }
 
 // Mutation returns the AccountMutation object of the builder.
@@ -243,6 +274,38 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.FromAccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FromAccountTable,
+			Columns: []string{account.FromAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.ToAccountIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ToAccountTable,
+			Columns: []string{account.ToAccountColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -18,16 +18,8 @@ func (Transaction) Fields() []ent.Field {
 // Edges of the Transaction.
 func (Transaction) Edges() []ent.Edge {
     return []ent.Edge{
-        edge.To("from_account", Account.Type).
-            Unique().
-            StorageKey(edge.Column("from_account_number")).
-            StructTag(`json:"fromAccount"`),
-        edge.To("to_account", Account.Type).
-            Unique().
-            StorageKey(edge.Column("to_account_number")).
-            StructTag(`json:"toAccount"`),
-        edge.To("detail", TransactionDetail.Type).
-            StorageKey(edge.Column("transaction_id")).
-            Unique(),
+        edge.From("from_account", Account.Type).Ref("from_account").Unique(),
+        edge.From("to_account", Account.Type).Ref("to_account").Unique(),
+        edge.To("detail", TransactionDetails.Type).Unique().StorageKey(edge.Column("transaction_id")),
     }
 }

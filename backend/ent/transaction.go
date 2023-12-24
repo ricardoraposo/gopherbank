@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
-	"github.com/ricardoraposo/gopherbank/ent/transactiondetail"
+	"github.com/ricardoraposo/gopherbank/ent/transactiondetails"
 )
 
 // Transaction is the model entity for the Transaction schema.
@@ -20,20 +20,20 @@ type Transaction struct {
 	ID int `json:"id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TransactionQuery when eager-loading is set.
-	Edges               TransactionEdges `json:"edges"`
-	from_account_number *string
-	to_account_number   *string
-	selectValues        sql.SelectValues
+	Edges        TransactionEdges `json:"edges"`
+	from_account *string
+	to_account   *string
+	selectValues sql.SelectValues
 }
 
 // TransactionEdges holds the relations/edges for other nodes in the graph.
 type TransactionEdges struct {
 	// FromAccount holds the value of the from_account edge.
-	FromAccount *Account `json:"fromAccount"`
+	FromAccount *Account `json:"from_account,omitempty"`
 	// ToAccount holds the value of the to_account edge.
-	ToAccount *Account `json:"toAccount"`
+	ToAccount *Account `json:"to_account,omitempty"`
 	// Detail holds the value of the detail edge.
-	Detail *TransactionDetail `json:"detail,omitempty"`
+	Detail *TransactionDetails `json:"detail,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -67,11 +67,11 @@ func (e TransactionEdges) ToAccountOrErr() (*Account, error) {
 
 // DetailOrErr returns the Detail value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e TransactionEdges) DetailOrErr() (*TransactionDetail, error) {
+func (e TransactionEdges) DetailOrErr() (*TransactionDetails, error) {
 	if e.loadedTypes[2] {
 		if e.Detail == nil {
 			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: transactiondetail.Label}
+			return nil, &NotFoundError{label: transactiondetails.Label}
 		}
 		return e.Detail, nil
 	}
@@ -85,9 +85,9 @@ func (*Transaction) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case transaction.FieldID:
 			values[i] = new(sql.NullInt64)
-		case transaction.ForeignKeys[0]: // from_account_number
+		case transaction.ForeignKeys[0]: // from_account
 			values[i] = new(sql.NullString)
-		case transaction.ForeignKeys[1]: // to_account_number
+		case transaction.ForeignKeys[1]: // to_account
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -112,17 +112,17 @@ func (t *Transaction) assignValues(columns []string, values []any) error {
 			t.ID = int(value.Int64)
 		case transaction.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field from_account_number", values[i])
+				return fmt.Errorf("unexpected type %T for field from_account", values[i])
 			} else if value.Valid {
-				t.from_account_number = new(string)
-				*t.from_account_number = value.String
+				t.from_account = new(string)
+				*t.from_account = value.String
 			}
 		case transaction.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field to_account_number", values[i])
+				return fmt.Errorf("unexpected type %T for field to_account", values[i])
 			} else if value.Valid {
-				t.to_account_number = new(string)
-				*t.to_account_number = value.String
+				t.to_account = new(string)
+				*t.to_account = value.String
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])
@@ -148,7 +148,7 @@ func (t *Transaction) QueryToAccount() *AccountQuery {
 }
 
 // QueryDetail queries the "detail" edge of the Transaction entity.
-func (t *Transaction) QueryDetail() *TransactionDetailQuery {
+func (t *Transaction) QueryDetail() *TransactionDetailsQuery {
 	return NewTransactionClient(t.config).QueryDetail(t)
 }
 

@@ -14,7 +14,7 @@ import (
 	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/ent/predicate"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
-	"github.com/ricardoraposo/gopherbank/ent/transactiondetail"
+	"github.com/ricardoraposo/gopherbank/ent/transactiondetails"
 )
 
 // TransactionQuery is the builder for querying Transaction entities.
@@ -26,7 +26,7 @@ type TransactionQuery struct {
 	predicates      []predicate.Transaction
 	withFromAccount *AccountQuery
 	withToAccount   *AccountQuery
-	withDetail      *TransactionDetailQuery
+	withDetail      *TransactionDetailsQuery
 	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -78,7 +78,7 @@ func (tq *TransactionQuery) QueryFromAccount() *AccountQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(transaction.Table, transaction.FieldID, selector),
 			sqlgraph.To(account.Table, account.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, transaction.FromAccountTable, transaction.FromAccountColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, transaction.FromAccountTable, transaction.FromAccountColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -100,7 +100,7 @@ func (tq *TransactionQuery) QueryToAccount() *AccountQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(transaction.Table, transaction.FieldID, selector),
 			sqlgraph.To(account.Table, account.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, transaction.ToAccountTable, transaction.ToAccountColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, transaction.ToAccountTable, transaction.ToAccountColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -109,8 +109,8 @@ func (tq *TransactionQuery) QueryToAccount() *AccountQuery {
 }
 
 // QueryDetail chains the current query on the "detail" edge.
-func (tq *TransactionQuery) QueryDetail() *TransactionDetailQuery {
-	query := (&TransactionDetailClient{config: tq.config}).Query()
+func (tq *TransactionQuery) QueryDetail() *TransactionDetailsQuery {
+	query := (&TransactionDetailsClient{config: tq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := tq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -121,7 +121,7 @@ func (tq *TransactionQuery) QueryDetail() *TransactionDetailQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(transaction.Table, transaction.FieldID, selector),
-			sqlgraph.To(transactiondetail.Table, transactiondetail.FieldID),
+			sqlgraph.To(transactiondetails.Table, transactiondetails.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, transaction.DetailTable, transaction.DetailColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
@@ -355,8 +355,8 @@ func (tq *TransactionQuery) WithToAccount(opts ...func(*AccountQuery)) *Transact
 
 // WithDetail tells the query-builder to eager-load the nodes that are connected to
 // the "detail" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TransactionQuery) WithDetail(opts ...func(*TransactionDetailQuery)) *TransactionQuery {
-	query := (&TransactionDetailClient{config: tq.config}).Query()
+func (tq *TransactionQuery) WithDetail(opts ...func(*TransactionDetailsQuery)) *TransactionQuery {
+	query := (&TransactionDetailsClient{config: tq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -465,7 +465,7 @@ func (tq *TransactionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	}
 	if query := tq.withDetail; query != nil {
 		if err := tq.loadDetail(ctx, query, nodes, nil,
-			func(n *Transaction, e *TransactionDetail) { n.Edges.Detail = e }); err != nil {
+			func(n *Transaction, e *TransactionDetails) { n.Edges.Detail = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -476,10 +476,10 @@ func (tq *TransactionQuery) loadFromAccount(ctx context.Context, query *AccountQ
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Transaction)
 	for i := range nodes {
-		if nodes[i].from_account_number == nil {
+		if nodes[i].from_account == nil {
 			continue
 		}
-		fk := *nodes[i].from_account_number
+		fk := *nodes[i].from_account
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -496,7 +496,7 @@ func (tq *TransactionQuery) loadFromAccount(ctx context.Context, query *AccountQ
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "from_account_number" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "from_account" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -508,10 +508,10 @@ func (tq *TransactionQuery) loadToAccount(ctx context.Context, query *AccountQue
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Transaction)
 	for i := range nodes {
-		if nodes[i].to_account_number == nil {
+		if nodes[i].to_account == nil {
 			continue
 		}
-		fk := *nodes[i].to_account_number
+		fk := *nodes[i].to_account
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -528,7 +528,7 @@ func (tq *TransactionQuery) loadToAccount(ctx context.Context, query *AccountQue
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "to_account_number" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "to_account" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -536,7 +536,7 @@ func (tq *TransactionQuery) loadToAccount(ctx context.Context, query *AccountQue
 	}
 	return nil
 }
-func (tq *TransactionQuery) loadDetail(ctx context.Context, query *TransactionDetailQuery, nodes []*Transaction, init func(*Transaction), assign func(*Transaction, *TransactionDetail)) error {
+func (tq *TransactionQuery) loadDetail(ctx context.Context, query *TransactionDetailsQuery, nodes []*Transaction, init func(*Transaction), assign func(*Transaction, *TransactionDetails)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Transaction)
 	for i := range nodes {
@@ -544,7 +544,7 @@ func (tq *TransactionQuery) loadDetail(ctx context.Context, query *TransactionDe
 		nodeids[nodes[i].ID] = nodes[i]
 	}
 	query.withFKs = true
-	query.Where(predicate.TransactionDetail(func(s *sql.Selector) {
+	query.Where(predicate.TransactionDetails(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(transaction.DetailColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
