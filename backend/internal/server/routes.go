@@ -10,6 +10,7 @@ func (s *FiberServer) RegisterRoutes() {
 	accountsHandler := handlers.NewAccountHandler(s.db)
 	transactionHandler := handlers.NewTransactionHandler(s.db)
 	authHandler := handlers.NewAuthHandler(s.db)
+	favoritehandler := handlers.NewFavoriteHandler(s.db)
 
 	api := s.App.Group("/api")
 	api.Use(middlewares.JWTAuthentication)
@@ -24,11 +25,14 @@ func (s *FiberServer) RegisterRoutes() {
 	api.Post("/withdraw", transactionHandler.Withdraw)
 	// api.Post("/deposit", transactionHandler.Deposit)
 
+    // favorite routes
+    api.Post("/favorite", favoritehandler.AddToFavorite)
+
 	// auth routes
 	auth := s.App.Group("/auth")
 	auth.Post("/", authHandler.Authenticate)
 	auth.Post("/new", middlewares.ValidateNewAccountParams, accountsHandler.CreateAccount)
-	
+
 	// admin routes
 	api.Get("/accounts", middlewares.IsAdmin, accountsHandler.GetAllAccounts)
 	api.Post("/deposit", middlewares.IsAdmin, transactionHandler.Deposit)

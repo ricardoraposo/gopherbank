@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -21,8 +22,16 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldAdmin holds the string denoting the admin field in the database.
 	FieldAdmin = "admin"
+	// EdgeFavoriteds holds the string denoting the favoriteds edge name in mutations.
+	EdgeFavoriteds = "favoriteds"
+	// EdgeFavorites holds the string denoting the favorites edge name in mutations.
+	EdgeFavorites = "favorites"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
+	// FavoritedsTable is the table that holds the favoriteds relation/edge. The primary key declared below.
+	FavoritedsTable = "account_favorites"
+	// FavoritesTable is the table that holds the favorites relation/edge. The primary key declared below.
+	FavoritesTable = "account_favorites"
 )
 
 // Columns holds all SQL columns for account fields.
@@ -33,6 +42,15 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldAdmin,
 }
+
+var (
+	// FavoritedsPrimaryKey and FavoritedsColumn2 are the table columns denoting the
+	// primary key for the favoriteds relation (M2M).
+	FavoritedsPrimaryKey = []string{"account_id", "favorited_id"}
+	// FavoritesPrimaryKey and FavoritesColumn2 are the table columns denoting the
+	// primary key for the favorites relation (M2M).
+	FavoritesPrimaryKey = []string{"account_id", "favorited_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -79,4 +97,46 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByAdmin orders the results by the admin field.
 func ByAdmin(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAdmin, opts...).ToFunc()
+}
+
+// ByFavoritedsCount orders the results by favoriteds count.
+func ByFavoritedsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFavoritedsStep(), opts...)
+	}
+}
+
+// ByFavoriteds orders the results by favoriteds terms.
+func ByFavoriteds(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFavoritedsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByFavoritesCount orders the results by favorites count.
+func ByFavoritesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFavoritesStep(), opts...)
+	}
+}
+
+// ByFavorites orders the results by favorites terms.
+func ByFavorites(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFavoritesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newFavoritedsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, FavoritedsTable, FavoritedsPrimaryKey...),
+	)
+}
+func newFavoritesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, FavoritesTable, FavoritesPrimaryKey...),
+	)
 }

@@ -76,9 +76,81 @@ func (au *AccountUpdate) SetNillableAdmin(b *bool) *AccountUpdate {
 	return au
 }
 
+// AddFavoritedIDs adds the "favoriteds" edge to the Account entity by IDs.
+func (au *AccountUpdate) AddFavoritedIDs(ids ...string) *AccountUpdate {
+	au.mutation.AddFavoritedIDs(ids...)
+	return au
+}
+
+// AddFavoriteds adds the "favoriteds" edges to the Account entity.
+func (au *AccountUpdate) AddFavoriteds(a ...*Account) *AccountUpdate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.AddFavoritedIDs(ids...)
+}
+
+// AddFavoriteIDs adds the "favorites" edge to the Account entity by IDs.
+func (au *AccountUpdate) AddFavoriteIDs(ids ...string) *AccountUpdate {
+	au.mutation.AddFavoriteIDs(ids...)
+	return au
+}
+
+// AddFavorites adds the "favorites" edges to the Account entity.
+func (au *AccountUpdate) AddFavorites(a ...*Account) *AccountUpdate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.AddFavoriteIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
+}
+
+// ClearFavoriteds clears all "favoriteds" edges to the Account entity.
+func (au *AccountUpdate) ClearFavoriteds() *AccountUpdate {
+	au.mutation.ClearFavoriteds()
+	return au
+}
+
+// RemoveFavoritedIDs removes the "favoriteds" edge to Account entities by IDs.
+func (au *AccountUpdate) RemoveFavoritedIDs(ids ...string) *AccountUpdate {
+	au.mutation.RemoveFavoritedIDs(ids...)
+	return au
+}
+
+// RemoveFavoriteds removes "favoriteds" edges to Account entities.
+func (au *AccountUpdate) RemoveFavoriteds(a ...*Account) *AccountUpdate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.RemoveFavoritedIDs(ids...)
+}
+
+// ClearFavorites clears all "favorites" edges to the Account entity.
+func (au *AccountUpdate) ClearFavorites() *AccountUpdate {
+	au.mutation.ClearFavorites()
+	return au
+}
+
+// RemoveFavoriteIDs removes the "favorites" edge to Account entities by IDs.
+func (au *AccountUpdate) RemoveFavoriteIDs(ids ...string) *AccountUpdate {
+	au.mutation.RemoveFavoriteIDs(ids...)
+	return au
+}
+
+// RemoveFavorites removes "favorites" edges to Account entities.
+func (au *AccountUpdate) RemoveFavorites(a ...*Account) *AccountUpdate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.RemoveFavoriteIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -128,6 +200,96 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := au.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
+	}
+	if au.mutation.FavoritedsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   account.FavoritedsTable,
+			Columns: account.FavoritedsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedFavoritedsIDs(); len(nodes) > 0 && !au.mutation.FavoritedsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   account.FavoritedsTable,
+			Columns: account.FavoritedsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.FavoritedsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   account.FavoritedsTable,
+			Columns: account.FavoritedsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.FavoritesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.FavoritesTable,
+			Columns: account.FavoritesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedFavoritesIDs(); len(nodes) > 0 && !au.mutation.FavoritesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.FavoritesTable,
+			Columns: account.FavoritesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.FavoritesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.FavoritesTable,
+			Columns: account.FavoritesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -198,9 +360,81 @@ func (auo *AccountUpdateOne) SetNillableAdmin(b *bool) *AccountUpdateOne {
 	return auo
 }
 
+// AddFavoritedIDs adds the "favoriteds" edge to the Account entity by IDs.
+func (auo *AccountUpdateOne) AddFavoritedIDs(ids ...string) *AccountUpdateOne {
+	auo.mutation.AddFavoritedIDs(ids...)
+	return auo
+}
+
+// AddFavoriteds adds the "favoriteds" edges to the Account entity.
+func (auo *AccountUpdateOne) AddFavoriteds(a ...*Account) *AccountUpdateOne {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.AddFavoritedIDs(ids...)
+}
+
+// AddFavoriteIDs adds the "favorites" edge to the Account entity by IDs.
+func (auo *AccountUpdateOne) AddFavoriteIDs(ids ...string) *AccountUpdateOne {
+	auo.mutation.AddFavoriteIDs(ids...)
+	return auo
+}
+
+// AddFavorites adds the "favorites" edges to the Account entity.
+func (auo *AccountUpdateOne) AddFavorites(a ...*Account) *AccountUpdateOne {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.AddFavoriteIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
+}
+
+// ClearFavoriteds clears all "favoriteds" edges to the Account entity.
+func (auo *AccountUpdateOne) ClearFavoriteds() *AccountUpdateOne {
+	auo.mutation.ClearFavoriteds()
+	return auo
+}
+
+// RemoveFavoritedIDs removes the "favoriteds" edge to Account entities by IDs.
+func (auo *AccountUpdateOne) RemoveFavoritedIDs(ids ...string) *AccountUpdateOne {
+	auo.mutation.RemoveFavoritedIDs(ids...)
+	return auo
+}
+
+// RemoveFavoriteds removes "favoriteds" edges to Account entities.
+func (auo *AccountUpdateOne) RemoveFavoriteds(a ...*Account) *AccountUpdateOne {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.RemoveFavoritedIDs(ids...)
+}
+
+// ClearFavorites clears all "favorites" edges to the Account entity.
+func (auo *AccountUpdateOne) ClearFavorites() *AccountUpdateOne {
+	auo.mutation.ClearFavorites()
+	return auo
+}
+
+// RemoveFavoriteIDs removes the "favorites" edge to Account entities by IDs.
+func (auo *AccountUpdateOne) RemoveFavoriteIDs(ids ...string) *AccountUpdateOne {
+	auo.mutation.RemoveFavoriteIDs(ids...)
+	return auo
+}
+
+// RemoveFavorites removes "favorites" edges to Account entities.
+func (auo *AccountUpdateOne) RemoveFavorites(a ...*Account) *AccountUpdateOne {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.RemoveFavoriteIDs(ids...)
 }
 
 // Where appends a list predicates to the AccountUpdate builder.
@@ -280,6 +514,96 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	}
 	if value, ok := auo.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
+	}
+	if auo.mutation.FavoritedsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   account.FavoritedsTable,
+			Columns: account.FavoritedsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedFavoritedsIDs(); len(nodes) > 0 && !auo.mutation.FavoritedsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   account.FavoritedsTable,
+			Columns: account.FavoritedsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.FavoritedsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   account.FavoritedsTable,
+			Columns: account.FavoritedsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.FavoritesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.FavoritesTable,
+			Columns: account.FavoritesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedFavoritesIDs(); len(nodes) > 0 && !auo.mutation.FavoritesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.FavoritesTable,
+			Columns: account.FavoritesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.FavoritesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.FavoritesTable,
+			Columns: account.FavoritesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Account{config: auo.config}
 	_spec.Assign = _node.assignValues

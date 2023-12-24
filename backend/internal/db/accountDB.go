@@ -23,8 +23,8 @@ type accountDB struct {
 	store *DB
 }
 
-func NewAccountStore(store *DB) AccountDB {
-	return &accountDB{store: store}
+func NewAccountStore(client *DB) AccountDB {
+	return &accountDB{store: client}
 }
 
 func (a *accountDB) Transfer(ctx context.Context, from, to string, amount float64) error {

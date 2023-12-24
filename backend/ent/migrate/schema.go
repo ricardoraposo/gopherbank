@@ -90,12 +90,38 @@ var (
 			},
 		},
 	}
+	// AccountFavoritesColumns holds the columns for the "account_favorites" table.
+	AccountFavoritesColumns = []*schema.Column{
+		{Name: "account_id", Type: field.TypeString},
+		{Name: "favorited_id", Type: field.TypeString},
+	}
+	// AccountFavoritesTable holds the schema information for the "account_favorites" table.
+	AccountFavoritesTable = &schema.Table{
+		Name:       "account_favorites",
+		Columns:    AccountFavoritesColumns,
+		PrimaryKey: []*schema.Column{AccountFavoritesColumns[0], AccountFavoritesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "account_favorites_account_id",
+				Columns:    []*schema.Column{AccountFavoritesColumns[0]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "account_favorites_favorited_id",
+				Columns:    []*schema.Column{AccountFavoritesColumns[1]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AccountsTable,
 		TransactionsTable,
 		TransactionDetailsTable,
 		UsersTable,
+		AccountFavoritesTable,
 	}
 )
 
@@ -104,4 +130,6 @@ func init() {
 	TransactionsTable.ForeignKeys[1].RefTable = AccountsTable
 	TransactionDetailsTable.ForeignKeys[0].RefTable = TransactionsTable
 	UsersTable.ForeignKeys[0].RefTable = AccountsTable
+	AccountFavoritesTable.ForeignKeys[0].RefTable = AccountsTable
+	AccountFavoritesTable.ForeignKeys[1].RefTable = AccountsTable
 }

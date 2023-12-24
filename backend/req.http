@@ -11,7 +11,7 @@ POST http://localhost:5432/auth
 Content-Type: application/json
 
 {
-    "number": "01231832",
+    "number": "01164856",
     "password": "eusouoadmin"
 }
 
@@ -51,4 +51,13 @@ Content-Type: application/json
     "fromAccountNumber": "03305706",
     "toAccountNumber": "07571829",
     "amount": 10
+}
+
+POST http://localhost:5432/api/favorite
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzUxNDE4NCwibnVtYmVyIjoiMDExNjQ4NTYifQ.C6zwUGk64vp-rj_MJh_U-aOMmrBtyvOPwxVLFL77Ldo
+Content-Type: application/json
+
+{
+    "accountID": "01164856",
+    "favoritedID": "01479248"
 }

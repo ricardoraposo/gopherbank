@@ -24,8 +24,40 @@ type Account struct {
 	// CreatedAt holds the value of the "createdAt" field.
 	CreatedAt time.Time `json:"createdAt"`
 	// Admin holds the value of the "admin" field.
-	Admin        bool `json:"admin"`
+	Admin bool `json:"admin"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the AccountQuery when eager-loading is set.
+	Edges        AccountEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// AccountEdges holds the relations/edges for other nodes in the graph.
+type AccountEdges struct {
+	// Favoriteds holds the value of the favoriteds edge.
+	Favoriteds []*Account `json:"favoriteds,omitempty"`
+	// Favorites holds the value of the favorites edge.
+	Favorites []*Account `json:"favorites,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// FavoritedsOrErr returns the Favoriteds value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) FavoritedsOrErr() ([]*Account, error) {
+	if e.loadedTypes[0] {
+		return e.Favoriteds, nil
+	}
+	return nil, &NotLoadedError{edge: "favoriteds"}
+}
+
+// FavoritesOrErr returns the Favorites value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) FavoritesOrErr() ([]*Account, error) {
+	if e.loadedTypes[1] {
+		return e.Favorites, nil
+	}
+	return nil, &NotLoadedError{edge: "favorites"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -97,6 +129,16 @@ func (a *Account) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (a *Account) Value(name string) (ent.Value, error) {
 	return a.selectValues.Get(name)
+}
+
+// QueryFavoriteds queries the "favoriteds" edge of the Account entity.
+func (a *Account) QueryFavoriteds() *AccountQuery {
+	return NewAccountClient(a.config).QueryFavoriteds(a)
+}
+
+// QueryFavorites queries the "favorites" edge of the Account entity.
+func (a *Account) QueryFavorites() *AccountQuery {
+	return NewAccountClient(a.config).QueryFavorites(a)
 }
 
 // Update returns a builder for updating this Account.

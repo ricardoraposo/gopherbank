@@ -36,18 +36,24 @@ const (
 // AccountMutation represents an operation that mutates the Account nodes in the graph.
 type AccountMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *string
-	password      *string
-	balance       *float64
-	addbalance    *float64
-	createdAt     *time.Time
-	admin         *bool
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Account, error)
-	predicates    []predicate.Account
+	op                Op
+	typ               string
+	id                *string
+	password          *string
+	balance           *float64
+	addbalance        *float64
+	createdAt         *time.Time
+	admin             *bool
+	clearedFields     map[string]struct{}
+	favoriteds        map[string]struct{}
+	removedfavoriteds map[string]struct{}
+	clearedfavoriteds bool
+	favorites         map[string]struct{}
+	removedfavorites  map[string]struct{}
+	clearedfavorites  bool
+	done              bool
+	oldValue          func(context.Context) (*Account, error)
+	predicates        []predicate.Account
 }
 
 var _ ent.Mutation = (*AccountMutation)(nil)
@@ -318,6 +324,114 @@ func (m *AccountMutation) ResetAdmin() {
 	m.admin = nil
 }
 
+// AddFavoritedIDs adds the "favoriteds" edge to the Account entity by ids.
+func (m *AccountMutation) AddFavoritedIDs(ids ...string) {
+	if m.favoriteds == nil {
+		m.favoriteds = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.favoriteds[ids[i]] = struct{}{}
+	}
+}
+
+// ClearFavoriteds clears the "favoriteds" edge to the Account entity.
+func (m *AccountMutation) ClearFavoriteds() {
+	m.clearedfavoriteds = true
+}
+
+// FavoritedsCleared reports if the "favoriteds" edge to the Account entity was cleared.
+func (m *AccountMutation) FavoritedsCleared() bool {
+	return m.clearedfavoriteds
+}
+
+// RemoveFavoritedIDs removes the "favoriteds" edge to the Account entity by IDs.
+func (m *AccountMutation) RemoveFavoritedIDs(ids ...string) {
+	if m.removedfavoriteds == nil {
+		m.removedfavoriteds = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.favoriteds, ids[i])
+		m.removedfavoriteds[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedFavoriteds returns the removed IDs of the "favoriteds" edge to the Account entity.
+func (m *AccountMutation) RemovedFavoritedsIDs() (ids []string) {
+	for id := range m.removedfavoriteds {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// FavoritedsIDs returns the "favoriteds" edge IDs in the mutation.
+func (m *AccountMutation) FavoritedsIDs() (ids []string) {
+	for id := range m.favoriteds {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetFavoriteds resets all changes to the "favoriteds" edge.
+func (m *AccountMutation) ResetFavoriteds() {
+	m.favoriteds = nil
+	m.clearedfavoriteds = false
+	m.removedfavoriteds = nil
+}
+
+// AddFavoriteIDs adds the "favorites" edge to the Account entity by ids.
+func (m *AccountMutation) AddFavoriteIDs(ids ...string) {
+	if m.favorites == nil {
+		m.favorites = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.favorites[ids[i]] = struct{}{}
+	}
+}
+
+// ClearFavorites clears the "favorites" edge to the Account entity.
+func (m *AccountMutation) ClearFavorites() {
+	m.clearedfavorites = true
+}
+
+// FavoritesCleared reports if the "favorites" edge to the Account entity was cleared.
+func (m *AccountMutation) FavoritesCleared() bool {
+	return m.clearedfavorites
+}
+
+// RemoveFavoriteIDs removes the "favorites" edge to the Account entity by IDs.
+func (m *AccountMutation) RemoveFavoriteIDs(ids ...string) {
+	if m.removedfavorites == nil {
+		m.removedfavorites = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.favorites, ids[i])
+		m.removedfavorites[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedFavorites returns the removed IDs of the "favorites" edge to the Account entity.
+func (m *AccountMutation) RemovedFavoritesIDs() (ids []string) {
+	for id := range m.removedfavorites {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// FavoritesIDs returns the "favorites" edge IDs in the mutation.
+func (m *AccountMutation) FavoritesIDs() (ids []string) {
+	for id := range m.favorites {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetFavorites resets all changes to the "favorites" edge.
+func (m *AccountMutation) ResetFavorites() {
+	m.favorites = nil
+	m.clearedfavorites = false
+	m.removedfavorites = nil
+}
+
 // Where appends a list predicates to the AccountMutation builder.
 func (m *AccountMutation) Where(ps ...predicate.Account) {
 	m.predicates = append(m.predicates, ps...)
@@ -517,49 +631,111 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.favoriteds != nil {
+		edges = append(edges, account.EdgeFavoriteds)
+	}
+	if m.favorites != nil {
+		edges = append(edges, account.EdgeFavorites)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *AccountMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case account.EdgeFavoriteds:
+		ids := make([]ent.Value, 0, len(m.favoriteds))
+		for id := range m.favoriteds {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeFavorites:
+		ids := make([]ent.Value, 0, len(m.favorites))
+		for id := range m.favorites {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.removedfavoriteds != nil {
+		edges = append(edges, account.EdgeFavoriteds)
+	}
+	if m.removedfavorites != nil {
+		edges = append(edges, account.EdgeFavorites)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case account.EdgeFavoriteds:
+		ids := make([]ent.Value, 0, len(m.removedfavoriteds))
+		for id := range m.removedfavoriteds {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeFavorites:
+		ids := make([]ent.Value, 0, len(m.removedfavorites))
+		for id := range m.removedfavorites {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.clearedfavoriteds {
+		edges = append(edges, account.EdgeFavoriteds)
+	}
+	if m.clearedfavorites {
+		edges = append(edges, account.EdgeFavorites)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *AccountMutation) EdgeCleared(name string) bool {
+	switch name {
+	case account.EdgeFavoriteds:
+		return m.clearedfavoriteds
+	case account.EdgeFavorites:
+		return m.clearedfavorites
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *AccountMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Account unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *AccountMutation) ResetEdge(name string) error {
+	switch name {
+	case account.EdgeFavoriteds:
+		m.ResetFavoriteds()
+		return nil
+	case account.EdgeFavorites:
+		m.ResetFavorites()
+		return nil
+	}
 	return fmt.Errorf("unknown Account edge %s", name)
 }
 

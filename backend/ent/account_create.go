@@ -74,6 +74,36 @@ func (ac *AccountCreate) SetID(s string) *AccountCreate {
 	return ac
 }
 
+// AddFavoritedIDs adds the "favoriteds" edge to the Account entity by IDs.
+func (ac *AccountCreate) AddFavoritedIDs(ids ...string) *AccountCreate {
+	ac.mutation.AddFavoritedIDs(ids...)
+	return ac
+}
+
+// AddFavoriteds adds the "favoriteds" edges to the Account entity.
+func (ac *AccountCreate) AddFavoriteds(a ...*Account) *AccountCreate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ac.AddFavoritedIDs(ids...)
+}
+
+// AddFavoriteIDs adds the "favorites" edge to the Account entity by IDs.
+func (ac *AccountCreate) AddFavoriteIDs(ids ...string) *AccountCreate {
+	ac.mutation.AddFavoriteIDs(ids...)
+	return ac
+}
+
+// AddFavorites adds the "favorites" edges to the Account entity.
+func (ac *AccountCreate) AddFavorites(a ...*Account) *AccountCreate {
+	ids := make([]string, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ac.AddFavoriteIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (ac *AccountCreate) Mutation() *AccountMutation {
 	return ac.mutation
@@ -187,6 +217,38 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	if value, ok := ac.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
 		_node.Admin = value
+	}
+	if nodes := ac.mutation.FavoritedsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   account.FavoritedsTable,
+			Columns: account.FavoritedsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.FavoritesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.FavoritesTable,
+			Columns: account.FavoritesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
