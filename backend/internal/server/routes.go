@@ -21,9 +21,10 @@ func (s *FiberServer) RegisterRoutes() {
 	// api.Get("accounts", accountsHandler.GetAllAccounts)
 
 	// transactions routes
+	api.Get("/transaction", transactionHandler.GetAllTransactions)
+    api.Get("/transaction/:id", transactionHandler.GetAccountTransactions)
 	api.Post("/transfer", transactionHandler.Transfer)
 	api.Post("/withdraw", transactionHandler.Withdraw)
-	// api.Post("/deposit", transactionHandler.Deposit)
 
     // favorite routes
     api.Post("/favorite", favoritehandler.AddToFavorite)

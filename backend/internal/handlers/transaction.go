@@ -16,6 +16,35 @@ func NewTransactionHandler(client *db.DB) *TransactionHandler {
 	return &TransactionHandler{store: transactionDB}
 }
 
+func (h *TransactionHandler) GetAllTransactions(c *fiber.Ctx) error {
+	transactions, err := h.store.GetAllTransactions(c.Context())
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(fiber.Map{"transactions": transactions})
+}
+
+func (h *TransactionHandler) GetAccountTransactions(c *fiber.Ctx) error {
+	accountNumber := c.Params("id")
+
+	claims, ok := c.Context().Value("claims").(jwt.MapClaims)
+	if !ok {
+		return c.JSON(fiber.Map{"error": "Failed to parse token"})
+	}
+
+	if claims["number"] != accountNumber {
+		return fiber.NewError(fiber.StatusUnauthorized, "Unhautorized")
+	}
+
+	transactions, err := h.store.GetAccountTransactions(c.Context(), accountNumber)
+	if err != nil {
+		return c.JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{"transactions": transactions})
+}
+
 func (h *TransactionHandler) Transfer(c *fiber.Ctx) error {
 	params := &models.TransferParams{}
 	if err := c.BodyParser(params); err != nil {
@@ -28,7 +57,7 @@ func (h *TransactionHandler) Transfer(c *fiber.Ctx) error {
 	}
 
 	if claims["number"] != params.FromAccountNumber {
-		return fiber.NewError(fiber.StatusUnauthorized, "Not enough credentials")
+		return fiber.NewError(fiber.StatusUnauthorized, "Unhautorized")
 	}
 
 	params.Type = "transfer"

@@ -3,10 +3,15 @@ package db
 import (
 	"context"
 
+	"github.com/ricardoraposo/gopherbank/ent"
+	"github.com/ricardoraposo/gopherbank/ent/account"
+	"github.com/ricardoraposo/gopherbank/ent/transaction"
 	"github.com/ricardoraposo/gopherbank/models"
 )
 
 type TransactionDB interface {
+	GetAllTransactions(context.Context) ([]*ent.TransactionDetails, error)
+	GetAccountTransactions(context.Context, string) ([]*ent.TransactionDetails, error)
 	CreateTransferTransaction(context.Context, *models.TransferParams) error
 	CreateDepositTransaction(context.Context, *models.DepositParams) error
 	CreateWithdrawTransaction(context.Context, *models.WithdrawParams) error
@@ -39,8 +44,7 @@ func (t *transactionDB) CreateTransferTransaction(ctx context.Context, params *m
 	transaction, err := t.store.client.Transaction.
 		Create().
 		SetToAccount(toAccount).
-		SetFromAccount(fromAccount).
-		Save(ctx)
+		SetFromAccount(fromAccount).Save(ctx)
 
 	return t.store.client.TransactionDetails.Create().
 		SetType(params.Type).
@@ -88,4 +92,39 @@ func (t *transactionDB) CreateWithdrawTransaction(ctx context.Context, params *m
 		SetAmount(params.Amount).
 		SetTransaction(transaction).
 		Exec(ctx)
+}
+
+func (t *transactionDB) GetAllTransactions(ctx context.Context) ([]*ent.TransactionDetails, error) {
+	transactions, err := t.store.client.TransactionDetails.Query().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return transactions, nil
+}
+
+func (t *transactionDB) GetAccountTransactions(ctx context.Context, accountNumber string) ([]*ent.TransactionDetails, error) {
+	toTransactions, err := t.store.client.Transaction.
+        Query().
+        Where(transaction.HasToAccountWith(account.ID(accountNumber))).
+        QueryDetail().
+        All(ctx)
+
+	fromTransactions, err := t.store.client.Transaction.
+        Query().
+        Where(transaction.HasFromAccountWith(account.ID(accountNumber))).
+        QueryDetail().
+        All(ctx)
+
+    for _, transaction := range fromTransactions {
+        transaction.Amount = -transaction.Amount
+    }
+
+    toTransactions = append(toTransactions, fromTransactions...)
+
+    if err != nil {
+        return nil, err
+    }
+
+	return toTransactions, nil
 }

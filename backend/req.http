@@ -1,5 +1,5 @@
 GET http://localhost:5432/api/accounts
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzQzNjkxNSwibnVtYmVyIjoiMDEyMzE4MzIifQ.yKUTvsm80CASRaHIMv-7U2XwQ-HIHQhBLkMKFbFyPS4
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzYwNjA0OSwibnVtYmVyIjoiMDI5NTQ5MjAifQ.5Odh5Dep_aQwH7a4UWb0V_2fqMVNpZ94y_dHoUcnItI
 
 GET http://localhost:5432/api/accounts/05898155
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGlyZXMiOjE3MDM0MjI1MDcsIm51bWJlciI6IjA1ODk4MTU1In0.3ZC95xJg2VJ0Ds2Hl3ErX1yHglXuwBble_5m3KCWc-U
@@ -61,3 +61,9 @@ Content-Type: application/json
     "accountID": "01164856",
     "favoritedID": "01479248"
 }
+
+GET http://localhost:5432/api/transaction
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzYwNjA0OSwibnVtYmVyIjoiMDI5NTQ5MjAifQ.5Odh5Dep_aQwH7a4UWb0V_2fqMVNpZ94y_dHoUcnItI
+
+GET http://localhost:5432/api/transaction/02954920
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzYwNjA0OSwibnVtYmVyIjoiMDI5NTQ5MjAifQ.5Odh5Dep_aQwH7a4UWb0V_2fqMVNpZ94y_dHoUcnItI
