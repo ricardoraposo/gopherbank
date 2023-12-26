@@ -12,7 +12,8 @@ import (
 
 type UserDB interface {
 	CreateUser(context.Context, *models.NewAccountParams, *ent.Account) error
-	EditUser(context.Context, *models.EditUserParams, string) error
+	GetUser(context.Context, string) (*ent.User, error)
+	EditUser(context.Context, models.EditUserParams, string) error
 	DeleteUser(context.Context, string) error
 }
 
@@ -40,7 +41,20 @@ func (u *userDB) CreateUser(ctx context.Context, p *models.NewAccountParams, acc
 	return nil
 }
 
-func (u *userDB) EditUser(ctx context.Context, p *models.EditUserParams, accountNumber string) error {
+func (u *userDB) GetUser(ctx context.Context, accountNumber string) (*ent.User, error) {
+	user, err := u.store.client.User.
+		Query().
+		Where(user.HasAccountWith(account.ID(accountNumber))).
+		Only(ctx)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed getting user: %w", err)
+	}
+
+	return user, nil
+}
+
+func (u *userDB) EditUser(ctx context.Context, p models.EditUserParams, accountNumber string) error {
 	rows, err := u.store.client.User.Update().
 		Where(user.HasAccountWith(account.ID(accountNumber))).
 		SetFirstName(p.FirstName).

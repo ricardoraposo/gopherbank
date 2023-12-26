@@ -67,3 +67,14 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJl
 
 GET http://localhost:5432/api/transaction/00140275
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzcwOTM1MCwibnVtYmVyIjoiMDAxNDAyNzUifQ._iInftTcDflYDrpxrdj76yHgQ89vfJZARJOu7V_7bic
+
+
+# user related stuff
+
+PUT http://localhost:5432/api/user/00440491
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzcwOTM1MCwibnVtYmVyIjoiMDAxNDAyNzUifQ._iInftTcDflYDrpxrdj76yHgQ89vfJZARJOu7V_7bic
+Content-Type: application/json
+
+{
+    "firstName": "Benjamin"
+}
