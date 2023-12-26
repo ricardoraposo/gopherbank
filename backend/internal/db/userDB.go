@@ -5,12 +5,14 @@ import (
 	"fmt"
 
 	"github.com/ricardoraposo/gopherbank/ent"
+	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/ent/user"
 	"github.com/ricardoraposo/gopherbank/models"
 )
 
 type UserDB interface {
 	CreateUser(context.Context, *models.NewAccountParams, *ent.Account) error
+	EditUser(context.Context, *models.EditUserParams, string) error
 	DeleteUser(context.Context, string) error
 }
 
@@ -33,6 +35,25 @@ func (u *userDB) CreateUser(ctx context.Context, p *models.NewAccountParams, acc
 
 	if err != nil {
 		return fmt.Errorf("failed creating user: %w", err)
+	}
+
+	return nil
+}
+
+func (u *userDB) EditUser(ctx context.Context, p *models.EditUserParams, accountNumber string) error {
+	rows, err := u.store.client.User.Update().
+		Where(user.HasAccountWith(account.ID(accountNumber))).
+		SetFirstName(p.FirstName).
+		SetLastName(p.LastName).
+		SetEmail(p.Email).
+		Save(ctx)
+
+	if err != nil {
+		return fmt.Errorf("failed updating user: %w", err)
+	}
+
+	if rows < 1 {
+		return fmt.Errorf("User %s not found", accountNumber)
 	}
 
 	return nil

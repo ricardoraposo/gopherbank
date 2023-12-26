@@ -10,8 +10,13 @@ import (
 )
 
 func JWTAuthentication(c *fiber.Ctx) error {
-	token := c.GetReqHeaders()["Authorization"][0]
+	authHeader := c.GetReqHeaders()["Authorization"]
 
+    if len(authHeader) == 0 {
+        return fiber.NewError(fiber.StatusUnauthorized, "Missing token")
+    }
+
+    token := authHeader[0]
 	claims, err := getClaimsFromJWT(token)
 	if err != nil {
         return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")

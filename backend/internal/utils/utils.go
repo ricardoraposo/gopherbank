@@ -3,8 +3,11 @@ package utils
 import (
 	"fmt"
 	"math/rand"
+	"sort"
 	"strings"
 
+	"github.com/ricardoraposo/gopherbank/ent"
+	"github.com/ricardoraposo/gopherbank/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -31,4 +34,9 @@ func EncryptPassword(password string) (string, error) {
 func ComparePasswords(hashedPassword, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	return err == nil
+}
+
+func SortTransactionsByDate(transactions []*ent.TransactionDetails) []*ent.TransactionDetails {
+	sort.Sort(models.ByTransactedAt(transactions))
+	return transactions
 }

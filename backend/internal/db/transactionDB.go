@@ -6,6 +6,7 @@ import (
 	"github.com/ricardoraposo/gopherbank/ent"
 	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
+	"github.com/ricardoraposo/gopherbank/internal/utils"
 	"github.com/ricardoraposo/gopherbank/models"
 )
 
@@ -105,26 +106,26 @@ func (t *transactionDB) GetAllTransactions(ctx context.Context) ([]*ent.Transact
 
 func (t *transactionDB) GetAccountTransactions(ctx context.Context, accountNumber string) ([]*ent.TransactionDetails, error) {
 	toTransactions, err := t.store.client.Transaction.
-        Query().
-        Where(transaction.HasToAccountWith(account.ID(accountNumber))).
-        QueryDetail().
-        All(ctx)
+		Query().
+		Where(transaction.HasToAccountWith(account.ID(accountNumber))).
+		QueryDetail().
+		All(ctx)
 
 	fromTransactions, err := t.store.client.Transaction.
-        Query().
-        Where(transaction.HasFromAccountWith(account.ID(accountNumber))).
-        QueryDetail().
-        All(ctx)
+		Query().
+		Where(transaction.HasFromAccountWith(account.ID(accountNumber))).
+		QueryDetail().
+		All(ctx)
 
-    for _, transaction := range fromTransactions {
-        transaction.Amount = -transaction.Amount
-    }
+	for _, transaction := range fromTransactions {
+		transaction.Amount = -transaction.Amount
+	}
 
-    toTransactions = append(toTransactions, fromTransactions...)
+    transactions := append(toTransactions, fromTransactions...)
 
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-	return toTransactions, nil
+	return utils.SortTransactionsByDate(transactions), nil
 }

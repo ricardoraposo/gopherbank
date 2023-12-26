@@ -7,3 +7,9 @@ type User struct {
 	Email         string `json:"email"`
 	AccountNumber string `json:"accountNumber"`
 }
+
+type EditUserParams struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
+}
