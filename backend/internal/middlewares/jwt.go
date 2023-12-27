@@ -3,6 +3,7 @@ package middlewares
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -12,19 +13,19 @@ import (
 func JWTAuthentication(c *fiber.Ctx) error {
 	authHeader := c.GetReqHeaders()["Authorization"]
 
-    if len(authHeader) == 0 {
-        return fiber.NewError(fiber.StatusUnauthorized, "Missing token")
-    }
+	if len(authHeader) == 0 {
+		return fiber.NewError(fiber.StatusUnauthorized, "Missing token")
+	}
 
-    token := authHeader[0]
+	token := strings.Fields(authHeader[0])[0]
 	claims, err := getClaimsFromJWT(token)
 	if err != nil {
-        return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")
+		return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")
 	}
 
 	expirationTime := claims["expires"].(float64)
 	if int64(expirationTime) < time.Now().Unix() {
-        return fiber.NewError(fiber.StatusUnauthorized, "Token expired")
+		return fiber.NewError(fiber.StatusUnauthorized, "Token expired")
 	}
 
 	c.Context().SetUserValue("claims", claims)
