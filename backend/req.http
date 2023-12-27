@@ -1,5 +1,5 @@
-GET http://localhost:5432/api/accounts
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzYwNjA0OSwibnVtYmVyIjoiMDI5NTQ5MjAifQ.5Odh5Dep_aQwH7a4UWb0V_2fqMVNpZ94y_dHoUcnItI
+GET http://192.168.0.141:5432/api/accounts
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwaXJlcyI6MTcwMzc4MDE1MSwibnVtYmVyIjoiMDAxNDAyNzUifQ.uLbpwrSe9LduBmaqy0_I9_DSxYBtwzvHf-RUjjgud70
 
 GET http://localhost:5432/api/accounts/05898155
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGlyZXMiOjE3MDM0MjI1MDcsIm51bWJlciI6IjA1ODk4MTU1In0.3ZC95xJg2VJ0Ds2Hl3ErX1yHglXuwBble_5m3KCWc-U
@@ -7,7 +7,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGly
 DELETE http://localhost:5432/api/accounts/03483281
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6ZmFsc2UsImV4cGlyZXMiOjE3MDMzNjg4MjMsIm51bWJlciI6IjAzNDgzMjgxIn0.-HujP6FnEq2Nt2i69LQjlp8lot5q-i4LBx5vkXhho6s
 
-POST http://localhost:5432/auth
+POST http://192.168.0.141:5432/auth
 Content-Type: application/json
 
 {
@@ -78,3 +78,5 @@ Content-Type: application/json
 {
     "firstName": "Benjamin"
 }
+
+GET http://localhost:5432/test/accounts

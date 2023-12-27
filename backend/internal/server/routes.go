@@ -15,8 +15,8 @@ func (s *FiberServer) RegisterRoutes() {
 	authHandler := handlers.NewAuthHandler(s.db)
 	favoritehandler := handlers.NewFavoriteHandler(s.db)
 
-    s.Use(logger.New())
-    s.Use(cors.New())
+	s.Use(logger.New())
+	s.Use(cors.New())
 
 	api := s.App.Group("/api")
 	api.Use(middlewares.JWTAuthentication)
@@ -43,6 +43,7 @@ func (s *FiberServer) RegisterRoutes() {
 	auth.Post("/new", middlewares.ValidateNewAccountParams, accountsHandler.CreateAccount)
 
 	// admin routes
+	// api.Get("/accounts", middlewares.IsAdmin, accountsHandler.GetAllAccounts)
 	api.Get("/accounts", middlewares.IsAdmin, accountsHandler.GetAllAccounts)
 	api.Get("/transaction", middlewares.IsAdmin, transactionHandler.GetAllTransactions)
 	api.Post("/deposit", middlewares.IsAdmin, transactionHandler.Deposit)

@@ -12,7 +12,7 @@ func main() {
 	app := server.New()
 	app.RegisterRoutes()
 
-	port := fmt.Sprintf(":%s", os.Getenv("APP_PORT"))
+	port := fmt.Sprintf("%s:%s", os.Getenv("APP_HOST"), os.Getenv("APP_PORT"))
 	if err := app.Listen(port); err != nil {
 		panic(err)
 	}
