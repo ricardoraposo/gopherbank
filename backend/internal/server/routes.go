@@ -1,6 +1,8 @@
 package server
 
 import (
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/ricardoraposo/gopherbank/internal/handlers"
 	"github.com/ricardoraposo/gopherbank/internal/middlewares"
 )
@@ -12,6 +14,9 @@ func (s *FiberServer) RegisterRoutes() {
 	transactionHandler := handlers.NewTransactionHandler(s.db)
 	authHandler := handlers.NewAuthHandler(s.db)
 	favoritehandler := handlers.NewFavoriteHandler(s.db)
+
+    s.Use(logger.New())
+    s.Use(cors.New())
 
 	api := s.App.Group("/api")
 	api.Use(middlewares.JWTAuthentication)
@@ -26,15 +31,15 @@ func (s *FiberServer) RegisterRoutes() {
 
 	// transactions routes
 	api.Get("/transaction/:id", transactionHandler.GetAccountTransactions)
-	api.Post("/transfer", transactionHandler.Transfer)
-	api.Post("/withdraw", transactionHandler.Withdraw)
+	api.Post("/transfer", middlewares.ValidateTransferParams, transactionHandler.Transfer)
+	api.Post("/withdraw", middlewares.ValidateWithdrawParams, transactionHandler.Withdraw)
 
 	// favorite routes
 	api.Post("/favorite", favoritehandler.AddToFavorite)
 
 	// auth routes
 	auth := s.App.Group("/auth")
-	auth.Post("/", authHandler.Authenticate)
+	auth.Post("/", middlewares.ValidateLoginParams, authHandler.Authenticate)
 	auth.Post("/new", middlewares.ValidateNewAccountParams, accountsHandler.CreateAccount)
 
 	// admin routes

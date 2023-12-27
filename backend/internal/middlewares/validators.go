@@ -27,3 +27,58 @@ func ValidateNewAccountParams(c *fiber.Ctx) error {
 
 	return c.Next()
 }
+
+func ValidateLoginParams(c *fiber.Ctx) error {
+	var login models.LoginParams
+	if err := c.BodyParser(&login); err != nil {
+		return err
+	}
+
+	if len(login.Number) < 1 {
+		return fiber.NewError(fiber.StatusBadRequest, "Account number must be provided")
+	}
+
+	if len(login.Password) < minPasswordLength {
+		return fiber.NewError(fiber.StatusBadRequest, "Password must have at least 8 characters")
+	}
+
+	return c.Next()
+}
+
+func ValidateTransferParams(c *fiber.Ctx) error {
+	var transfer models.TransferParams
+	if err := c.BodyParser(&transfer); err != nil {
+		return err
+	}
+
+	if len(transfer.ToAccountNumber) < 1 {
+		return fiber.NewError(fiber.StatusBadRequest, "Destiny account number must be provided")
+	}
+
+	if len(transfer.FromAccountNumber) < 1 {
+		return fiber.NewError(fiber.StatusBadRequest, "Origin account number must be provided")
+	}
+
+	if transfer.Amount <= 0 {
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid amount")
+	}
+
+	return c.Next()
+}
+
+func ValidateWithdrawParams(c *fiber.Ctx) error {
+    var withdraw models.WithdrawParams
+    if err := c.BodyParser(&withdraw); err != nil {
+        return err
+    }
+
+    if len(withdraw.FromAccountNumber) < 1 {
+        return fiber.NewError(fiber.StatusBadRequest, "Origin account number must be provided")
+    }
+
+    if withdraw.Amount <= 0 {
+        return fiber.NewError(fiber.StatusBadRequest, "Invalid amount")
+    }
+
+    return c.Next()
+}

@@ -21,17 +21,12 @@ type NewAccountParams struct {
 	Number    string `json:"number"`
 }
 
-type DisplayAccount struct {
-	FirstName string  `json:"firstName"`
-	LastName  string  `json:"lastName"`
-	Email     string  `json:"email"`
-	Number    string  `json:"number"`
-	Balance   float64 `json:"balance"`
-	Password  string  `json:"-"`
-	Admin     bool    `json:"-"`
+type LoginParams struct {
+	Number   string `json:"number"`
+	Password string `json:"password"`
 }
 
 type NewPasswordParams struct {
-	Number    string    `json:"number"`
-	Password  string    `json:"password"`
+	Number   string `json:"number"`
+	Password string `json:"password"`
 }
