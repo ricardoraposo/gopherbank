@@ -98,6 +98,15 @@ func (a *AccountHandler) RecoverAccountPassword(c *fiber.Ctx) error {
 		return err
 	}
 
+    claims, ok := c.Context().Value("claims").(jwt.MapClaims)
+    if !ok {
+        return fiber.NewError(fiber.StatusUnauthorized, "Failed to parse token")
+    }
+
+    if claims["number"] != params.Number {
+        return fiber.NewError(fiber.StatusUnauthorized, "Not enough credentials")
+    }
+
 	encryptedPassword, err := utils.EncryptPassword(params.Password)
 	if err != nil {
 		return err
