@@ -91,3 +91,21 @@ func (a *AccountHandler) DeleteAccount(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"Message": "Account removed successfully"})
 }
+
+func (a *AccountHandler) RecoverAccountPassword(c *fiber.Ctx) error {
+	params := models.NewPasswordParams{}
+	if err := c.BodyParser(&params); err != nil {
+		return err
+	}
+
+	encryptedPassword, err := utils.EncryptPassword(params.Password)
+	if err != nil {
+		return err
+	}
+
+	if err := a.accountDB.RecoverPassword(c.Context(), encryptedPassword, params.Number); err != nil {
+		return err
+	}
+
+    return c.JSON(fiber.Map{"Message": "Password updated successfully"})
+}

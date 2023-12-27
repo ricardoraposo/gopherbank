@@ -19,6 +19,7 @@ func (s *FiberServer) RegisterRoutes() {
 	// accounts routes
 	api.Get("/accounts/:id", accountsHandler.GetAccountByNumber)
 	api.Delete("/accounts/:id", accountsHandler.DeleteAccount)
+	api.Patch("/accounts/", accountsHandler.RecoverAccountPassword)
 
 	// user routes
 	api.Put("/user/:id", userHandler.EditUser)

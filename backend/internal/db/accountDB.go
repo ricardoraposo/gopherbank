@@ -17,6 +17,7 @@ type AccountDB interface {
 	AddToAccount(ctx context.Context, to string, amount float64) error
 	RemoveFromAccount(ctx context.Context, from string, amount float64) error
 	Transfer(ctx context.Context, from string, to string, amount float64) error
+	RecoverPassword(ctx context.Context, password string, number string) error
 }
 
 type accountDB struct {
@@ -117,11 +118,15 @@ func (a *accountDB) DeleteAccount(ctx context.Context, number string) error {
 	return nil
 }
 
-// func scanRow(row *sql.Rows) (*models.DisplayAccount, error) {
-// 	var account models.DisplayAccount
-// 	err := row.Scan(&account.FirstName, &account.LastName, &account.Email, &account.Number, &account.Balance, &account.Password, &account.Admin)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &account, nil
-// }
+func (a *accountDB) RecoverPassword(ctx context.Context, password string, number string) error {
+	rows, err := a.store.client.Account.Update().Where(account.ID(number)).SetPassword(password).Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	if rows < 1 {
+		return fmt.Errorf("Account %s not found", number)
+	}
+
+	return nil
+}

@@ -30,3 +30,8 @@ type DisplayAccount struct {
 	Password  string  `json:"-"`
 	Admin     bool    `json:"-"`
 }
+
+type NewPasswordParams struct {
+	Number    string    `json:"number"`
+	Password  string    `json:"password"`
+}
