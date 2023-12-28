@@ -1,12 +1,13 @@
 import axios from 'axios';
+import { apiURL } from '../consts';
 
-const token = localStorage.getItem('jwt-token');
+const token = localStorage.getItem('token');
 
 const instance = axios.create({
-  baseURL: 'http://192.168.0.141:5432/',
+  baseURL: `http://${apiURL}`,
   headers: {
-    'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   },
 });
 

@@ -1,3 +1,6 @@
 {
-	"extends": "@trybe/eslint-config-frontend/typescript"
+	"extends": "@trybe/eslint-config-frontend/typescript",
+  "rules": {
+    "react/no-unescaped-entities": "off"
+  }
 }
