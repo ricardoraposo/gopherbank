@@ -34,13 +34,13 @@ function SignUp() {
 
   return (
     <div
-      className="h-screen flex justify-center items-center
+      className="h-dvh flex justify-center items-center
       bg-login bg-cover"
     >
       <form
         className="bg-gray rounded-[40px] opacity-85
         flex flex-col justify-center items-center gap-2
-        w-4/5 h-[90dvh]"
+        w-4/5 h-[90%]"
       >
         <h1 className="text-white text-3xl font-bold">REGISTER</h1>
         <FormInput

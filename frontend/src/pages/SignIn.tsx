@@ -34,7 +34,7 @@ function SignIn() {
 
   return (
     <div
-      className="h-screen flex flex-col justify-center items-center
+      className="h-dvh flex flex-col justify-center items-center
       bg-bg bg-login bg-cover font-primary"
     >
       <div className="w-4/5">

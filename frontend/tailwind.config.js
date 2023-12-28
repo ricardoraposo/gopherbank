@@ -15,6 +15,7 @@ export default {
       colors: {
         bg: "#171717",
         gray: "#292929",
+        "mid-gray": "#3D3D3D",
         grayish: "#ACACAC",
         orange: "#F97F50",
         "purple": "#3E47D4",
