@@ -2,14 +2,10 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 	c "github.com/ricardoraposo/gopherbank/config"
 	"github.com/ricardoraposo/gopherbank/ent"
-	"github.com/ricardoraposo/gopherbank/ent/account"
-	"github.com/ricardoraposo/gopherbank/ent/transaction"
 	"github.com/ricardoraposo/gopherbank/internal/utils"
 )
 
@@ -20,32 +16,20 @@ func main() {
 	}
 
 	ctx := context.Background()
-	//
-	// client.User.Delete().ExecX(ctx)
-	// client.Account.Delete().ExecX(ctx)
-	//
-	// if err := client.Schema.Create(ctx); err != nil {
-	// 	panic(err)
-	// }
-	//
-	// for _, p := range Params {
-	// 	acc := createAccount(client, ctx, p)
-	// 	createUser(client, ctx, p, acc)
-	// }
-	//
-	// createAdmin(client, ctx)
 
-	t := client.Transaction.
-		Query().
-        WithToAccount().
-        WithFromAccount().
-        WithDetail().
-		Where(transaction.HasFromAccountWith(account.ID("06182488"))).
-		AllX(ctx)
+	client.User.Delete().ExecX(ctx)
+	client.Account.Delete().ExecX(ctx)
 
-	jt, _ := json.Marshal(t)
+	if err := client.Schema.Create(ctx); err != nil {
+		panic(err)
+	}
 
-	fmt.Println(string(jt))
+	for _, p := range Params {
+		acc := createAccount(client, ctx, p)
+		createUser(client, ctx, p, acc)
+	}
+
+	createAdmin(client, ctx)
 }
 
 func createAccount(client *ent.Client, ctx context.Context, p NewAccountParams) *ent.Account {
@@ -62,6 +46,7 @@ func createUser(client *ent.Client, ctx context.Context, p NewAccountParams, acc
 		SetFirstName(p.FirstName).
 		SetLastName(p.LastName).
 		SetEmail(p.Email).
+		SetPictureURL(p.PictureUrl).
 		SetAccount(acc).
 		ExecX(ctx)
 }
@@ -78,45 +63,51 @@ func createAdmin(client *ent.Client, ctx context.Context) {
 		SetFirstName("Rick").
 		SetLastName("Raposo").
 		SetEmail("admin@gopher.com").
+        SetPictureURL("https://i.imgur.com/eSQ3jw3.png").
 		SetAccount(acc).
 		ExecX(ctx)
 }
 
 type NewAccountParams struct {
-	FirstName string
-	LastName  string
-	Password  string
-	Email     string
-	Number    string
+	FirstName  string
+	LastName   string
+	Password   string
+	Email      string
+	Number     string
+	PictureUrl string
 }
 
 var Params = []NewAccountParams{
-	NewAccountParams{
+	{
 		FirstName: "Ricardo",
 		LastName:  "Gopher",
 		Password:  "123456789",
 		Email:     "rick@Gopher.com",
 		Number:    utils.GenerateAccountNumber(),
+        PictureUrl: "https://i.imgur.com/2Mq70Sx.png",
 	},
-	NewAccountParams{
+	{
 		FirstName: "Xico",
 		LastName:  "Gopher",
 		Password:  "123456789",
 		Email:     "xico@gopher.com",
 		Number:    utils.GenerateAccountNumber(),
+        PictureUrl: "https://i.imgur.com/iPebJXT.png",
 	},
-	NewAccountParams{
+	{
 		FirstName: "Willy",
 		LastName:  "Gopher",
 		Password:  "123456789",
 		Email:     "willy@gopher.com",
 		Number:    utils.GenerateAccountNumber(),
+        PictureUrl: "https://i.imgur.com/2Mq70Sx.png",
 	},
-	NewAccountParams{
+	{
 		FirstName: "Tito",
 		LastName:  "Gopher",
 		Password:  "123456789",
 		Email:     "tito@gopher.com",
 		Number:    utils.GenerateAccountNumber(),
+        PictureUrl: "https://i.imgur.com/NMgNhJG.png",
 	},
 }

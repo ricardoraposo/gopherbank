@@ -1,22 +1,36 @@
+import { useQuery } from '@tanstack/react-query';
 import vector from '../assets/vector.svg';
-import { profilepic1, profilepic2, profilepic3, profilepic4 } from '../consts';
 import TProfilePic from './TProfilePic';
+import instance from '../api/axiosIstance';
+import { choosePicture } from '../utils/transactionHelpers';
 
-function RecentTransactions() {
+type Props = {
+  id: string;
+}
+
+function RecentTransactions({ id }: Props) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["transactions"],
+    queryFn: () => instance.get(`/api/transaction/${id}`),
+    select: ({ data: { transactions } }) => transactions.slice(0, 5),
+  })
+
+  if (isLoading) return <div>Loading...</div>
+
   return (
     <div
       className="h-28 text-white bg-orange rounded-3xl px-5
-      relative flex flex-col grow justify-center items-center gap-4"
+      relative flex flex-col grow justify-center items-start gap-4"
     >
-      <img src={ vector } alt="little thingy" className="absolute right-2 top-0 h-14" />
-      <div>
+      <img src={vector} alt="little thingy" className="absolute right-2 top-0 h-14" />
+      <div className="z-10">
         <h2 className="text-base font-normal">Recent Transactions</h2>
         <div className="flex gap-2">
-          <TProfilePic profileURL={ profilepic1 } />
-          <TProfilePic profileURL={ profilepic2 } />
-          <TProfilePic profileURL={ profilepic3 } />
-          <TProfilePic profileURL={ profilepic4 } />
-          <TProfilePic profileURL={ profilepic1 } />
+          {
+            data.map((transaction: any) => (
+              <TProfilePic key={transaction.id} profileURL={choosePicture(transaction.edges)} />
+            ))
+          }
         </div>
       </div>
     </div>

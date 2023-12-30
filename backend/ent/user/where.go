@@ -68,6 +68,11 @@ func Email(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldEmail, v))
 }
 
+// PictureURL applies equality check predicate on the "picture_url" field. It's identical to PictureURLEQ.
+func PictureURL(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldPictureURL, v))
+}
+
 // FirstNameEQ applies the EQ predicate on the "first_name" field.
 func FirstNameEQ(v string) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldFirstName, v))
@@ -261,6 +266,71 @@ func EmailEqualFold(v string) predicate.User {
 // EmailContainsFold applies the ContainsFold predicate on the "email" field.
 func EmailContainsFold(v string) predicate.User {
 	return predicate.User(sql.FieldContainsFold(FieldEmail, v))
+}
+
+// PictureURLEQ applies the EQ predicate on the "picture_url" field.
+func PictureURLEQ(v string) predicate.User {
+	return predicate.User(sql.FieldEQ(FieldPictureURL, v))
+}
+
+// PictureURLNEQ applies the NEQ predicate on the "picture_url" field.
+func PictureURLNEQ(v string) predicate.User {
+	return predicate.User(sql.FieldNEQ(FieldPictureURL, v))
+}
+
+// PictureURLIn applies the In predicate on the "picture_url" field.
+func PictureURLIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldIn(FieldPictureURL, vs...))
+}
+
+// PictureURLNotIn applies the NotIn predicate on the "picture_url" field.
+func PictureURLNotIn(vs ...string) predicate.User {
+	return predicate.User(sql.FieldNotIn(FieldPictureURL, vs...))
+}
+
+// PictureURLGT applies the GT predicate on the "picture_url" field.
+func PictureURLGT(v string) predicate.User {
+	return predicate.User(sql.FieldGT(FieldPictureURL, v))
+}
+
+// PictureURLGTE applies the GTE predicate on the "picture_url" field.
+func PictureURLGTE(v string) predicate.User {
+	return predicate.User(sql.FieldGTE(FieldPictureURL, v))
+}
+
+// PictureURLLT applies the LT predicate on the "picture_url" field.
+func PictureURLLT(v string) predicate.User {
+	return predicate.User(sql.FieldLT(FieldPictureURL, v))
+}
+
+// PictureURLLTE applies the LTE predicate on the "picture_url" field.
+func PictureURLLTE(v string) predicate.User {
+	return predicate.User(sql.FieldLTE(FieldPictureURL, v))
+}
+
+// PictureURLContains applies the Contains predicate on the "picture_url" field.
+func PictureURLContains(v string) predicate.User {
+	return predicate.User(sql.FieldContains(FieldPictureURL, v))
+}
+
+// PictureURLHasPrefix applies the HasPrefix predicate on the "picture_url" field.
+func PictureURLHasPrefix(v string) predicate.User {
+	return predicate.User(sql.FieldHasPrefix(FieldPictureURL, v))
+}
+
+// PictureURLHasSuffix applies the HasSuffix predicate on the "picture_url" field.
+func PictureURLHasSuffix(v string) predicate.User {
+	return predicate.User(sql.FieldHasSuffix(FieldPictureURL, v))
+}
+
+// PictureURLEqualFold applies the EqualFold predicate on the "picture_url" field.
+func PictureURLEqualFold(v string) predicate.User {
+	return predicate.User(sql.FieldEqualFold(FieldPictureURL, v))
+}
+
+// PictureURLContainsFold applies the ContainsFold predicate on the "picture_url" field.
+func PictureURLContainsFold(v string) predicate.User {
+	return predicate.User(sql.FieldContainsFold(FieldPictureURL, v))
 }
 
 // HasAccount applies the HasEdge predicate on the "account" edge.

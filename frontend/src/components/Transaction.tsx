@@ -4,10 +4,11 @@ type Props = {
   name: string;
   profileURL: string;
   amount: number;
+  date: string;
   type: 'Transfer' | 'Deposit' | 'Withdraw';
 };
 
-function Transaction({ name, profileURL, amount, type }: Props) {
+function Transaction({ name, profileURL, date, amount, type }: Props) {
   const usFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 
   return (
@@ -16,7 +17,7 @@ function Transaction({ name, profileURL, amount, type }: Props) {
         <TProfilePic profileURL={profileURL} className="h-10 w-10" />
         <div className="flex flex-col">
           <h3 className="font-semibold">{name}</h3>
-          <p className="text-gray-200">20 - 01 2023, 06:00</p>
+          <p className="text-gray-200">{date}</p>
         </div>
       </div>
       <div className="flex flex-col items-end">

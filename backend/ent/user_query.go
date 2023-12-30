@@ -298,7 +298,7 @@ func (uq *UserQuery) WithAccount(opts ...func(*AccountQuery)) *UserQuery {
 // Example:
 //
 //	var v []struct {
-//		FirstName string `json:"first_name"`
+//		FirstName string `json:"firstName"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -321,7 +321,7 @@ func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
 // Example:
 //
 //	var v []struct {
-//		FirstName string `json:"first_name"`
+//		FirstName string `json:"firstName"`
 //	}
 //
 //	client.User.Query().

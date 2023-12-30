@@ -11,9 +11,10 @@ import { useQuery } from '@tanstack/react-query';
 
 function Dashboard() {
   const navigate = useNavigate();
+  const id = "08533436"
   const { isError, isLoading } = useQuery({
     queryKey: ["user"],
-    queryFn: () => instance.get('/api/accounts/06182488'),
+    queryFn: () => instance.get(`/api/accounts/${id}`),
   })
 
   if (isError) {
@@ -25,15 +26,15 @@ function Dashboard() {
   return (
     < div >
       <div className="mx-5 my-2">
-        <Header />
-        <BalanceDisplay />
+        <Header id={id} />
+        <BalanceDisplay id={id} />
         <OperationSection />
         <div className="flex gap-4 mt-6">
           <InvestBanner />
-          <RecentTransactions />
+          <RecentTransactions id={id} />
         </div>
       </div>
-      <Transactions />
+      <Transactions id={id} />
     </div >
   );
 }

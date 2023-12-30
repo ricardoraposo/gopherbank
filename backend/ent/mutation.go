@@ -1959,6 +1959,7 @@ type UserMutation struct {
 	first_name     *string
 	last_name      *string
 	email          *string
+	picture_url    *string
 	clearedFields  map[string]struct{}
 	account        *string
 	clearedaccount bool
@@ -2173,6 +2174,42 @@ func (m *UserMutation) ResetEmail() {
 	m.email = nil
 }
 
+// SetPictureURL sets the "picture_url" field.
+func (m *UserMutation) SetPictureURL(s string) {
+	m.picture_url = &s
+}
+
+// PictureURL returns the value of the "picture_url" field in the mutation.
+func (m *UserMutation) PictureURL() (r string, exists bool) {
+	v := m.picture_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPictureURL returns the old "picture_url" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldPictureURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPictureURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPictureURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPictureURL: %w", err)
+	}
+	return oldValue.PictureURL, nil
+}
+
+// ResetPictureURL resets all changes to the "picture_url" field.
+func (m *UserMutation) ResetPictureURL() {
+	m.picture_url = nil
+}
+
 // SetAccountID sets the "account" edge to the Account entity by id.
 func (m *UserMutation) SetAccountID(id string) {
 	m.account = &id
@@ -2246,7 +2283,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.first_name != nil {
 		fields = append(fields, user.FieldFirstName)
 	}
@@ -2255,6 +2292,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.email != nil {
 		fields = append(fields, user.FieldEmail)
+	}
+	if m.picture_url != nil {
+		fields = append(fields, user.FieldPictureURL)
 	}
 	return fields
 }
@@ -2270,6 +2310,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.LastName()
 	case user.FieldEmail:
 		return m.Email()
+	case user.FieldPictureURL:
+		return m.PictureURL()
 	}
 	return nil, false
 }
@@ -2285,6 +2327,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldLastName(ctx)
 	case user.FieldEmail:
 		return m.OldEmail(ctx)
+	case user.FieldPictureURL:
+		return m.OldPictureURL(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -2314,6 +2358,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetEmail(v)
+		return nil
+	case user.FieldPictureURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPictureURL(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -2372,6 +2423,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldEmail:
 		m.ResetEmail()
+		return nil
+	case user.FieldPictureURL:
+		m.ResetPictureURL()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

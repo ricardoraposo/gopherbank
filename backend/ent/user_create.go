@@ -38,6 +38,12 @@ func (uc *UserCreate) SetEmail(s string) *UserCreate {
 	return uc
 }
 
+// SetPictureURL sets the "picture_url" field.
+func (uc *UserCreate) SetPictureURL(s string) *UserCreate {
+	uc.mutation.SetPictureURL(s)
+	return uc
+}
+
 // SetAccountID sets the "account" edge to the Account entity by ID.
 func (uc *UserCreate) SetAccountID(id string) *UserCreate {
 	uc.mutation.SetAccountID(id)
@@ -102,6 +108,9 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Email(); !ok {
 		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "User.email"`)}
 	}
+	if _, ok := uc.mutation.PictureURL(); !ok {
+		return &ValidationError{Name: "picture_url", err: errors.New(`ent: missing required field "User.picture_url"`)}
+	}
 	if _, ok := uc.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account", err: errors.New(`ent: missing required edge "User.account"`)}
 	}
@@ -142,6 +151,10 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
 		_node.Email = value
+	}
+	if value, ok := uc.mutation.PictureURL(); ok {
+		_spec.SetField(user.FieldPictureURL, field.TypeString, value)
+		_node.PictureURL = value
 	}
 	if nodes := uc.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

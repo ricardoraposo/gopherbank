@@ -107,8 +107,12 @@ func (t *transactionDB) GetAllTransactions(ctx context.Context) ([]*ent.Transact
 func (t *transactionDB) GetAccountTransactions(ctx context.Context, accountNumber string) ([]*ent.Transaction, error) {
 	toTransactions, err := t.store.client.Transaction.
 		Query().
-		WithToAccount().
-		WithFromAccount().
+		WithToAccount(func(q *ent.AccountQuery) {
+			q.WithUser()
+		}).
+		WithFromAccount(func(q *ent.AccountQuery) {
+			q.WithUser()
+		}).
 		WithDetail().
 		Where(transaction.HasToAccountWith(account.ID(accountNumber))).
 		All(ctx)

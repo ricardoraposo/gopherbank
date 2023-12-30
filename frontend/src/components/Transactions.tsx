@@ -1,23 +1,28 @@
 import { useQuery } from '@tanstack/react-query';
 import instance from '../api/axiosIstance';
-import { transactionMock } from '../consts';
 import Line from './Line';
 import Transaction from './Transaction';
+import { chooseName, choosePicture, makeCapitalized } from '../utils/transactionHelpers';
 
-function Transactions() {
+type Props = {
+  id: string;
+}
+
+function Transactions({ id }: Props) {
   const { data, isLoading } = useQuery({
     queryKey: ["transactions"],
-    queryFn: () => instance.get('/api/transaction/06182488'),
-    select: ({ data }) => data,
+    queryFn: () => instance.get(`/api/transaction/${id}`),
+    select: ({ data: { transactions } }) => transactions,
   })
 
-  if (isLoading) return <div>I'm loading</div>
+  const usFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+
+  if (isLoading) return <div>Let him cook</div>
 
   return (
     <div
       className="relative w-screen h-auto min-h-[60dvh] mt-6 bg-gray-100 rounded-t-[40px]"
     >
-      {console.log(data)}
       <Line />
       <div>
         <br />
@@ -25,13 +30,14 @@ function Transactions() {
         <br />
         <div className="flex flex-col gap-2">
           {
-            transactionMock.map((transaction) => (
+            data.map((transaction: any) => (
               <Transaction
                 key={transaction.id}
-                name={transaction.name}
-                profileURL={transaction.profileURL}
-                amount={transaction.amount}
-                type={transaction.type}
+                name={chooseName(transaction.edges)}
+                profileURL={choosePicture(transaction.edges)}
+                amount={transaction.edges.detail.amount}
+                date={usFormat.format(new Date(transaction.edges.detail.transactedAt))}
+                type={makeCapitalized(transaction.edges.detail.type) as "Transfer" | "Withdraw" | "Deposit"}
               />
             ))
           }

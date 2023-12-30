@@ -3,10 +3,14 @@ import DownArrow from '../assets/down_arrow.svg';
 import { useQuery } from '@tanstack/react-query';
 import instance from '../api/axiosIstance';
 
-function BalanceDisplay() {
+type Props = {
+  id: string;
+}
+
+function BalanceDisplay({ id }: Props) {
   const { data } = useQuery({
     queryKey: ["user"],
-    queryFn: () => instance.get('/api/accounts/06182488'),
+    queryFn: () => instance.get(`/api/accounts/${id}`),
     select: ({ data }) => data,
   })
 

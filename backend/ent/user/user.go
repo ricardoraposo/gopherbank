@@ -18,6 +18,8 @@ const (
 	FieldLastName = "last_name"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
+	// FieldPictureURL holds the string denoting the picture_url field in the database.
+	FieldPictureURL = "picture_url"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
 	EdgeAccount = "account"
 	// AccountFieldID holds the string denoting the ID field of the Account.
@@ -39,6 +41,7 @@ var Columns = []string{
 	FieldFirstName,
 	FieldLastName,
 	FieldEmail,
+	FieldPictureURL,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "users"
@@ -90,6 +93,11 @@ func ByLastName(opts ...sql.OrderTermOption) OrderOption {
 // ByEmail orders the results by the email field.
 func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEmail, opts...).ToFunc()
+}
+
+// ByPictureURL orders the results by the picture_url field.
+func ByPictureURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPictureURL, opts...).ToFunc()
 }
 
 // ByAccountField orders the results by account field.

@@ -70,6 +70,20 @@ func (uu *UserUpdate) SetNillableEmail(s *string) *UserUpdate {
 	return uu
 }
 
+// SetPictureURL sets the "picture_url" field.
+func (uu *UserUpdate) SetPictureURL(s string) *UserUpdate {
+	uu.mutation.SetPictureURL(s)
+	return uu
+}
+
+// SetNillablePictureURL sets the "picture_url" field if the given value is not nil.
+func (uu *UserUpdate) SetNillablePictureURL(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetPictureURL(*s)
+	}
+	return uu
+}
+
 // SetAccountID sets the "account" edge to the Account entity by ID.
 func (uu *UserUpdate) SetAccountID(id string) *UserUpdate {
 	uu.mutation.SetAccountID(id)
@@ -158,6 +172,9 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
 	}
+	if value, ok := uu.mutation.PictureURL(); ok {
+		_spec.SetField(user.FieldPictureURL, field.TypeString, value)
+	}
 	if uu.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -245,6 +262,20 @@ func (uuo *UserUpdateOne) SetEmail(s string) *UserUpdateOne {
 func (uuo *UserUpdateOne) SetNillableEmail(s *string) *UserUpdateOne {
 	if s != nil {
 		uuo.SetEmail(*s)
+	}
+	return uuo
+}
+
+// SetPictureURL sets the "picture_url" field.
+func (uuo *UserUpdateOne) SetPictureURL(s string) *UserUpdateOne {
+	uuo.mutation.SetPictureURL(s)
+	return uuo
+}
+
+// SetNillablePictureURL sets the "picture_url" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillablePictureURL(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetPictureURL(*s)
 	}
 	return uuo
 }
@@ -366,6 +397,9 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
+	}
+	if value, ok := uuo.mutation.PictureURL(); ok {
+		_spec.SetField(user.FieldPictureURL, field.TypeString, value)
 	}
 	if uuo.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{

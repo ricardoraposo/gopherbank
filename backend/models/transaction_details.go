@@ -19,5 +19,5 @@ func (a ByTransactedAt) Swap(i, j int) {
 }
 
 func (a ByTransactedAt) Less(i, j int) bool {
-	return a[i].Edges.Detail.TransactedAt.Before(a[j].Edges.Detail.TransactedAt)
+	return a[i].Edges.Detail.TransactedAt.After(a[j].Edges.Detail.TransactedAt)
 }

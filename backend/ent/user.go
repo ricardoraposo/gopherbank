@@ -18,11 +18,13 @@ type User struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// FirstName holds the value of the "first_name" field.
-	FirstName string `json:"first_name"`
+	FirstName string `json:"firstName"`
 	// LastName holds the value of the "last_name" field.
 	LastName string `json:"lastName"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email"`
+	// PictureURL holds the value of the "picture_url" field.
+	PictureURL string `json:"pictureUrl"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -59,7 +61,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldFirstName, user.FieldLastName, user.FieldEmail:
+		case user.FieldFirstName, user.FieldLastName, user.FieldEmail, user.FieldPictureURL:
 			values[i] = new(sql.NullString)
 		case user.ForeignKeys[0]: // account_user
 			values[i] = new(sql.NullString)
@@ -101,6 +103,12 @@ func (u *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
 				u.Email = value.String
+			}
+		case user.FieldPictureURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field picture_url", values[i])
+			} else if value.Valid {
+				u.PictureURL = value.String
 			}
 		case user.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -158,6 +166,9 @@ func (u *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("email=")
 	builder.WriteString(u.Email)
+	builder.WriteString(", ")
+	builder.WriteString("picture_url=")
+	builder.WriteString(u.PictureURL)
 	builder.WriteByte(')')
 	return builder.String()
 }

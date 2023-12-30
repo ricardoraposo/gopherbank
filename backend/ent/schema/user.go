@@ -15,9 +15,10 @@ type User struct {
 func (User) Fields() []ent.Field {
     return []ent.Field{
         // field.String("id").StorageKey("user_account").StructTag(`json:"account"`),
-        field.String("first_name").MaxLen(50).StructTag(`json:"first_name"`),
+        field.String("first_name").MaxLen(50).StructTag(`json:"firstName"`),
         field.String("last_name").MaxLen(50).StructTag(`json:"lastName"`),
         field.String("email").StructTag(`json:"email"`),
+        field.String("picture_url").StructTag(`json:"pictureUrl"`),
     }
 }
 
