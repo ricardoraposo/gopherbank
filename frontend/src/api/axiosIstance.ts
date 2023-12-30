@@ -4,7 +4,7 @@ import { apiURL } from '../consts';
 const token = localStorage.getItem('token');
 
 const instance = axios.create({
-  baseURL: `http://${apiURL}`,
+  baseURL: `${apiURL}`,
   headers: {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',

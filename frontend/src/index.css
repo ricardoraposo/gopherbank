@@ -5,6 +5,6 @@
 
 @layer base {
   body {
-    @apply w-screen bg-bg font-primary
+    @apply w-screen bg-gray-600 font-primary
   }
 }

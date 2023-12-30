@@ -47,12 +47,6 @@ func (tdc *TransactionDetailsCreate) SetNillableTransactedAt(t *time.Time) *Tran
 	return tdc
 }
 
-// SetID sets the "id" field.
-func (tdc *TransactionDetailsCreate) SetID(i int) *TransactionDetailsCreate {
-	tdc.mutation.SetID(i)
-	return tdc
-}
-
 // SetTransactionID sets the "transaction" edge to the Transaction entity by ID.
 func (tdc *TransactionDetailsCreate) SetTransactionID(id int) *TransactionDetailsCreate {
 	tdc.mutation.SetTransactionID(id)
@@ -138,10 +132,8 @@ func (tdc *TransactionDetailsCreate) sqlSave(ctx context.Context) (*TransactionD
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != _node.ID {
-		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
-	}
+	id := _spec.ID.Value.(int64)
+	_node.ID = int(id)
 	tdc.mutation.id = &_node.ID
 	tdc.mutation.done = true
 	return _node, nil
@@ -152,10 +144,6 @@ func (tdc *TransactionDetailsCreate) createSpec() (*TransactionDetails, *sqlgrap
 		_node = &TransactionDetails{config: tdc.config}
 		_spec = sqlgraph.NewCreateSpec(transactiondetails.Table, sqlgraph.NewFieldSpec(transactiondetails.FieldID, field.TypeInt))
 	)
-	if id, ok := tdc.mutation.ID(); ok {
-		_node.ID = id
-		_spec.ID.Value = id
-	}
 	if value, ok := tdc.mutation.Amount(); ok {
 		_spec.SetField(transactiondetails.FieldAmount, field.TypeFloat64, value)
 		_node.Amount = value
@@ -182,7 +170,7 @@ func (tdc *TransactionDetailsCreate) createSpec() (*TransactionDetails, *sqlgrap
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.transaction_id = &nodes[0]
+		_node.transaction_detail = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -233,7 +221,7 @@ func (tdcb *TransactionDetailsCreateBulk) Save(ctx context.Context) ([]*Transact
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+				if specs[i].ID.Value != nil {
 					id := specs[i].ID.Value.(int64)
 					nodes[i].ID = int(id)
 				}

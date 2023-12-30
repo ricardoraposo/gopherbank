@@ -17,7 +17,7 @@ import (
 type TransactionDetails struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"transactionId"`
+	ID int `json:"id,omitempty"`
 	// Amount holds the value of the "amount" field.
 	Amount float64 `json:"amount"`
 	// Type holds the value of the "type" field.
@@ -26,9 +26,9 @@ type TransactionDetails struct {
 	TransactedAt time.Time `json:"transactedAt"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TransactionDetailsQuery when eager-loading is set.
-	Edges          TransactionDetailsEdges `json:"edges"`
-	transaction_id *int
-	selectValues   sql.SelectValues
+	Edges              TransactionDetailsEdges `json:"edges"`
+	transaction_detail *int
+	selectValues       sql.SelectValues
 }
 
 // TransactionDetailsEdges holds the relations/edges for other nodes in the graph.
@@ -66,7 +66,7 @@ func (*TransactionDetails) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case transactiondetails.FieldTransactedAt:
 			values[i] = new(sql.NullTime)
-		case transactiondetails.ForeignKeys[0]: // transaction_id
+		case transactiondetails.ForeignKeys[0]: // transaction_detail
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -109,10 +109,10 @@ func (td *TransactionDetails) assignValues(columns []string, values []any) error
 			}
 		case transactiondetails.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field transaction_id", value)
+				return fmt.Errorf("unexpected type %T for edge-field transaction_detail", value)
 			} else if value.Valid {
-				td.transaction_id = new(int)
-				*td.transaction_id = int(value.Int64)
+				td.transaction_detail = new(int)
+				*td.transaction_detail = int(value.Int64)
 			}
 		default:
 			td.selectValues.Set(columns[i], values[i])

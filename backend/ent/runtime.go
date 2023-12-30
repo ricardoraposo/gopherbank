@@ -32,21 +32,21 @@ func init() {
 	transactiondetailsFields := schema.TransactionDetails{}.Fields()
 	_ = transactiondetailsFields
 	// transactiondetailsDescType is the schema descriptor for type field.
-	transactiondetailsDescType := transactiondetailsFields[2].Descriptor()
+	transactiondetailsDescType := transactiondetailsFields[1].Descriptor()
 	// transactiondetails.TypeValidator is a validator for the "type" field. It is called by the builders before save.
 	transactiondetails.TypeValidator = transactiondetailsDescType.Validators[0].(func(string) error)
 	// transactiondetailsDescTransactedAt is the schema descriptor for transacted_at field.
-	transactiondetailsDescTransactedAt := transactiondetailsFields[3].Descriptor()
+	transactiondetailsDescTransactedAt := transactiondetailsFields[2].Descriptor()
 	// transactiondetails.DefaultTransactedAt holds the default value on creation for the transacted_at field.
 	transactiondetails.DefaultTransactedAt = transactiondetailsDescTransactedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescFirstName is the schema descriptor for first_name field.
-	userDescFirstName := userFields[1].Descriptor()
+	userDescFirstName := userFields[0].Descriptor()
 	// user.FirstNameValidator is a validator for the "first_name" field. It is called by the builders before save.
 	user.FirstNameValidator = userDescFirstName.Validators[0].(func(string) error)
 	// userDescLastName is the schema descriptor for last_name field.
-	userDescLastName := userFields[2].Descriptor()
+	userDescLastName := userFields[1].Descriptor()
 	// user.LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
 	user.LastNameValidator = userDescLastName.Validators[0].(func(string) error)
 }

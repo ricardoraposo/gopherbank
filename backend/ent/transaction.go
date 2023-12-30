@@ -20,10 +20,10 @@ type Transaction struct {
 	ID int `json:"id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TransactionQuery when eager-loading is set.
-	Edges        TransactionEdges `json:"edges"`
-	from_account *string
-	to_account   *string
-	selectValues sql.SelectValues
+	Edges                TransactionEdges `json:"edges"`
+	account_from_account *string
+	account_to_account   *string
+	selectValues         sql.SelectValues
 }
 
 // TransactionEdges holds the relations/edges for other nodes in the graph.
@@ -85,9 +85,9 @@ func (*Transaction) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case transaction.FieldID:
 			values[i] = new(sql.NullInt64)
-		case transaction.ForeignKeys[0]: // from_account
+		case transaction.ForeignKeys[0]: // account_from_account
 			values[i] = new(sql.NullString)
-		case transaction.ForeignKeys[1]: // to_account
+		case transaction.ForeignKeys[1]: // account_to_account
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -112,17 +112,17 @@ func (t *Transaction) assignValues(columns []string, values []any) error {
 			t.ID = int(value.Int64)
 		case transaction.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field from_account", values[i])
+				return fmt.Errorf("unexpected type %T for field account_from_account", values[i])
 			} else if value.Valid {
-				t.from_account = new(string)
-				*t.from_account = value.String
+				t.account_from_account = new(string)
+				*t.account_from_account = value.String
 			}
 		case transaction.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field to_account", values[i])
+				return fmt.Errorf("unexpected type %T for field account_to_account", values[i])
 			} else if value.Valid {
-				t.to_account = new(string)
-				*t.to_account = value.String
+				t.account_to_account = new(string)
+				*t.account_to_account = value.String
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])

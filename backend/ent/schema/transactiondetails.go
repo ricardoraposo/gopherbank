@@ -19,7 +19,6 @@ func (TransactionDetails) Fields() []ent.Field {
 	types := regexp.MustCompile("^(deposit|withdraw|transfer)$")
 
 	return []ent.Field{
-		field.Int("id").StorageKey("transaction_id").StructTag(`json:"transactionId"`),
 		field.Float("amount").StructTag(`json:"amount"`),
 		field.String("type").Match(types).StructTag(`json:"type"`),
 		field.Time("transacted_at").Default(time.Now).Immutable().StructTag(`json:"transactedAt"`),

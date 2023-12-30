@@ -13,12 +13,18 @@ export default {
         login: "url('/src/assets/bg_pattern.png')",
       },
       colors: {
-        bg: "#171717",
-        gray: "#292929",
-        "mid-gray": "#3D3D3D",
-        grayish: "#ACACAC",
+        gray : {
+          100: "#EEEEEE",
+          200: "#ACACAC",
+          300: "#9E9E9E",
+          400: "#3D3D3D",
+          500: "#292929",
+          600: "#171717",
+        },
         orange: "#F97F50",
-        "purple": "#3E47D4",
+        purple: "#3E47D4",
+        red: "#D86045",
+        green: "#559137",
       }
     },
   },

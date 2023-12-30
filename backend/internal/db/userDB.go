@@ -74,7 +74,7 @@ func (u *userDB) EditUser(ctx context.Context, p models.EditUserParams, accountN
 }
 
 func (u *userDB) DeleteUser(ctx context.Context, number string) error {
-	rows, err := u.store.client.User.Delete().Where(user.ID(number)).Exec(ctx)
+	rows, err := u.store.client.User.Delete().Where(user.HasAccountWith(account.ID(number))).Exec(ctx)
 	if err != nil {
 		return err
 	}

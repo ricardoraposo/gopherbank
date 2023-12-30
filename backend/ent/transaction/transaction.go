@@ -20,8 +20,6 @@ const (
 	EdgeDetail = "detail"
 	// AccountFieldID holds the string denoting the ID field of the Account.
 	AccountFieldID = "number"
-	// TransactionDetailsFieldID holds the string denoting the ID field of the TransactionDetails.
-	TransactionDetailsFieldID = "transaction_id"
 	// Table holds the table name of the transaction in the database.
 	Table = "transactions"
 	// FromAccountTable is the table that holds the from_account relation/edge.
@@ -30,21 +28,21 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "account" package.
 	FromAccountInverseTable = "accounts"
 	// FromAccountColumn is the table column denoting the from_account relation/edge.
-	FromAccountColumn = "from_account"
+	FromAccountColumn = "account_from_account"
 	// ToAccountTable is the table that holds the to_account relation/edge.
 	ToAccountTable = "transactions"
 	// ToAccountInverseTable is the table name for the Account entity.
 	// It exists in this package in order to avoid circular dependency with the "account" package.
 	ToAccountInverseTable = "accounts"
 	// ToAccountColumn is the table column denoting the to_account relation/edge.
-	ToAccountColumn = "to_account"
+	ToAccountColumn = "account_to_account"
 	// DetailTable is the table that holds the detail relation/edge.
 	DetailTable = "transaction_details"
 	// DetailInverseTable is the table name for the TransactionDetails entity.
 	// It exists in this package in order to avoid circular dependency with the "transactiondetails" package.
 	DetailInverseTable = "transaction_details"
 	// DetailColumn is the table column denoting the detail relation/edge.
-	DetailColumn = "transaction_id"
+	DetailColumn = "transaction_detail"
 )
 
 // Columns holds all SQL columns for transaction fields.
@@ -55,8 +53,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "transactions"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"from_account",
-	"to_account",
+	"account_from_account",
+	"account_to_account",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -119,7 +117,7 @@ func newToAccountStep() *sqlgraph.Step {
 func newDetailStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(DetailInverseTable, TransactionDetailsFieldID),
+		sqlgraph.To(DetailInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, DetailTable, DetailColumn),
 	)
 }

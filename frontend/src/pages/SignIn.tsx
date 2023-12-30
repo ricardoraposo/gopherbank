@@ -23,10 +23,11 @@ function SignIn() {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
+      console.log(formValues)
       const { data } = await axios.post(`${apiURL}/auth`, formValues);
       const { token } = data;
       localStorage.setItem('token', token);
-      navigate('/home');
+      navigate('/dashboard');
     } catch (error: any) {
       console.error(error.response.data);
     }
@@ -45,13 +46,13 @@ function SignIn() {
             <span className="text-orange">NOW</span>
           </h1>
         </div>
-        <div className="text-grayish">
+        <div className="text-gray-200">
           <p>We will do everything but count coins.</p>
           <p>Faster, easier and more convenient</p>
         </div>
       </div>
       <form
-        className="bg-gray rounded-[40px] opacity-85
+        className="bg-gray-500 rounded-[40px] opacity-85
         flex flex-col justify-center items-center gap-2
         w-4/5 h-96 mt-16"
       >
@@ -61,8 +62,8 @@ function SignIn() {
           name="number"
           id="number"
           type="number"
-          value={ formValues.number }
-          onChangeFn={ handleFormChange }
+          value={formValues.number}
+          onChangeFn={handleFormChange}
           inputMode="numeric"
         />
         <FormInput
@@ -70,17 +71,17 @@ function SignIn() {
           name="password"
           id="password"
           type="password"
-          value={ formValues.password }
-          onChangeFn={ handleFormChange }
+          value={formValues.password}
+          onChangeFn={handleFormChange}
         />
-        <FormButton label="Sign in" onSubmitFn={ handleSubmit } />
+        <FormButton label="Sign in" onSubmitFn={handleSubmit} />
         <div>
           <div className="flex justify-between gap-4 text-xs text-white my-1">
             Don't have an account ?
             {' '}
             <button
               className="text-purple font-semibold"
-              onClick={ () => navigate('/signup') }
+              onClick={() => navigate('/signup')}
               type="button"
             >
               Create one

@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 	c "github.com/ricardoraposo/gopherbank/config"
 	"github.com/ricardoraposo/gopherbank/ent"
+	"github.com/ricardoraposo/gopherbank/ent/account"
+	"github.com/ricardoraposo/gopherbank/ent/transaction"
 	"github.com/ricardoraposo/gopherbank/internal/utils"
 )
 
@@ -16,20 +20,32 @@ func main() {
 	}
 
 	ctx := context.Background()
+	//
+	// client.User.Delete().ExecX(ctx)
+	// client.Account.Delete().ExecX(ctx)
+	//
+	// if err := client.Schema.Create(ctx); err != nil {
+	// 	panic(err)
+	// }
+	//
+	// for _, p := range Params {
+	// 	acc := createAccount(client, ctx, p)
+	// 	createUser(client, ctx, p, acc)
+	// }
+	//
+	// createAdmin(client, ctx)
 
-	client.User.Delete().ExecX(ctx)
-	client.Account.Delete().ExecX(ctx)
+	t := client.Transaction.
+		Query().
+        WithToAccount().
+        WithFromAccount().
+        WithDetail().
+		Where(transaction.HasFromAccountWith(account.ID("06182488"))).
+		AllX(ctx)
 
-	if err := client.Schema.Create(ctx); err != nil {
-		panic(err)
-	}
+	jt, _ := json.Marshal(t)
 
-	for _, p := range Params {
-		acc := createAccount(client, ctx, p)
-		createUser(client, ctx, p, acc)
-	}
-
-	createAdmin(client, ctx)
+	fmt.Println(string(jt))
 }
 
 func createAccount(client *ent.Client, ctx context.Context, p NewAccountParams) *ent.Account {

@@ -476,10 +476,10 @@ func (tq *TransactionQuery) loadFromAccount(ctx context.Context, query *AccountQ
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Transaction)
 	for i := range nodes {
-		if nodes[i].from_account == nil {
+		if nodes[i].account_from_account == nil {
 			continue
 		}
-		fk := *nodes[i].from_account
+		fk := *nodes[i].account_from_account
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -496,7 +496,7 @@ func (tq *TransactionQuery) loadFromAccount(ctx context.Context, query *AccountQ
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "from_account" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "account_from_account" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -508,10 +508,10 @@ func (tq *TransactionQuery) loadToAccount(ctx context.Context, query *AccountQue
 	ids := make([]string, 0, len(nodes))
 	nodeids := make(map[string][]*Transaction)
 	for i := range nodes {
-		if nodes[i].to_account == nil {
+		if nodes[i].account_to_account == nil {
 			continue
 		}
-		fk := *nodes[i].to_account
+		fk := *nodes[i].account_to_account
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -528,7 +528,7 @@ func (tq *TransactionQuery) loadToAccount(ctx context.Context, query *AccountQue
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "to_account" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "account_to_account" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -552,13 +552,13 @@ func (tq *TransactionQuery) loadDetail(ctx context.Context, query *TransactionDe
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.transaction_id
+		fk := n.transaction_detail
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "transaction_id" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "transaction_detail" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "transaction_id" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "transaction_detail" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

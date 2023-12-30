@@ -13,6 +13,7 @@ import (
 	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/ent/predicate"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
+	"github.com/ricardoraposo/gopherbank/ent/user"
 )
 
 // AccountUpdate is the builder for updating Account entities.
@@ -75,6 +76,25 @@ func (au *AccountUpdate) SetNillableAdmin(b *bool) *AccountUpdate {
 		au.SetAdmin(*b)
 	}
 	return au
+}
+
+// SetUserID sets the "user" edge to the User entity by ID.
+func (au *AccountUpdate) SetUserID(id int) *AccountUpdate {
+	au.mutation.SetUserID(id)
+	return au
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (au *AccountUpdate) SetNillableUserID(id *int) *AccountUpdate {
+	if id != nil {
+		au = au.SetUserID(*id)
+	}
+	return au
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (au *AccountUpdate) SetUser(u *User) *AccountUpdate {
+	return au.SetUserID(u.ID)
 }
 
 // AddFavoritedIDs adds the "favoriteds" edge to the Account entity by IDs.
@@ -140,6 +160,12 @@ func (au *AccountUpdate) AddToAccount(t ...*Transaction) *AccountUpdate {
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (au *AccountUpdate) ClearUser() *AccountUpdate {
+	au.mutation.ClearUser()
+	return au
 }
 
 // ClearFavoriteds clears all "favoriteds" edges to the Account entity.
@@ -273,6 +299,35 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := au.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
+	}
+	if au.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   account.UserTable,
+			Columns: []string{account.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   account.UserTable,
+			Columns: []string{account.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if au.mutation.FavoritedsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -523,6 +578,25 @@ func (auo *AccountUpdateOne) SetNillableAdmin(b *bool) *AccountUpdateOne {
 	return auo
 }
 
+// SetUserID sets the "user" edge to the User entity by ID.
+func (auo *AccountUpdateOne) SetUserID(id int) *AccountUpdateOne {
+	auo.mutation.SetUserID(id)
+	return auo
+}
+
+// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableUserID(id *int) *AccountUpdateOne {
+	if id != nil {
+		auo = auo.SetUserID(*id)
+	}
+	return auo
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (auo *AccountUpdateOne) SetUser(u *User) *AccountUpdateOne {
+	return auo.SetUserID(u.ID)
+}
+
 // AddFavoritedIDs adds the "favoriteds" edge to the Account entity by IDs.
 func (auo *AccountUpdateOne) AddFavoritedIDs(ids ...string) *AccountUpdateOne {
 	auo.mutation.AddFavoritedIDs(ids...)
@@ -586,6 +660,12 @@ func (auo *AccountUpdateOne) AddToAccount(t ...*Transaction) *AccountUpdateOne {
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (auo *AccountUpdateOne) ClearUser() *AccountUpdateOne {
+	auo.mutation.ClearUser()
+	return auo
 }
 
 // ClearFavoriteds clears all "favoriteds" edges to the Account entity.
@@ -749,6 +829,35 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	}
 	if value, ok := auo.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
+	}
+	if auo.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   account.UserTable,
+			Columns: []string{account.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   account.UserTable,
+			Columns: []string{account.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if auo.mutation.FavoritedsCleared() {
 		edge := &sqlgraph.EdgeSpec{

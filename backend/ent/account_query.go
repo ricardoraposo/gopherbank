@@ -14,6 +14,7 @@ import (
 	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/ent/predicate"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
+	"github.com/ricardoraposo/gopherbank/ent/user"
 )
 
 // AccountQuery is the builder for querying Account entities.
@@ -23,6 +24,7 @@ type AccountQuery struct {
 	order           []account.OrderOption
 	inters          []Interceptor
 	predicates      []predicate.Account
+	withUser        *UserQuery
 	withFavoriteds  *AccountQuery
 	withFavorites   *AccountQuery
 	withFromAccount *TransactionQuery
@@ -61,6 +63,28 @@ func (aq *AccountQuery) Unique(unique bool) *AccountQuery {
 func (aq *AccountQuery) Order(o ...account.OrderOption) *AccountQuery {
 	aq.order = append(aq.order, o...)
 	return aq
+}
+
+// QueryUser chains the current query on the "user" edge.
+func (aq *AccountQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, account.UserTable, account.UserColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // QueryFavoriteds chains the current query on the "favoriteds" edge.
@@ -343,6 +367,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		order:           append([]account.OrderOption{}, aq.order...),
 		inters:          append([]Interceptor{}, aq.inters...),
 		predicates:      append([]predicate.Account{}, aq.predicates...),
+		withUser:        aq.withUser.Clone(),
 		withFavoriteds:  aq.withFavoriteds.Clone(),
 		withFavorites:   aq.withFavorites.Clone(),
 		withFromAccount: aq.withFromAccount.Clone(),
@@ -351,6 +376,17 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		sql:  aq.sql.Clone(),
 		path: aq.path,
 	}
+}
+
+// WithUser tells the query-builder to eager-load the nodes that are connected to
+// the "user" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithUser(opts ...func(*UserQuery)) *AccountQuery {
+	query := (&UserClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withUser = query
+	return aq
 }
 
 // WithFavoriteds tells the query-builder to eager-load the nodes that are connected to
@@ -475,7 +511,8 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
+			aq.withUser != nil,
 			aq.withFavoriteds != nil,
 			aq.withFavorites != nil,
 			aq.withFromAccount != nil,
@@ -499,6 +536,12 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
+	}
+	if query := aq.withUser; query != nil {
+		if err := aq.loadUser(ctx, query, nodes, nil,
+			func(n *Account, e *User) { n.Edges.User = e }); err != nil {
+			return nil, err
+		}
 	}
 	if query := aq.withFavoriteds; query != nil {
 		if err := aq.loadFavoriteds(ctx, query, nodes,
@@ -531,6 +574,34 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	return nodes, nil
 }
 
+func (aq *AccountQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*Account, init func(*Account), assign func(*Account, *User)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.User(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.UserColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.account_user
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "account_user" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_user" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 func (aq *AccountQuery) loadFavoriteds(ctx context.Context, query *AccountQuery, nodes []*Account, init func(*Account), assign func(*Account, *Account)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[string]*Account)
@@ -672,13 +743,13 @@ func (aq *AccountQuery) loadFromAccount(ctx context.Context, query *TransactionQ
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.from_account
+		fk := n.account_from_account
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "from_account" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "account_from_account" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "from_account" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "account_from_account" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -703,13 +774,13 @@ func (aq *AccountQuery) loadToAccount(ctx context.Context, query *TransactionQue
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.to_account
+		fk := n.account_to_account
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "to_account" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "account_to_account" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "to_account" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "account_to_account" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

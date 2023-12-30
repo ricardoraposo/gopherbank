@@ -12,7 +12,7 @@ import (
 
 type TransactionDB interface {
 	GetAllTransactions(context.Context) ([]*ent.TransactionDetails, error)
-	GetAccountTransactions(context.Context, string) ([]*ent.TransactionDetails, error)
+	GetAccountTransactions(context.Context, string) ([]*ent.Transaction, error)
 	CreateTransferTransaction(context.Context, *models.TransferParams) error
 	CreateDepositTransaction(context.Context, *models.DepositParams) error
 	CreateWithdrawTransaction(context.Context, *models.WithdrawParams) error
@@ -104,24 +104,32 @@ func (t *transactionDB) GetAllTransactions(ctx context.Context) ([]*ent.Transact
 	return transactions, nil
 }
 
-func (t *transactionDB) GetAccountTransactions(ctx context.Context, accountNumber string) ([]*ent.TransactionDetails, error) {
+func (t *transactionDB) GetAccountTransactions(ctx context.Context, accountNumber string) ([]*ent.Transaction, error) {
 	toTransactions, err := t.store.client.Transaction.
 		Query().
+		WithToAccount().
+		WithFromAccount().
+		WithDetail().
 		Where(transaction.HasToAccountWith(account.ID(accountNumber))).
-		QueryDetail().
 		All(ctx)
 
 	fromTransactions, err := t.store.client.Transaction.
 		Query().
+		WithToAccount(func(q *ent.AccountQuery) {
+			q.WithUser()
+		}).
+		WithFromAccount(func(q *ent.AccountQuery) {
+			q.WithUser()
+		}).
+		WithDetail().
 		Where(transaction.HasFromAccountWith(account.ID(accountNumber))).
-		QueryDetail().
 		All(ctx)
 
 	for _, transaction := range fromTransactions {
-		transaction.Amount = -transaction.Amount
+		transaction.Edges.Detail.Amount = -transaction.Edges.Detail.Amount
 	}
 
-    transactions := append(toTransactions, fromTransactions...)
+	transactions := append(toTransactions, fromTransactions...)
 
 	if err != nil {
 		return nil, err

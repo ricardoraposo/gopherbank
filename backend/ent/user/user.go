@@ -11,7 +11,7 @@ const (
 	// Label holds the string label denoting the user type in the database.
 	Label = "user"
 	// FieldID holds the string denoting the id field in the database.
-	FieldID = "user_account"
+	FieldID = "id"
 	// FieldFirstName holds the string denoting the first_name field in the database.
 	FieldFirstName = "first_name"
 	// FieldLastName holds the string denoting the last_name field in the database.
@@ -30,7 +30,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "account" package.
 	AccountInverseTable = "accounts"
 	// AccountColumn is the table column denoting the account relation/edge.
-	AccountColumn = "user_account"
+	AccountColumn = "account_user"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -44,7 +44,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "users"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"user_account",
+	"account_user",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -102,6 +102,6 @@ func newAccountStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AccountInverseTable, AccountFieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, AccountTable, AccountColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, AccountTable, AccountColumn),
 	)
 }

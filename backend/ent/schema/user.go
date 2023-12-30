@@ -14,7 +14,7 @@ type User struct {
 // Fields of the User.
 func (User) Fields() []ent.Field {
     return []ent.Field{
-        field.String("id").StorageKey("user_account").StructTag(`json:"account"`),
+        // field.String("id").StorageKey("user_account").StructTag(`json:"account"`),
         field.String("first_name").MaxLen(50).StructTag(`json:"first_name"`),
         field.String("last_name").MaxLen(50).StructTag(`json:"lastName"`),
         field.String("email").StructTag(`json:"email"`),
@@ -24,6 +24,6 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-        edge.To("account", Account.Type).Unique(),
+        edge.From("account", Account.Type).Ref("user").Unique().Required(),
     }
 }

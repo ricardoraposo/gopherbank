@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ricardoraposo/gopherbank/ent/account"
+	"github.com/ricardoraposo/gopherbank/ent/user"
 )
 
 // Account is the model entity for the Account schema.
@@ -33,6 +34,8 @@ type Account struct {
 
 // AccountEdges holds the relations/edges for other nodes in the graph.
 type AccountEdges struct {
+	// User holds the value of the user edge.
+	User *User `json:"user,omitempty"`
 	// Favoriteds holds the value of the favoriteds edge.
 	Favoriteds []*Account `json:"favoriteds,omitempty"`
 	// Favorites holds the value of the favorites edge.
@@ -43,13 +46,26 @@ type AccountEdges struct {
 	ToAccount []*Transaction `json:"to_account,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
+}
+
+// UserOrErr returns the User value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AccountEdges) UserOrErr() (*User, error) {
+	if e.loadedTypes[0] {
+		if e.User == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: user.Label}
+		}
+		return e.User, nil
+	}
+	return nil, &NotLoadedError{edge: "user"}
 }
 
 // FavoritedsOrErr returns the Favoriteds value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) FavoritedsOrErr() ([]*Account, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		return e.Favoriteds, nil
 	}
 	return nil, &NotLoadedError{edge: "favoriteds"}
@@ -58,7 +74,7 @@ func (e AccountEdges) FavoritedsOrErr() ([]*Account, error) {
 // FavoritesOrErr returns the Favorites value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) FavoritesOrErr() ([]*Account, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.Favorites, nil
 	}
 	return nil, &NotLoadedError{edge: "favorites"}
@@ -67,7 +83,7 @@ func (e AccountEdges) FavoritesOrErr() ([]*Account, error) {
 // FromAccountOrErr returns the FromAccount value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) FromAccountOrErr() ([]*Transaction, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.FromAccount, nil
 	}
 	return nil, &NotLoadedError{edge: "from_account"}
@@ -76,7 +92,7 @@ func (e AccountEdges) FromAccountOrErr() ([]*Transaction, error) {
 // ToAccountOrErr returns the ToAccount value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) ToAccountOrErr() ([]*Transaction, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.ToAccount, nil
 	}
 	return nil, &NotLoadedError{edge: "to_account"}
@@ -151,6 +167,11 @@ func (a *Account) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (a *Account) Value(name string) (ent.Value, error) {
 	return a.selectValues.Get(name)
+}
+
+// QueryUser queries the "user" edge of the Account entity.
+func (a *Account) QueryUser() *UserQuery {
+	return NewAccountClient(a.config).QueryUser(a)
 }
 
 // QueryFavoriteds queries the "favoriteds" edge of the Account entity.

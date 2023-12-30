@@ -22,6 +22,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldAdmin holds the string denoting the admin field in the database.
 	FieldAdmin = "admin"
+	// EdgeUser holds the string denoting the user edge name in mutations.
+	EdgeUser = "user"
 	// EdgeFavoriteds holds the string denoting the favoriteds edge name in mutations.
 	EdgeFavoriteds = "favoriteds"
 	// EdgeFavorites holds the string denoting the favorites edge name in mutations.
@@ -30,10 +32,19 @@ const (
 	EdgeFromAccount = "from_account"
 	// EdgeToAccount holds the string denoting the to_account edge name in mutations.
 	EdgeToAccount = "to_account"
+	// UserFieldID holds the string denoting the ID field of the User.
+	UserFieldID = "id"
 	// TransactionFieldID holds the string denoting the ID field of the Transaction.
 	TransactionFieldID = "id"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
+	// UserTable is the table that holds the user relation/edge.
+	UserTable = "users"
+	// UserInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserInverseTable = "users"
+	// UserColumn is the table column denoting the user relation/edge.
+	UserColumn = "account_user"
 	// FavoritedsTable is the table that holds the favoriteds relation/edge. The primary key declared below.
 	FavoritedsTable = "account_favorites"
 	// FavoritesTable is the table that holds the favorites relation/edge. The primary key declared below.
@@ -44,14 +55,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "transaction" package.
 	FromAccountInverseTable = "transactions"
 	// FromAccountColumn is the table column denoting the from_account relation/edge.
-	FromAccountColumn = "from_account"
+	FromAccountColumn = "account_from_account"
 	// ToAccountTable is the table that holds the to_account relation/edge.
 	ToAccountTable = "transactions"
 	// ToAccountInverseTable is the table name for the Transaction entity.
 	// It exists in this package in order to avoid circular dependency with the "transaction" package.
 	ToAccountInverseTable = "transactions"
 	// ToAccountColumn is the table column denoting the to_account relation/edge.
-	ToAccountColumn = "to_account"
+	ToAccountColumn = "account_to_account"
 )
 
 // Columns holds all SQL columns for account fields.
@@ -119,6 +130,13 @@ func ByAdmin(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAdmin, opts...).ToFunc()
 }
 
+// ByUserField orders the results by user field.
+func ByUserField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByFavoritedsCount orders the results by favoriteds count.
 func ByFavoritedsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -173,6 +191,13 @@ func ByToAccount(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newToAccountStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
+}
+func newUserStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserInverseTable, UserFieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, UserTable, UserColumn),
+	)
 }
 func newFavoritedsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

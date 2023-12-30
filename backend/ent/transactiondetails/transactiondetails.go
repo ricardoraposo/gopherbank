@@ -13,7 +13,7 @@ const (
 	// Label holds the string label denoting the transactiondetails type in the database.
 	Label = "transaction_details"
 	// FieldID holds the string denoting the id field in the database.
-	FieldID = "transaction_id"
+	FieldID = "id"
 	// FieldAmount holds the string denoting the amount field in the database.
 	FieldAmount = "amount"
 	// FieldType holds the string denoting the type field in the database.
@@ -22,8 +22,6 @@ const (
 	FieldTransactedAt = "transacted_at"
 	// EdgeTransaction holds the string denoting the transaction edge name in mutations.
 	EdgeTransaction = "transaction"
-	// TransactionFieldID holds the string denoting the ID field of the Transaction.
-	TransactionFieldID = "id"
 	// Table holds the table name of the transactiondetails in the database.
 	Table = "transaction_details"
 	// TransactionTable is the table that holds the transaction relation/edge.
@@ -32,7 +30,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "transaction" package.
 	TransactionInverseTable = "transactions"
 	// TransactionColumn is the table column denoting the transaction relation/edge.
-	TransactionColumn = "transaction_id"
+	TransactionColumn = "transaction_detail"
 )
 
 // Columns holds all SQL columns for transactiondetails fields.
@@ -46,7 +44,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "transaction_details"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"transaction_id",
+	"transaction_detail",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -103,7 +101,7 @@ func ByTransactionField(field string, opts ...sql.OrderTermOption) OrderOption {
 func newTransactionStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TransactionInverseTable, TransactionFieldID),
+		sqlgraph.To(TransactionInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, true, TransactionTable, TransactionColumn),
 	)
 }

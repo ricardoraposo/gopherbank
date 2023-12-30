@@ -89,11 +89,11 @@ func (a *accountDB) CreateAccount(ctx context.Context, acc *models.NewAccountPar
 }
 
 func (a *accountDB) GetAccountByNumber(ctx context.Context, number string) (*ent.Account, error) {
-	account, err := a.store.client.Account.Query().Where(account.ID(number)).Only(ctx)
+	acc, err := a.store.client.Account.Query().Where(account.ID(number)).WithUser().Only(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return account, nil
+	return acc, nil
 }
 
 func (a *accountDB) GetAllAccounts(ctx context.Context) ([]*ent.Account, error) {

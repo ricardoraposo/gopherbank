@@ -16,7 +16,7 @@ import (
 type User struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"account"`
+	ID int `json:"id,omitempty"`
 	// FirstName holds the value of the "first_name" field.
 	FirstName string `json:"first_name"`
 	// LastName holds the value of the "last_name" field.
@@ -26,7 +26,7 @@ type User struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
-	user_account *string
+	account_user *string
 	selectValues sql.SelectValues
 }
 
@@ -57,9 +57,11 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID, user.FieldFirstName, user.FieldLastName, user.FieldEmail:
+		case user.FieldID:
+			values[i] = new(sql.NullInt64)
+		case user.FieldFirstName, user.FieldLastName, user.FieldEmail:
 			values[i] = new(sql.NullString)
-		case user.ForeignKeys[0]: // user_account
+		case user.ForeignKeys[0]: // account_user
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -77,11 +79,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case user.FieldID:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value.Valid {
-				u.ID = value.String
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
 			}
+			u.ID = int(value.Int64)
 		case user.FieldFirstName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field first_name", values[i])
@@ -102,10 +104,10 @@ func (u *User) assignValues(columns []string, values []any) error {
 			}
 		case user.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field user_account", values[i])
+				return fmt.Errorf("unexpected type %T for field account_user", values[i])
 			} else if value.Valid {
-				u.user_account = new(string)
-				*u.user_account = value.String
+				u.account_user = new(string)
+				*u.account_user = value.String
 			}
 		default:
 			u.selectValues.Set(columns[i], values[i])

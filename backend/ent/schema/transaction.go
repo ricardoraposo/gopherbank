@@ -20,6 +20,6 @@ func (Transaction) Edges() []ent.Edge {
     return []ent.Edge{
         edge.From("from_account", Account.Type).Ref("from_account").Unique(),
         edge.From("to_account", Account.Type).Ref("to_account").Unique(),
-        edge.To("detail", TransactionDetails.Type).Unique().StorageKey(edge.Column("transaction_id")),
+        edge.To("detail", TransactionDetails.Type).Unique(),
     }
 }

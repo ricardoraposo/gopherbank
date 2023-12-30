@@ -412,10 +412,10 @@ func (tdq *TransactionDetailsQuery) loadTransaction(ctx context.Context, query *
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*TransactionDetails)
 	for i := range nodes {
-		if nodes[i].transaction_id == nil {
+		if nodes[i].transaction_detail == nil {
 			continue
 		}
-		fk := *nodes[i].transaction_id
+		fk := *nodes[i].transaction_detail
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -432,7 +432,7 @@ func (tdq *TransactionDetailsQuery) loadTransaction(ctx context.Context, query *
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "transaction_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "transaction_detail" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

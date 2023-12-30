@@ -76,14 +76,6 @@ func (uu *UserUpdate) SetAccountID(id string) *UserUpdate {
 	return uu
 }
 
-// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (uu *UserUpdate) SetNillableAccountID(id *string) *UserUpdate {
-	if id != nil {
-		uu = uu.SetAccountID(*id)
-	}
-	return uu
-}
-
 // SetAccount sets the "account" edge to the Account entity.
 func (uu *UserUpdate) SetAccount(a *Account) *UserUpdate {
 	return uu.SetAccountID(a.ID)
@@ -139,6 +131,9 @@ func (uu *UserUpdate) check() error {
 			return &ValidationError{Name: "last_name", err: fmt.Errorf(`ent: validator failed for field "User.last_name": %w`, err)}
 		}
 	}
+	if _, ok := uu.mutation.AccountID(); uu.mutation.AccountCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "User.account"`)
+	}
 	return nil
 }
 
@@ -146,7 +141,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := uu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
 	if ps := uu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -165,8 +160,8 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if uu.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   user.AccountTable,
 			Columns: []string{user.AccountColumn},
 			Bidi:    false,
@@ -178,8 +173,8 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := uu.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   user.AccountTable,
 			Columns: []string{user.AccountColumn},
 			Bidi:    false,
@@ -260,14 +255,6 @@ func (uuo *UserUpdateOne) SetAccountID(id string) *UserUpdateOne {
 	return uuo
 }
 
-// SetNillableAccountID sets the "account" edge to the Account entity by ID if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableAccountID(id *string) *UserUpdateOne {
-	if id != nil {
-		uuo = uuo.SetAccountID(*id)
-	}
-	return uuo
-}
-
 // SetAccount sets the "account" edge to the Account entity.
 func (uuo *UserUpdateOne) SetAccount(a *Account) *UserUpdateOne {
 	return uuo.SetAccountID(a.ID)
@@ -336,6 +323,9 @@ func (uuo *UserUpdateOne) check() error {
 			return &ValidationError{Name: "last_name", err: fmt.Errorf(`ent: validator failed for field "User.last_name": %w`, err)}
 		}
 	}
+	if _, ok := uuo.mutation.AccountID(); uuo.mutation.AccountCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "User.account"`)
+	}
 	return nil
 }
 
@@ -343,7 +333,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if err := uuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
 	id, ok := uuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "User.id" for update`)}
@@ -379,8 +369,8 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if uuo.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   user.AccountTable,
 			Columns: []string{user.AccountColumn},
 			Bidi:    false,
@@ -392,8 +382,8 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if nodes := uuo.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   user.AccountTable,
 			Columns: []string{user.AccountColumn},
 			Bidi:    false,

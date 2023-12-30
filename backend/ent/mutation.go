@@ -45,6 +45,8 @@ type AccountMutation struct {
 	createdAt           *time.Time
 	admin               *bool
 	clearedFields       map[string]struct{}
+	user                *int
+	cleareduser         bool
 	favoriteds          map[string]struct{}
 	removedfavoriteds   map[string]struct{}
 	clearedfavoriteds   bool
@@ -328,6 +330,45 @@ func (m *AccountMutation) OldAdmin(ctx context.Context) (v bool, err error) {
 // ResetAdmin resets all changes to the "admin" field.
 func (m *AccountMutation) ResetAdmin() {
 	m.admin = nil
+}
+
+// SetUserID sets the "user" edge to the User entity by id.
+func (m *AccountMutation) SetUserID(id int) {
+	m.user = &id
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *AccountMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared reports if the "user" edge to the User entity was cleared.
+func (m *AccountMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserID returns the "user" edge ID in the mutation.
+func (m *AccountMutation) UserID() (id int, exists bool) {
+	if m.user != nil {
+		return *m.user, true
+	}
+	return
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *AccountMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *AccountMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
 }
 
 // AddFavoritedIDs adds the "favoriteds" edge to the Account entity by ids.
@@ -745,7 +786,10 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
+	if m.user != nil {
+		edges = append(edges, account.EdgeUser)
+	}
 	if m.favoriteds != nil {
 		edges = append(edges, account.EdgeFavoriteds)
 	}
@@ -765,6 +809,10 @@ func (m *AccountMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case account.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
 	case account.EdgeFavoriteds:
 		ids := make([]ent.Value, 0, len(m.favoriteds))
 		for id := range m.favoriteds {
@@ -795,7 +843,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedfavoriteds != nil {
 		edges = append(edges, account.EdgeFavoriteds)
 	}
@@ -845,7 +893,10 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
+	if m.cleareduser {
+		edges = append(edges, account.EdgeUser)
+	}
 	if m.clearedfavoriteds {
 		edges = append(edges, account.EdgeFavoriteds)
 	}
@@ -865,6 +916,8 @@ func (m *AccountMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *AccountMutation) EdgeCleared(name string) bool {
 	switch name {
+	case account.EdgeUser:
+		return m.cleareduser
 	case account.EdgeFavoriteds:
 		return m.clearedfavoriteds
 	case account.EdgeFavorites:
@@ -881,6 +934,9 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *AccountMutation) ClearEdge(name string) error {
 	switch name {
+	case account.EdgeUser:
+		m.ClearUser()
+		return nil
 	}
 	return fmt.Errorf("unknown Account unique edge %s", name)
 }
@@ -889,6 +945,9 @@ func (m *AccountMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *AccountMutation) ResetEdge(name string) error {
 	switch name {
+	case account.EdgeUser:
+		m.ResetUser()
+		return nil
 	case account.EdgeFavoriteds:
 		m.ResetFavoriteds()
 		return nil
@@ -1442,12 +1501,6 @@ func (m TransactionDetailsMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of TransactionDetails entities.
-func (m *TransactionDetailsMutation) SetID(id int) {
-	m.id = &id
-}
-
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
 func (m *TransactionDetailsMutation) ID() (id int, exists bool) {
@@ -1902,7 +1955,7 @@ type UserMutation struct {
 	config
 	op             Op
 	typ            string
-	id             *string
+	id             *int
 	first_name     *string
 	last_name      *string
 	email          *string
@@ -1934,7 +1987,7 @@ func newUserMutation(c config, op Op, opts ...userOption) *UserMutation {
 }
 
 // withUserID sets the ID field of the mutation.
-func withUserID(id string) userOption {
+func withUserID(id int) userOption {
 	return func(m *UserMutation) {
 		var (
 			err   error
@@ -1984,15 +2037,9 @@ func (m UserMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of User entities.
-func (m *UserMutation) SetID(id string) {
-	m.id = &id
-}
-
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *UserMutation) ID() (id string, exists bool) {
+func (m *UserMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -2003,12 +2050,12 @@ func (m *UserMutation) ID() (id string, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *UserMutation) IDs(ctx context.Context) ([]string, error) {
+func (m *UserMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []string{id}, nil
+			return []int{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):

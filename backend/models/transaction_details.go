@@ -8,7 +8,7 @@ type TransactionDetails struct {
 	Type          string  `json:"type"`
 	TransactedAt  string  `json:"transactedAt"`
 }
-type ByTransactedAt []*ent.TransactionDetails
+type ByTransactedAt []*ent.Transaction
 
 func (a ByTransactedAt) Len() int {
 	return len(a)
@@ -19,5 +19,5 @@ func (a ByTransactedAt) Swap(i, j int) {
 }
 
 func (a ByTransactedAt) Less(i, j int) bool {
-	return a[i].TransactedAt.Before(a[j].TransactedAt)
+	return a[i].Edges.Detail.TransactedAt.Before(a[j].Edges.Detail.TransactedAt)
 }

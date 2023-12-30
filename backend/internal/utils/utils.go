@@ -36,7 +36,7 @@ func ComparePasswords(hashedPassword, password string) bool {
 	return err == nil
 }
 
-func SortTransactionsByDate(transactions []*ent.TransactionDetails) []*ent.TransactionDetails {
+func SortTransactionsByDate(transactions []*ent.Transaction) []*ent.Transaction {
 	sort.Sort(models.ByTransactedAt(transactions))
 	return transactions
 }

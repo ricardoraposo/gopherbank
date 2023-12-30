@@ -38,7 +38,7 @@ function SignUp() {
       bg-login bg-cover"
     >
       <form
-        className="bg-gray rounded-[40px] opacity-85
+        className="bg-gray-500 rounded-[40px] opacity-85
         flex flex-col justify-center items-center gap-2
         w-4/5 h-[90%]"
       >

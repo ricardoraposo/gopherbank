@@ -1,6 +1,7 @@
 {
 	"extends": "@trybe/eslint-config-frontend/typescript",
   "rules": {
-    "react/no-unescaped-entities": "off"
+    "react/no-unescaped-entities": "off",
+    "max-len": 100
   }
 }
