@@ -1,25 +1,22 @@
 import axios from 'axios';
-import { motion } from 'framer-motion';
-import { useAtom } from 'jotai';
-import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import { useAtom } from 'jotai';
+import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+
 import { apiURL, queryParams } from '../consts';
 import { accountAtom, tokenAtom } from '../store/atom';
 
-import Header from '../components/Header';
+import SavedAccounts from '../components/SavedAccounts';
+import AmountDisplay from '../components/AmountDisplay';
+import SendBtn from '../components/SendBtn';
 import Loading from '../components/Loading';
-import InvestBanner from '../components/InvestBanner';
-import Transactions from '../components/Transactions';
-import BalanceDisplay from '../components/BalanceDisplay';
-import OperationSection from '../components/OperationSection';
-import RecentTransactions from '../components/RecentTransactions';
-import SideMenu from '../components/SideMenu';
 
-function Dashboard() {
+function Operation() {
   const navigate = useNavigate();
-  const [, setID] = useAtom(accountAtom);
   const [token, setToken] = useAtom(tokenAtom);
+  const [, setID] = useAtom(accountAtom);
   const { isLoading, error } = useQuery({
     queryKey: ['user', token],
     queryFn: async () => {
@@ -35,30 +32,22 @@ function Dashboard() {
       setToken('');
       navigate('/signin');
     }
-  }, [error]);
+  }, [token]);
 
   if (isLoading) return <Loading />;
 
   return (
     <motion.div
+      className="w-full h-dvh flex flex-col justify-between items-center"
       initial={ { x: 300, opacity: 0 } }
       animate={ { x: 0, opacity: 1 } }
       exit={ { x: -300, opacity: 0, transition: { duration: 0.1 } } }
-      className="relative"
     >
-      <SideMenu />
-      <div className="mx-5 py-2">
-        <Header />
-        <BalanceDisplay />
-        <OperationSection />
-        <div className="flex gap-4 mt-6">
-          <InvestBanner />
-          <RecentTransactions />
-        </div>
-      </div>
-      <Transactions />
+      <SavedAccounts />
+      <AmountDisplay />
+      <SendBtn />
     </motion.div>
   );
 }
 
-export default Dashboard;
+export default Operation;

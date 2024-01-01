@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import vector from '../assets/vector.svg';
 import TProfilePic from './TProfilePic';
-import instance from '../api/axiosIstance';
 import { choosePicture } from '../utils/transactionHelpers';
+import axios from 'axios';
+import { apiURL, queryParams } from '../consts';
+import { useAtom } from 'jotai';
+import { accountAtom, tokenAtom } from '../store/atom';
 
-type Props = {
-  id: string;
-}
-
-function RecentTransactions({ id }: Props) {
+function RecentTransactions() {
+  const [id] = useAtom(accountAtom)
+  const [token] = useAtom(tokenAtom)
   const { data, isLoading } = useQuery({
     queryKey: ["transactions"],
-    queryFn: () => instance.get(`/api/transaction/${id}`),
+    queryFn: () => axios.get(`${apiURL}/api/transaction/${id}`, queryParams(token)),
     select: ({ data: { transactions } }) => transactions.slice(0, 5),
   })
 
@@ -27,7 +28,7 @@ function RecentTransactions({ id }: Props) {
         <h2 className="text-base font-normal">Recent Transactions</h2>
         <div className="flex gap-2">
           {
-            data.map((transaction: any) => (
+            data?.map((transaction: any) => (
               <TProfilePic key={transaction.id} profileURL={choosePicture(transaction.edges)} />
             ))
           }

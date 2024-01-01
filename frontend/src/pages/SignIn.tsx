@@ -1,12 +1,17 @@
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiURL } from '../consts';
+import { useAtom } from 'jotai';
+import { motion } from 'framer-motion';
+import { apiURL, queryParams } from '../consts';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
+import { tokenAtom } from '../store/atom';
 
 function SignIn() {
   const navigate = useNavigate();
+  const [token, setToken] = useAtom(tokenAtom);
+  const [isLoading, setIsLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     number: '',
     password: '',
@@ -23,20 +28,37 @@ function SignIn() {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
-      console.log(formValues)
       const { data } = await axios.post(`${apiURL}/auth`, formValues);
       const { token } = data;
-      localStorage.setItem('token', token);
-      navigate('/dashboard');
+      setIsLoading(true);
+      setToken(token);
+      navigate('/');
     } catch (error: any) {
       console.error(error.response.data);
     }
   };
 
+  useEffect(() => {
+    const checkToken = async () => {
+      if (token) {
+        try {
+          await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
+          navigate('/');
+        } catch (e: any) {
+          console.log('Keep going');
+        }
+      }
+    };
+    checkToken();
+  }, [token]);
+
   return (
-    <div
+    <motion.div
       className="h-dvh flex flex-col justify-center items-center
       bg-bg bg-login bg-cover font-primary"
+      initial={ { x: 300, opacity: 0 } }
+      animate={ { x: 0, opacity: 1 } }
+      exit={ { x: -300, opacity: 0, transition: { duration: 0.1 } } }
     >
       <div className="w-4/5">
         <div className="text-white text-[2.8rem] leading-snug font-extrabold">
@@ -62,8 +84,8 @@ function SignIn() {
           name="number"
           id="number"
           type="number"
-          value={formValues.number}
-          onChangeFn={handleFormChange}
+          value={ formValues.number }
+          onChangeFn={ handleFormChange }
           inputMode="numeric"
         />
         <FormInput
@@ -71,17 +93,17 @@ function SignIn() {
           name="password"
           id="password"
           type="password"
-          value={formValues.password}
-          onChangeFn={handleFormChange}
+          value={ formValues.password }
+          onChangeFn={ handleFormChange }
         />
-        <FormButton label="Sign in" onSubmitFn={handleSubmit} />
+        <FormButton label="Sign in" onSubmitFn={ handleSubmit } isLoading={ isLoading } />
         <div>
           <div className="flex justify-between gap-4 text-xs text-white my-1">
             Don't have an account ?
             {' '}
             <button
               className="text-purple font-semibold"
-              onClick={() => navigate('/signup')}
+              onClick={ () => navigate('/signup') }
               type="button"
             >
               Create one
@@ -99,7 +121,7 @@ function SignIn() {
           </div>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 }
 

@@ -17,30 +17,40 @@ func NewUserHandler(client *db.DB) *UserHandler {
 	return &UserHandler{userDB}
 }
 
+func (u *UserHandler) GetUser(c *fiber.Ctx) error {
+    accountID := c.Params("id")
+    user, err := u.userDB.GetUser(c.Context(), accountID)
+    if err != nil {
+        return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("error querying the user: %v", err))
+    }
+
+    return c.JSON(fiber.Map{"user": user})
+}
+
 func (u *UserHandler) EditUser(c *fiber.Ctx) error {
-    ctx := c.Context()
+	ctx := c.Context()
 	accountId := c.Params("id")
 	params := models.EditUserParams{}
 	if err := c.BodyParser(&params); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("error parsing body: %v", err))
 	}
 
-    user, err := u.userDB.GetUser(ctx, accountId)
-    if err != nil {
-        return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("error querying the user: %v", err))
-    }
+	user, err := u.userDB.GetUser(ctx, accountId)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("error querying the user: %v", err))
+	}
 
-    if params.FirstName == "" {
-        params.FirstName = user.FirstName
-    }
+	if params.FirstName == "" {
+		params.FirstName = user.FirstName
+	}
 
-    if params.LastName == "" {
-        params.LastName = user.LastName
-    }
+	if params.LastName == "" {
+		params.LastName = user.LastName
+	}
 
-    if params.Email == "" {
-        params.Email = user.Email
-    }
+	if params.Email == "" {
+		params.Email = user.Email
+	}
 
 	if err := u.userDB.EditUser(ctx, params, accountId); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("error editing user: %v", err))

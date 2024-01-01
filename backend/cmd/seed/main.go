@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 	c "github.com/ricardoraposo/gopherbank/config"
 	"github.com/ricardoraposo/gopherbank/ent"
+	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/internal/utils"
 )
 
@@ -17,19 +20,30 @@ func main() {
 
 	ctx := context.Background()
 
-	client.User.Delete().ExecX(ctx)
-	client.Account.Delete().ExecX(ctx)
+	// client.User.Delete().ExecX(ctx)
+	// client.Account.Delete().ExecX(ctx)
+	//
+	// if err := client.Schema.Create(ctx); err != nil {
+	// 	panic(err)
+	// }
+	//
+	// for _, p := range Params {
+	// 	acc := createAccount(client, ctx, p)
+	// 	createUser(client, ctx, p, acc)
+	// }
+	//
+	// createAdmin(client, ctx)
 
-	if err := client.Schema.Create(ctx); err != nil {
-		panic(err)
-	}
+	fav := client.Account.
+		Query().
+		Where(account.ID("08533436")).
+		WithFavorites(func(q *ent.AccountQuery) {
+			q.WithUser()
+		}).
+		OnlyX(ctx)
 
-	for _, p := range Params {
-		acc := createAccount(client, ctx, p)
-		createUser(client, ctx, p, acc)
-	}
-
-	createAdmin(client, ctx)
+	fb, _ := json.Marshal(fav)
+	fmt.Println(string(fb))
 }
 
 func createAccount(client *ent.Client, ctx context.Context, p NewAccountParams) *ent.Account {
@@ -63,7 +77,7 @@ func createAdmin(client *ent.Client, ctx context.Context) {
 		SetFirstName("Rick").
 		SetLastName("Raposo").
 		SetEmail("admin@gopher.com").
-        SetPictureURL("https://i.imgur.com/eSQ3jw3.png").
+		SetPictureURL("https://i.imgur.com/eSQ3jw3.png").
 		SetAccount(acc).
 		ExecX(ctx)
 }
@@ -79,35 +93,35 @@ type NewAccountParams struct {
 
 var Params = []NewAccountParams{
 	{
-		FirstName: "Ricardo",
-		LastName:  "Gopher",
-		Password:  "123456789",
-		Email:     "rick@Gopher.com",
-		Number:    utils.GenerateAccountNumber(),
-        PictureUrl: "https://i.imgur.com/2Mq70Sx.png",
+		FirstName:  "Ricardo",
+		LastName:   "Gopher",
+		Password:   "123456789",
+		Email:      "rick@Gopher.com",
+		Number:     utils.GenerateAccountNumber(),
+		PictureUrl: "https://i.imgur.com/2Mq70Sx.png",
 	},
 	{
-		FirstName: "Xico",
-		LastName:  "Gopher",
-		Password:  "123456789",
-		Email:     "xico@gopher.com",
-		Number:    utils.GenerateAccountNumber(),
-        PictureUrl: "https://i.imgur.com/iPebJXT.png",
+		FirstName:  "Xico",
+		LastName:   "Gopher",
+		Password:   "123456789",
+		Email:      "xico@gopher.com",
+		Number:     utils.GenerateAccountNumber(),
+		PictureUrl: "https://i.imgur.com/iPebJXT.png",
 	},
 	{
-		FirstName: "Willy",
-		LastName:  "Gopher",
-		Password:  "123456789",
-		Email:     "willy@gopher.com",
-		Number:    utils.GenerateAccountNumber(),
-        PictureUrl: "https://i.imgur.com/2Mq70Sx.png",
+		FirstName:  "Willy",
+		LastName:   "Gopher",
+		Password:   "123456789",
+		Email:      "willy@gopher.com",
+		Number:     utils.GenerateAccountNumber(),
+		PictureUrl: "https://i.imgur.com/2Mq70Sx.png",
 	},
 	{
-		FirstName: "Tito",
-		LastName:  "Gopher",
-		Password:  "123456789",
-		Email:     "tito@gopher.com",
-		Number:    utils.GenerateAccountNumber(),
-        PictureUrl: "https://i.imgur.com/NMgNhJG.png",
+		FirstName:  "Tito",
+		LastName:   "Gopher",
+		Password:   "123456789",
+		Email:      "tito@gopher.com",
+		Number:     utils.GenerateAccountNumber(),
+		PictureUrl: "https://i.imgur.com/NMgNhJG.png",
 	},
 }

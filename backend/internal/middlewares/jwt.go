@@ -10,6 +10,14 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+func GetJWTAccount(c *fiber.Ctx) error {
+    claims, ok := c.Context().UserValue("claims").(jwt.MapClaims)
+    if !ok {
+        return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")
+    }
+    return c.JSON(fiber.Map{"number": claims["number"]})
+}
+
 func JWTAuthentication(c *fiber.Ctx) error {
 	authHeader := c.GetReqHeaders()["Authorization"]
 
@@ -17,7 +25,13 @@ func JWTAuthentication(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "Missing token")
 	}
 
-	token := strings.Fields(authHeader[0])[1]
+	tokenFields := strings.Fields(authHeader[0])
+
+    if len(tokenFields) != 2 || tokenFields[0] != "Bearer" {
+        return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")
+    }
+
+    token := tokenFields[1]
 	claims, err := getClaimsFromJWT(token)
 	if err != nil {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")

@@ -21,12 +21,16 @@ func (s *FiberServer) RegisterRoutes() {
 	api := s.App.Group("/api")
 	api.Use(middlewares.JWTAuthentication)
 
+	// jwt routes
+	api.Get("/jwt", middlewares.GetJWTAccount)
+
 	// accounts routes
 	api.Get("/accounts/:id", accountsHandler.GetAccountByNumber)
 	api.Delete("/accounts/:id", accountsHandler.DeleteAccount)
 	api.Patch("/accounts/", accountsHandler.RecoverAccountPassword)
 
 	// user routes
+	api.Get("/user/:id", userHandler.GetUser)
 	api.Put("/user/:id", userHandler.EditUser)
 
 	// transactions routes
@@ -35,6 +39,7 @@ func (s *FiberServer) RegisterRoutes() {
 	api.Post("/withdraw", middlewares.ValidateWithdrawParams, transactionHandler.Withdraw)
 
 	// favorite routes
+	api.Get("/favorite", favoritehandler.GetFavorites)
 	api.Post("/favorite", favoritehandler.AddToFavorite)
 
 	// auth routes

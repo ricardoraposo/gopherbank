@@ -2,6 +2,9 @@
 	"extends": "@trybe/eslint-config-frontend/typescript",
   "rules": {
     "react/no-unescaped-entities": "off",
-    "max-len": 100
+    "max-len": 0,
+    "react-hooks/exhaustive-deps": "off",
+    "@typescript-eslint/no-shadow": "off",
+    "jsx-a11y/control-has-associated-label": "off"
   }
 }

@@ -34,6 +34,18 @@ func (a *accountDB) Transfer(ctx context.Context, from, to string, amount float6
 		return err
 	}
 
+	_, err = a.GetAccountByNumber(ctx, from)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = a.GetAccountByNumber(ctx, to)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	err = a.RemoveFromAccount(ctx, from, amount)
 	if err != nil {
 		tx.Rollback()

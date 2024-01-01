@@ -1,23 +1,24 @@
 import { useQuery } from '@tanstack/react-query';
-import instance from '../api/axiosIstance';
+import axios from 'axios';
+import { useAtom } from 'jotai';
 import Line from './Line';
 import Transaction from './Transaction';
 import { chooseName, choosePicture, makeCapitalized } from '../utils/transactionHelpers';
+import { apiURL, queryParams } from '../consts';
+import { accountAtom, tokenAtom } from '../store/atom';
 
-type Props = {
-  id: string;
-}
-
-function Transactions({ id }: Props) {
+function Transactions() {
+  const [id] = useAtom(accountAtom);
+  const [token] = useAtom(tokenAtom);
   const { data, isLoading } = useQuery({
-    queryKey: ["transactions"],
-    queryFn: () => instance.get(`/api/transaction/${id}`),
+    queryKey: ['transactions'],
+    queryFn: () => axios.get(`${apiURL}/api/transaction/${id}`, queryParams(token)),
     select: ({ data: { transactions } }) => transactions,
-  })
+  });
 
-  const usFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+  const usFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' });
 
-  if (isLoading) return <div>Let him cook</div>
+  if (isLoading) return <div>Let him cook</div>;
 
   return (
     <div
@@ -30,14 +31,14 @@ function Transactions({ id }: Props) {
         <br />
         <div className="flex flex-col gap-2">
           {
-            data.map((transaction: any) => (
+            data?.map((transaction: any) => (
               <Transaction
-                key={transaction.id}
-                name={chooseName(transaction.edges)}
-                profileURL={choosePicture(transaction.edges)}
-                amount={transaction.edges.detail.amount}
-                date={usFormat.format(new Date(transaction.edges.detail.transactedAt))}
-                type={makeCapitalized(transaction.edges.detail.type) as "Transfer" | "Withdraw" | "Deposit"}
+                key={ transaction.id }
+                name={ chooseName(transaction.edges) }
+                profileURL={ choosePicture(transaction.edges) }
+                amount={ transaction.edges.detail.amount }
+                date={ usFormat.format(new Date(transaction.edges.detail.transactedAt)) }
+                type={ makeCapitalized(transaction.edges.detail.type) as 'Transfer' | 'Withdraw' | 'Deposit' }
               />
             ))
           }

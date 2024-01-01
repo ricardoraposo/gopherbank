@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import FormButton from '../components/FormButton';
 import FormInput from '../components/FormInput';
 import { apiURL } from '../consts';
+import { motion } from 'framer-motion'
 
 function SignUp() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     firstName: '',
     lastName: '',
@@ -24,18 +26,22 @@ function SignUp() {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(`${apiURL}/auth/new`, formValues);
-      console.log('data: ', data);
+      setIsLoading(true);
+      await axios.post(`${apiURL}/auth/new`, formValues);
       navigate('/signin');
+      setIsLoading(false);
     } catch (error: any) {
       console.error(error.response.data);
     }
   };
 
   return (
-    <div
+    <motion.div
       className="h-dvh flex justify-center items-center
       bg-login bg-cover"
+      initial={{ x: 300, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: -300, opacity: 0, transition: { duration: 0.1 } }}
     >
       <form
         className="bg-gray-500 rounded-[40px] opacity-85
@@ -48,47 +54,48 @@ function SignUp() {
           name="firstName"
           id="firstName"
           type="text"
-          value={ formValues.firstName }
-          onChangeFn={ handleFormChange }
+          value={formValues.firstName}
+          onChangeFn={handleFormChange}
         />
         <FormInput
           label="Last name"
           name="lastName"
           id="lastName"
           type="text"
-          value={ formValues.lastName }
-          onChangeFn={ handleFormChange }
+          value={formValues.lastName}
+          onChangeFn={handleFormChange}
         />
         <FormInput
           label="E-mail"
           name="email"
           id="email"
           type="email"
-          value={ formValues.email }
-          onChangeFn={ handleFormChange }
+          value={formValues.email}
+          onChangeFn={handleFormChange}
         />
         <FormInput
           label="Password"
           name="password"
           id="password"
           type="password"
-          value={ formValues.password }
-          onChangeFn={ handleFormChange }
+          value={formValues.password}
+          onChangeFn={handleFormChange}
         />
         <FormInput
           label="Confirm password"
           name="confirm"
           id="confirm"
           type="password"
-          value={ confirmPassword }
-          onChangeFn={ (e) => setConfirmPassword(e.target.value) }
+          value={confirmPassword}
+          onChangeFn={(e) => setConfirmPassword(e.target.value)}
         />
         <FormButton
           label="Sign up"
-          onSubmitFn={ handleSubmit }
+          onSubmitFn={handleSubmit}
+          isLoading={isLoading}
         />
       </form>
-    </div>
+    </motion.div>
   );
 }
 

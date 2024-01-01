@@ -36,11 +36,34 @@ func (f *FavoriteHandler) AddToFavorite(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "Not enough credentials")
 	}
 
-	if err := f.db.CreateFavorite(c.Context(), p); err != nil {
+	if err := f.db.ToggleFavorite(c.Context(), p); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
 	return c.JSON(fiber.Map{
 		"message": fmt.Sprintf("%v and %v are now besto friendos", p.AccountID, p.FavoritedID),
 	})
+}
+
+func (f *FavoriteHandler) GetFavorites(c *fiber.Ctx) error {
+    claims, ok := c.Context().Value("claims").(jwt.MapClaims)
+    if !ok {
+        fmt.Println("could not get the claims")
+        return fiber.NewError(fiber.StatusInternalServerError, "authentication error")
+    }
+
+    accountNumber, ok := claims["number"].(string)
+    if !ok {
+        fmt.Println("could not get the account number")
+        return fiber.NewError(fiber.StatusInternalServerError, "authentication error")
+    }
+
+    favorites, err := f.db.GetFavoritedsByAccount(c.Context(), accountNumber)
+    if err != nil {
+        return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+    }
+
+    return c.JSON(fiber.Map{
+        "favorites": favorites,
+    })
 }
