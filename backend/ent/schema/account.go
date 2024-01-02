@@ -17,9 +17,9 @@ type Account struct {
 func (Account) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").StorageKey("number").Unique().StructTag(`json:"number"`),
-		field.String("password").StructTag(`json:"password"`),
+		field.String("password").StructTag(`json:"-"`),
 		field.Float("balance").Default(0).StructTag(`json:"balance"`),
-		field.Time("createdAt").Default(time.Now).Immutable().StructTag(`json:"createdAt"`),
+		field.Time("createdAt").Default(time.Now).Immutable().StructTag(`json:"-"`),
 		field.Bool("admin").Default(false).StructTag(`json:"admin"`),
 	}
 }
@@ -31,5 +31,7 @@ func (Account) Edges() []ent.Edge {
         edge.To("favorites", Account.Type).From("favoriteds"),
         edge.To("from_account", Transaction.Type),
         edge.To("to_account", Transaction.Type),
+        edge.To("deposit_request", DepositRequest.Type),
+        edge.To("notification", Notification.Type),
     }
 }

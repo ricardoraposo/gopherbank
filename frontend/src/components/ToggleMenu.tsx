@@ -8,9 +8,9 @@ function ToggleMenu() {
     <div
       className="flex flex-col gap-1"
     >
-      <div className={ `w-5 h-[2px] bg-white transition-transform duration-500 ${showMenu && 'rotate-[405deg] translate-y-[140%]'}` } />
+      <div className={ `w-5 h-[2px] bg-white transition-transform duration-700 ${showMenu && 'rotate-[405deg] translate-y-[140%]'}` } />
       <div className={ `w-5 h-[2px] bg-white ${showMenu && 'hidden'}` } />
-      <div className={ `w-5 h-[2px] bg-white transition-transform duration-500 ${showMenu && '-rotate-[405deg] -translate-y-[140%]'}` } />
+      <div className={ `w-5 h-[2px] bg-white transition-transform duration-700 ${showMenu && '-rotate-[405deg] -translate-y-[140%]'}` } />
     </div>
   );
 }

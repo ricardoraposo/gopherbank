@@ -18,6 +18,7 @@ type NewAccountParams struct {
 	LastName  string `json:"lastName"`
 	Password  string `json:"password"`
 	Email     string `json:"email"`
+    PictureURL string `json:"pictureUrl"`
 	Number    string `json:"number"`
 }
 

@@ -6,6 +6,8 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
+var defaultPictureUrl = "https://i.imgur.com/fLjGgnc.png"
+
 // User holds the schema definition for the User entity.
 type User struct {
 	ent.Schema
@@ -18,7 +20,7 @@ func (User) Fields() []ent.Field {
         field.String("first_name").MaxLen(50).StructTag(`json:"firstName"`),
         field.String("last_name").MaxLen(50).StructTag(`json:"lastName"`),
         field.String("email").StructTag(`json:"email"`),
-        field.String("picture_url").StructTag(`json:"pictureUrl"`),
+        field.String("picture_url").Optional().Default(defaultPictureUrl).StructTag(`json:"pictureUrl"`),
     }
 }
 

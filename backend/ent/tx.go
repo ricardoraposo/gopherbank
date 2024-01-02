@@ -14,6 +14,10 @@ type Tx struct {
 	config
 	// Account is the client for interacting with the Account builders.
 	Account *AccountClient
+	// DepositRequest is the client for interacting with the DepositRequest builders.
+	DepositRequest *DepositRequestClient
+	// Notification is the client for interacting with the Notification builders.
+	Notification *NotificationClient
 	// Transaction is the client for interacting with the Transaction builders.
 	Transaction *TransactionClient
 	// TransactionDetails is the client for interacting with the TransactionDetails builders.
@@ -152,6 +156,8 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Account = NewAccountClient(tx.config)
+	tx.DepositRequest = NewDepositRequestClient(tx.config)
+	tx.Notification = NewNotificationClient(tx.config)
 	tx.Transaction = NewTransactionClient(tx.config)
 	tx.TransactionDetails = NewTransactionDetailsClient(tx.config)
 	tx.User = NewUserClient(tx.config)

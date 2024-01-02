@@ -9,6 +9,12 @@ import (
 // Account is the predicate function for account builders.
 type Account func(*sql.Selector)
 
+// DepositRequest is the predicate function for depositrequest builders.
+type DepositRequest func(*sql.Selector)
+
+// Notification is the predicate function for notification builders.
+type Notification func(*sql.Selector)
+
 // Transaction is the predicate function for transaction builders.
 type Transaction func(*sql.Selector)
 

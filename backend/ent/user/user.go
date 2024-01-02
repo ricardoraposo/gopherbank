@@ -70,6 +70,8 @@ var (
 	FirstNameValidator func(string) error
 	// LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
 	LastNameValidator func(string) error
+	// DefaultPictureURL holds the default value on creation for the "picture_url" field.
+	DefaultPictureURL string
 )
 
 // OrderOption defines the ordering options for the User queries.

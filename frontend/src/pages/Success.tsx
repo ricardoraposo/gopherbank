@@ -11,16 +11,24 @@ import { getHourAndMinutes, usFormat } from '../utils/helpers';
 
 function Success() {
   const { type } = useParams();
+  console.log('type: ', type);
   const navigate = useNavigate();
-  const [accountNumber] = useAtom(accountNumberAtom);
-  const [amount] = useAtom(amountAtom);
+  const [accountNumber, setAccountNumber] = useAtom(accountNumberAtom);
+  const [amount, setAmount] = useAtom(amountAtom);
   const [token] = useAtom(tokenAtom);
 
   const { data } = useQuery({
     queryKey: ['toUser', token],
     queryFn: () => axios.get(`${apiURL}/api/user/${accountNumber}`, queryParams(token)),
     select: ({ data: { user } }) => user,
+    enabled: type === 'transfer',
   });
+
+  const handleClick = () => {
+    setAccountNumber('');
+    setAmount('');
+    navigate('/');
+  };
 
   return (
     <motion.div
@@ -34,18 +42,31 @@ function Success() {
         alt="gopher in a party, celebrating the good transaction"
         className="w-44 h-44"
       />
-      <p className="w-[338px] text-white text-2xl font-bold mt-5">Done, operation concluded successfully!!!</p>
+      {
+        type === 'deposit' ? (
+          <div className="w-[338px]  mt-5 text-white">
+            <p className="text-xl font-bold">
+              Done, your deposit request has been sent!!!
+            </p>
+            <p className="text-lg text-white mt-3">
+              In a few hours, you should get confirmation of the deposit
+            </p>
+          </div>
+        ) : (
+          <p className="w-[338px] text-white text-2xl font-bold mt-5">
+            Done, operation concluded successfully!!!
+          </p>
+        )
+      }
       <div
         className="flex flex-col justify-center items-center
         border border-gray-500 w-[338px] h-32 rounded-xl mt-5"
       >
         <p className="text-3xl text-white font-bold">
-          {usFormat.format(parseFloat(amount)) && '$100.00'}
+          {usFormat.format(parseFloat(amount))}
         </p>
         <p className="text-white text-sm">
-          To
-          {' '}
-          {type === 'transfer' ? `${data?.firstName} ${data?.lastName}` : 'my wallet'}
+          {type === 'transfer' ? `To ${data?.firstName} ${data?.lastName}` : `${type === 'deposit' ? 'To' : 'From'} my wallet`}
         </p>
         <p className="text-white text-sm">
           Right now •
@@ -55,7 +76,7 @@ function Success() {
       </div>
       <button
         className="w-52 h-14 font-bold text-white rounded-full bg-orange mt-8"
-        onClick={ () => navigate('/') }
+        onClick={ handleClick }
       >
         Back to Dashboard
       </button>

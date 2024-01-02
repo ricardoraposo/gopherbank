@@ -84,6 +84,12 @@ func (uu *UserUpdate) SetNillablePictureURL(s *string) *UserUpdate {
 	return uu
 }
 
+// ClearPictureURL clears the value of the "picture_url" field.
+func (uu *UserUpdate) ClearPictureURL() *UserUpdate {
+	uu.mutation.ClearPictureURL()
+	return uu
+}
+
 // SetAccountID sets the "account" edge to the Account entity by ID.
 func (uu *UserUpdate) SetAccountID(id string) *UserUpdate {
 	uu.mutation.SetAccountID(id)
@@ -174,6 +180,9 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.PictureURL(); ok {
 		_spec.SetField(user.FieldPictureURL, field.TypeString, value)
+	}
+	if uu.mutation.PictureURLCleared() {
+		_spec.ClearField(user.FieldPictureURL, field.TypeString)
 	}
 	if uu.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -277,6 +286,12 @@ func (uuo *UserUpdateOne) SetNillablePictureURL(s *string) *UserUpdateOne {
 	if s != nil {
 		uuo.SetPictureURL(*s)
 	}
+	return uuo
+}
+
+// ClearPictureURL clears the value of the "picture_url" field.
+func (uuo *UserUpdateOne) ClearPictureURL() *UserUpdateOne {
+	uuo.mutation.ClearPictureURL()
 	return uuo
 }
 
@@ -400,6 +415,9 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.PictureURL(); ok {
 		_spec.SetField(user.FieldPictureURL, field.TypeString, value)
+	}
+	if uuo.mutation.PictureURLCleared() {
+		_spec.ClearField(user.FieldPictureURL, field.TypeString)
 	}
 	if uuo.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{

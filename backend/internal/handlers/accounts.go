@@ -49,7 +49,10 @@ func (a *AccountHandler) CreateAccount(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{"message": fmt.Sprintf("Account created successfully with number %s", num)})
+	return c.JSON(fiber.Map{
+        "number": num,
+        "message": fmt.Sprintf("Account created successfully with number %s", num),
+    })
 }
 
 func (a *AccountHandler) GetAllAccounts(c *fiber.Ctx) error {

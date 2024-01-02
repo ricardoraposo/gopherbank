@@ -6,7 +6,9 @@ import SignUp from './pages/SignUp';
 import Success from './pages/Success';
 import Dashboard from './pages/Dashboard';
 import Operation from './pages/Operation';
+import AddPicture from './pages/AddPicture';
 import OperationAccount from './pages/OperationAccount';
+import SignUpSuccess from './pages/SignUpSuccess';
 
 function App() {
   const location = useLocation();
@@ -17,6 +19,8 @@ function App() {
         <Route path="/" Component={ Dashboard } />
         <Route path="/signin" Component={ SignIn } />
         <Route path="/signup" Component={ SignUp } />
+        <Route path="/signup/picture" Component={ AddPicture } />
+        <Route path="/signup/success" Component={ SignUpSuccess } />
         <Route path="/operation/:type" Component={ Operation } />
         <Route path="/operation/:type/account" Component={ OperationAccount } />
         <Route path="/operation/:type/success" Component={ Success } />

@@ -1,20 +1,15 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useAtom } from 'jotai';
 import FormButton from '../components/FormButton';
 import FormInput from '../components/FormInput';
-import { apiURL } from '../consts';
-import { motion } from 'framer-motion'
+import { signUpAtom } from '../store/atom';
 
 function SignUp() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [formValues, setFormValues] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-  });
+  const [formValues, setFormValues] = useAtom(signUpAtom);
 
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -27,11 +22,11 @@ function SignUp() {
     e.preventDefault();
     try {
       setIsLoading(true);
-      await axios.post(`${apiURL}/auth/new`, formValues);
-      navigate('/signin');
-      setIsLoading(false);
+      navigate('/signup/picture');
     } catch (error: any) {
       console.error(error.response.data);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -39,9 +34,9 @@ function SignUp() {
     <motion.div
       className="h-dvh flex justify-center items-center
       bg-login bg-cover"
-      initial={{ x: 300, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -300, opacity: 0, transition: { duration: 0.1 } }}
+      initial={ { x: 300, opacity: 0 } }
+      animate={ { x: 0, opacity: 1 } }
+      exit={ { x: -300, opacity: 0, transition: { duration: 0.1 } } }
     >
       <form
         className="bg-gray-500 rounded-[40px] opacity-85
@@ -54,45 +49,45 @@ function SignUp() {
           name="firstName"
           id="firstName"
           type="text"
-          value={formValues.firstName}
-          onChangeFn={handleFormChange}
+          value={ formValues.firstName }
+          onChangeFn={ handleFormChange }
         />
         <FormInput
           label="Last name"
           name="lastName"
           id="lastName"
           type="text"
-          value={formValues.lastName}
-          onChangeFn={handleFormChange}
+          value={ formValues.lastName }
+          onChangeFn={ handleFormChange }
         />
         <FormInput
           label="E-mail"
           name="email"
           id="email"
           type="email"
-          value={formValues.email}
-          onChangeFn={handleFormChange}
+          value={ formValues.email }
+          onChangeFn={ handleFormChange }
         />
         <FormInput
           label="Password"
           name="password"
           id="password"
           type="password"
-          value={formValues.password}
-          onChangeFn={handleFormChange}
+          value={ formValues.password }
+          onChangeFn={ handleFormChange }
         />
         <FormInput
           label="Confirm password"
           name="confirm"
           id="confirm"
           type="password"
-          value={confirmPassword}
-          onChangeFn={(e) => setConfirmPassword(e.target.value)}
+          value={ confirmPassword }
+          onChangeFn={ (e) => setConfirmPassword(e.target.value) }
         />
         <FormButton
           label="Sign up"
-          onSubmitFn={handleSubmit}
-          isLoading={isLoading}
+          onSubmitFn={ handleSubmit }
+          isLoading={ isLoading }
         />
       </form>
     </motion.div>

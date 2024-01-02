@@ -11,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ricardoraposo/gopherbank/ent/account"
+	"github.com/ricardoraposo/gopherbank/ent/depositrequest"
+	"github.com/ricardoraposo/gopherbank/ent/notification"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
 	"github.com/ricardoraposo/gopherbank/ent/user"
 )
@@ -153,6 +155,36 @@ func (ac *AccountCreate) AddToAccount(t ...*Transaction) *AccountCreate {
 		ids[i] = t[i].ID
 	}
 	return ac.AddToAccountIDs(ids...)
+}
+
+// AddDepositRequestIDs adds the "deposit_request" edge to the DepositRequest entity by IDs.
+func (ac *AccountCreate) AddDepositRequestIDs(ids ...int) *AccountCreate {
+	ac.mutation.AddDepositRequestIDs(ids...)
+	return ac
+}
+
+// AddDepositRequest adds the "deposit_request" edges to the DepositRequest entity.
+func (ac *AccountCreate) AddDepositRequest(d ...*DepositRequest) *AccountCreate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return ac.AddDepositRequestIDs(ids...)
+}
+
+// AddNotificationIDs adds the "notification" edge to the Notification entity by IDs.
+func (ac *AccountCreate) AddNotificationIDs(ids ...int) *AccountCreate {
+	ac.mutation.AddNotificationIDs(ids...)
+	return ac
+}
+
+// AddNotification adds the "notification" edges to the Notification entity.
+func (ac *AccountCreate) AddNotification(n ...*Notification) *AccountCreate {
+	ids := make([]int, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return ac.AddNotificationIDs(ids...)
 }
 
 // Mutation returns the AccountMutation object of the builder.
@@ -342,6 +374,38 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.DepositRequestIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.DepositRequestTable,
+			Columns: []string{account.DepositRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(depositrequest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.NotificationIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationTable,
+			Columns: []string{account.NotificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

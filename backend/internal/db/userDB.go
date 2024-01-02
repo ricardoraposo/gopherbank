@@ -31,6 +31,7 @@ func (u *userDB) CreateUser(ctx context.Context, p *models.NewAccountParams, acc
 		SetEmail(p.Email).
 		SetFirstName(p.FirstName).
 		SetLastName(p.LastName).
+        SetPictureURL(p.PictureURL).
 		SetAccount(acc).
 		Exec(ctx)
 

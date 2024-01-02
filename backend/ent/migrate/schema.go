@@ -22,6 +22,50 @@ var (
 		Columns:    AccountsColumns,
 		PrimaryKey: []*schema.Column{AccountsColumns[0]},
 	}
+	// DepositRequestsColumns holds the columns for the "deposit_requests" table.
+	DepositRequestsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "amount", Type: field.TypeFloat64},
+		{Name: "status", Type: field.TypeString, Default: "pending"},
+		{Name: "account_deposit_request", Type: field.TypeString, Nullable: true},
+	}
+	// DepositRequestsTable holds the schema information for the "deposit_requests" table.
+	DepositRequestsTable = &schema.Table{
+		Name:       "deposit_requests",
+		Columns:    DepositRequestsColumns,
+		PrimaryKey: []*schema.Column{DepositRequestsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "deposit_requests_accounts_deposit_request",
+				Columns:    []*schema.Column{DepositRequestsColumns[3]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// NotificationsColumns holds the columns for the "notifications" table.
+	NotificationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "content", Type: field.TypeString},
+		{Name: "read", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "account_notification", Type: field.TypeString, Nullable: true},
+	}
+	// NotificationsTable holds the schema information for the "notifications" table.
+	NotificationsTable = &schema.Table{
+		Name:       "notifications",
+		Columns:    NotificationsColumns,
+		PrimaryKey: []*schema.Column{NotificationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "notifications_accounts_notification",
+				Columns:    []*schema.Column{NotificationsColumns[5]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// TransactionsColumns holds the columns for the "transactions" table.
 	TransactionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -76,7 +120,7 @@ var (
 		{Name: "first_name", Type: field.TypeString, Size: 50},
 		{Name: "last_name", Type: field.TypeString, Size: 50},
 		{Name: "email", Type: field.TypeString},
-		{Name: "picture_url", Type: field.TypeString},
+		{Name: "picture_url", Type: field.TypeString, Nullable: true, Default: "https://i.imgur.com/fLjGgnc.png"},
 		{Name: "account_user", Type: field.TypeString, Unique: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
@@ -121,6 +165,8 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AccountsTable,
+		DepositRequestsTable,
+		NotificationsTable,
 		TransactionsTable,
 		TransactionDetailsTable,
 		UsersTable,
@@ -129,6 +175,8 @@ var (
 )
 
 func init() {
+	DepositRequestsTable.ForeignKeys[0].RefTable = AccountsTable
+	NotificationsTable.ForeignKeys[0].RefTable = AccountsTable
 	TransactionsTable.ForeignKeys[0].RefTable = AccountsTable
 	TransactionsTable.ForeignKeys[1].RefTable = AccountsTable
 	TransactionDetailsTable.ForeignKeys[0].RefTable = TransactionsTable

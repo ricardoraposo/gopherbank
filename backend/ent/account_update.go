@@ -11,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ricardoraposo/gopherbank/ent/account"
+	"github.com/ricardoraposo/gopherbank/ent/depositrequest"
+	"github.com/ricardoraposo/gopherbank/ent/notification"
 	"github.com/ricardoraposo/gopherbank/ent/predicate"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
 	"github.com/ricardoraposo/gopherbank/ent/user"
@@ -157,6 +159,36 @@ func (au *AccountUpdate) AddToAccount(t ...*Transaction) *AccountUpdate {
 	return au.AddToAccountIDs(ids...)
 }
 
+// AddDepositRequestIDs adds the "deposit_request" edge to the DepositRequest entity by IDs.
+func (au *AccountUpdate) AddDepositRequestIDs(ids ...int) *AccountUpdate {
+	au.mutation.AddDepositRequestIDs(ids...)
+	return au
+}
+
+// AddDepositRequest adds the "deposit_request" edges to the DepositRequest entity.
+func (au *AccountUpdate) AddDepositRequest(d ...*DepositRequest) *AccountUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return au.AddDepositRequestIDs(ids...)
+}
+
+// AddNotificationIDs adds the "notification" edge to the Notification entity by IDs.
+func (au *AccountUpdate) AddNotificationIDs(ids ...int) *AccountUpdate {
+	au.mutation.AddNotificationIDs(ids...)
+	return au
+}
+
+// AddNotification adds the "notification" edges to the Notification entity.
+func (au *AccountUpdate) AddNotification(n ...*Notification) *AccountUpdate {
+	ids := make([]int, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return au.AddNotificationIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
@@ -250,6 +282,48 @@ func (au *AccountUpdate) RemoveToAccount(t ...*Transaction) *AccountUpdate {
 		ids[i] = t[i].ID
 	}
 	return au.RemoveToAccountIDs(ids...)
+}
+
+// ClearDepositRequest clears all "deposit_request" edges to the DepositRequest entity.
+func (au *AccountUpdate) ClearDepositRequest() *AccountUpdate {
+	au.mutation.ClearDepositRequest()
+	return au
+}
+
+// RemoveDepositRequestIDs removes the "deposit_request" edge to DepositRequest entities by IDs.
+func (au *AccountUpdate) RemoveDepositRequestIDs(ids ...int) *AccountUpdate {
+	au.mutation.RemoveDepositRequestIDs(ids...)
+	return au
+}
+
+// RemoveDepositRequest removes "deposit_request" edges to DepositRequest entities.
+func (au *AccountUpdate) RemoveDepositRequest(d ...*DepositRequest) *AccountUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return au.RemoveDepositRequestIDs(ids...)
+}
+
+// ClearNotification clears all "notification" edges to the Notification entity.
+func (au *AccountUpdate) ClearNotification() *AccountUpdate {
+	au.mutation.ClearNotification()
+	return au
+}
+
+// RemoveNotificationIDs removes the "notification" edge to Notification entities by IDs.
+func (au *AccountUpdate) RemoveNotificationIDs(ids ...int) *AccountUpdate {
+	au.mutation.RemoveNotificationIDs(ids...)
+	return au
+}
+
+// RemoveNotification removes "notification" edges to Notification entities.
+func (au *AccountUpdate) RemoveNotification(n ...*Notification) *AccountUpdate {
+	ids := make([]int, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return au.RemoveNotificationIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -509,6 +583,96 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.DepositRequestCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.DepositRequestTable,
+			Columns: []string{account.DepositRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(depositrequest.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedDepositRequestIDs(); len(nodes) > 0 && !au.mutation.DepositRequestCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.DepositRequestTable,
+			Columns: []string{account.DepositRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(depositrequest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.DepositRequestIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.DepositRequestTable,
+			Columns: []string{account.DepositRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(depositrequest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.NotificationCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationTable,
+			Columns: []string{account.NotificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedNotificationIDs(); len(nodes) > 0 && !au.mutation.NotificationCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationTable,
+			Columns: []string{account.NotificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.NotificationIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationTable,
+			Columns: []string{account.NotificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{account.Label}
@@ -657,6 +821,36 @@ func (auo *AccountUpdateOne) AddToAccount(t ...*Transaction) *AccountUpdateOne {
 	return auo.AddToAccountIDs(ids...)
 }
 
+// AddDepositRequestIDs adds the "deposit_request" edge to the DepositRequest entity by IDs.
+func (auo *AccountUpdateOne) AddDepositRequestIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.AddDepositRequestIDs(ids...)
+	return auo
+}
+
+// AddDepositRequest adds the "deposit_request" edges to the DepositRequest entity.
+func (auo *AccountUpdateOne) AddDepositRequest(d ...*DepositRequest) *AccountUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return auo.AddDepositRequestIDs(ids...)
+}
+
+// AddNotificationIDs adds the "notification" edge to the Notification entity by IDs.
+func (auo *AccountUpdateOne) AddNotificationIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.AddNotificationIDs(ids...)
+	return auo
+}
+
+// AddNotification adds the "notification" edges to the Notification entity.
+func (auo *AccountUpdateOne) AddNotification(n ...*Notification) *AccountUpdateOne {
+	ids := make([]int, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return auo.AddNotificationIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
@@ -750,6 +944,48 @@ func (auo *AccountUpdateOne) RemoveToAccount(t ...*Transaction) *AccountUpdateOn
 		ids[i] = t[i].ID
 	}
 	return auo.RemoveToAccountIDs(ids...)
+}
+
+// ClearDepositRequest clears all "deposit_request" edges to the DepositRequest entity.
+func (auo *AccountUpdateOne) ClearDepositRequest() *AccountUpdateOne {
+	auo.mutation.ClearDepositRequest()
+	return auo
+}
+
+// RemoveDepositRequestIDs removes the "deposit_request" edge to DepositRequest entities by IDs.
+func (auo *AccountUpdateOne) RemoveDepositRequestIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.RemoveDepositRequestIDs(ids...)
+	return auo
+}
+
+// RemoveDepositRequest removes "deposit_request" edges to DepositRequest entities.
+func (auo *AccountUpdateOne) RemoveDepositRequest(d ...*DepositRequest) *AccountUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return auo.RemoveDepositRequestIDs(ids...)
+}
+
+// ClearNotification clears all "notification" edges to the Notification entity.
+func (auo *AccountUpdateOne) ClearNotification() *AccountUpdateOne {
+	auo.mutation.ClearNotification()
+	return auo
+}
+
+// RemoveNotificationIDs removes the "notification" edge to Notification entities by IDs.
+func (auo *AccountUpdateOne) RemoveNotificationIDs(ids ...int) *AccountUpdateOne {
+	auo.mutation.RemoveNotificationIDs(ids...)
+	return auo
+}
+
+// RemoveNotification removes "notification" edges to Notification entities.
+func (auo *AccountUpdateOne) RemoveNotification(n ...*Notification) *AccountUpdateOne {
+	ids := make([]int, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return auo.RemoveNotificationIDs(ids...)
 }
 
 // Where appends a list predicates to the AccountUpdate builder.
@@ -1032,6 +1268,96 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(transaction.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.DepositRequestCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.DepositRequestTable,
+			Columns: []string{account.DepositRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(depositrequest.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedDepositRequestIDs(); len(nodes) > 0 && !auo.mutation.DepositRequestCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.DepositRequestTable,
+			Columns: []string{account.DepositRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(depositrequest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.DepositRequestIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.DepositRequestTable,
+			Columns: []string{account.DepositRequestColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(depositrequest.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.NotificationCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationTable,
+			Columns: []string{account.NotificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedNotificationIDs(); len(nodes) > 0 && !auo.mutation.NotificationCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationTable,
+			Columns: []string{account.NotificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.NotificationIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationTable,
+			Columns: []string{account.NotificationColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -32,10 +32,18 @@ const (
 	EdgeFromAccount = "from_account"
 	// EdgeToAccount holds the string denoting the to_account edge name in mutations.
 	EdgeToAccount = "to_account"
+	// EdgeDepositRequest holds the string denoting the deposit_request edge name in mutations.
+	EdgeDepositRequest = "deposit_request"
+	// EdgeNotification holds the string denoting the notification edge name in mutations.
+	EdgeNotification = "notification"
 	// UserFieldID holds the string denoting the ID field of the User.
 	UserFieldID = "id"
 	// TransactionFieldID holds the string denoting the ID field of the Transaction.
 	TransactionFieldID = "id"
+	// DepositRequestFieldID holds the string denoting the ID field of the DepositRequest.
+	DepositRequestFieldID = "id"
+	// NotificationFieldID holds the string denoting the ID field of the Notification.
+	NotificationFieldID = "id"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
 	// UserTable is the table that holds the user relation/edge.
@@ -63,6 +71,20 @@ const (
 	ToAccountInverseTable = "transactions"
 	// ToAccountColumn is the table column denoting the to_account relation/edge.
 	ToAccountColumn = "account_to_account"
+	// DepositRequestTable is the table that holds the deposit_request relation/edge.
+	DepositRequestTable = "deposit_requests"
+	// DepositRequestInverseTable is the table name for the DepositRequest entity.
+	// It exists in this package in order to avoid circular dependency with the "depositrequest" package.
+	DepositRequestInverseTable = "deposit_requests"
+	// DepositRequestColumn is the table column denoting the deposit_request relation/edge.
+	DepositRequestColumn = "account_deposit_request"
+	// NotificationTable is the table that holds the notification relation/edge.
+	NotificationTable = "notifications"
+	// NotificationInverseTable is the table name for the Notification entity.
+	// It exists in this package in order to avoid circular dependency with the "notification" package.
+	NotificationInverseTable = "notifications"
+	// NotificationColumn is the table column denoting the notification relation/edge.
+	NotificationColumn = "account_notification"
 )
 
 // Columns holds all SQL columns for account fields.
@@ -192,6 +214,34 @@ func ByToAccount(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newToAccountStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByDepositRequestCount orders the results by deposit_request count.
+func ByDepositRequestCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDepositRequestStep(), opts...)
+	}
+}
+
+// ByDepositRequest orders the results by deposit_request terms.
+func ByDepositRequest(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDepositRequestStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByNotificationCount orders the results by notification count.
+func ByNotificationCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newNotificationStep(), opts...)
+	}
+}
+
+// ByNotification orders the results by notification terms.
+func ByNotification(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNotificationStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newUserStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -225,5 +275,19 @@ func newToAccountStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ToAccountInverseTable, TransactionFieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ToAccountTable, ToAccountColumn),
+	)
+}
+func newDepositRequestStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DepositRequestInverseTable, DepositRequestFieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DepositRequestTable, DepositRequestColumn),
+	)
+}
+func newNotificationStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NotificationInverseTable, NotificationFieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, NotificationTable, NotificationColumn),
 	)
 }

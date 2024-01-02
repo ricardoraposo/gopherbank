@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { amountAtom, tokenAtom } from '../store/atom';
 import { apiURL, queryParams } from '../consts';
-import { usFormat } from '../utils/helpers';
+import { getVerbFromType, usFormat } from '../utils/helpers';
 
 function SendBtn() {
   const { type } = useParams();
@@ -16,7 +16,7 @@ function SendBtn() {
   const handleWithdraw = async () => {
     try {
       const { data: { number } } = await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
-      await axios.post(`${apiURL}/api/${type}`, {
+      await axios.post(`${apiURL}/api/withdraw`, {
         fromAccountNumber: number,
         amount: parseFloat(amount),
       }, queryParams(token));
@@ -26,10 +26,26 @@ function SendBtn() {
     }
   };
 
+  const handleDeposit = async () => {
+    try {
+      await axios.post(
+        `${apiURL}/api/deposit-request`,
+        { amount: parseFloat(amount) },
+        queryParams(token),
+      );
+      navigate('/operation/deposit/success');
+    } catch (e: any) {
+      console.log(e.response.data);
+    }
+  };
+
   const handleSend = async () => {
     switch (type) {
       case 'withdraw':
         handleWithdraw();
+        break;
+      case 'deposit':
+        handleDeposit();
         break;
       default:
         navigate(`${pathname}/account`);
@@ -42,7 +58,7 @@ function SendBtn() {
       flex justify-center items-center cursor-pointer"
       onClick={ handleSend }
     >
-      Send
+      {type && getVerbFromType(type)}
       {' '}
       {amount ? usFormat.format(parseFloat(amount)) : '$0.00'}
     </button>

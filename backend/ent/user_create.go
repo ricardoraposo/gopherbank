@@ -44,6 +44,14 @@ func (uc *UserCreate) SetPictureURL(s string) *UserCreate {
 	return uc
 }
 
+// SetNillablePictureURL sets the "picture_url" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePictureURL(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPictureURL(*s)
+	}
+	return uc
+}
+
 // SetAccountID sets the "account" edge to the Account entity by ID.
 func (uc *UserCreate) SetAccountID(id string) *UserCreate {
 	uc.mutation.SetAccountID(id)
@@ -62,6 +70,7 @@ func (uc *UserCreate) Mutation() *UserMutation {
 
 // Save creates the User in the database.
 func (uc *UserCreate) Save(ctx context.Context) (*User, error) {
+	uc.defaults()
 	return withHooks(ctx, uc.sqlSave, uc.mutation, uc.hooks)
 }
 
@@ -87,6 +96,14 @@ func (uc *UserCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (uc *UserCreate) defaults() {
+	if _, ok := uc.mutation.PictureURL(); !ok {
+		v := user.DefaultPictureURL
+		uc.mutation.SetPictureURL(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.FirstName(); !ok {
@@ -107,9 +124,6 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.Email(); !ok {
 		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "User.email"`)}
-	}
-	if _, ok := uc.mutation.PictureURL(); !ok {
-		return &ValidationError{Name: "picture_url", err: errors.New(`ent: missing required field "User.picture_url"`)}
 	}
 	if _, ok := uc.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account", err: errors.New(`ent: missing required edge "User.account"`)}
@@ -194,6 +208,7 @@ func (ucb *UserCreateBulk) Save(ctx context.Context) ([]*User, error) {
 	for i := range ucb.builders {
 		func(i int, root context.Context) {
 			builder := ucb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*UserMutation)
 				if !ok {

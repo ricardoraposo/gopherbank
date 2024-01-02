@@ -12,6 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ricardoraposo/gopherbank/ent/account"
+	"github.com/ricardoraposo/gopherbank/ent/depositrequest"
+	"github.com/ricardoraposo/gopherbank/ent/notification"
 	"github.com/ricardoraposo/gopherbank/ent/predicate"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
 	"github.com/ricardoraposo/gopherbank/ent/user"
@@ -20,15 +22,17 @@ import (
 // AccountQuery is the builder for querying Account entities.
 type AccountQuery struct {
 	config
-	ctx             *QueryContext
-	order           []account.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Account
-	withUser        *UserQuery
-	withFavoriteds  *AccountQuery
-	withFavorites   *AccountQuery
-	withFromAccount *TransactionQuery
-	withToAccount   *TransactionQuery
+	ctx                *QueryContext
+	order              []account.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Account
+	withUser           *UserQuery
+	withFavoriteds     *AccountQuery
+	withFavorites      *AccountQuery
+	withFromAccount    *TransactionQuery
+	withToAccount      *TransactionQuery
+	withDepositRequest *DepositRequestQuery
+	withNotification   *NotificationQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -168,6 +172,50 @@ func (aq *AccountQuery) QueryToAccount() *TransactionQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(transaction.Table, transaction.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.ToAccountTable, account.ToAccountColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDepositRequest chains the current query on the "deposit_request" edge.
+func (aq *AccountQuery) QueryDepositRequest() *DepositRequestQuery {
+	query := (&DepositRequestClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(depositrequest.Table, depositrequest.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.DepositRequestTable, account.DepositRequestColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryNotification chains the current query on the "notification" edge.
+func (aq *AccountQuery) QueryNotification() *NotificationQuery {
+	query := (&NotificationClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(notification.Table, notification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.NotificationTable, account.NotificationColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -362,16 +410,18 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		return nil
 	}
 	return &AccountQuery{
-		config:          aq.config,
-		ctx:             aq.ctx.Clone(),
-		order:           append([]account.OrderOption{}, aq.order...),
-		inters:          append([]Interceptor{}, aq.inters...),
-		predicates:      append([]predicate.Account{}, aq.predicates...),
-		withUser:        aq.withUser.Clone(),
-		withFavoriteds:  aq.withFavoriteds.Clone(),
-		withFavorites:   aq.withFavorites.Clone(),
-		withFromAccount: aq.withFromAccount.Clone(),
-		withToAccount:   aq.withToAccount.Clone(),
+		config:             aq.config,
+		ctx:                aq.ctx.Clone(),
+		order:              append([]account.OrderOption{}, aq.order...),
+		inters:             append([]Interceptor{}, aq.inters...),
+		predicates:         append([]predicate.Account{}, aq.predicates...),
+		withUser:           aq.withUser.Clone(),
+		withFavoriteds:     aq.withFavoriteds.Clone(),
+		withFavorites:      aq.withFavorites.Clone(),
+		withFromAccount:    aq.withFromAccount.Clone(),
+		withToAccount:      aq.withToAccount.Clone(),
+		withDepositRequest: aq.withDepositRequest.Clone(),
+		withNotification:   aq.withNotification.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -433,13 +483,35 @@ func (aq *AccountQuery) WithToAccount(opts ...func(*TransactionQuery)) *AccountQ
 	return aq
 }
 
+// WithDepositRequest tells the query-builder to eager-load the nodes that are connected to
+// the "deposit_request" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithDepositRequest(opts ...func(*DepositRequestQuery)) *AccountQuery {
+	query := (&DepositRequestClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withDepositRequest = query
+	return aq
+}
+
+// WithNotification tells the query-builder to eager-load the nodes that are connected to
+// the "notification" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithNotification(opts ...func(*NotificationQuery)) *AccountQuery {
+	query := (&NotificationClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withNotification = query
+	return aq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		Password string `json:"password"`
+//		Password string `json:"-"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -462,7 +534,7 @@ func (aq *AccountQuery) GroupBy(field string, fields ...string) *AccountGroupBy 
 // Example:
 //
 //	var v []struct {
-//		Password string `json:"password"`
+//		Password string `json:"-"`
 //	}
 //
 //	client.Account.Query().
@@ -511,12 +583,14 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [7]bool{
 			aq.withUser != nil,
 			aq.withFavoriteds != nil,
 			aq.withFavorites != nil,
 			aq.withFromAccount != nil,
 			aq.withToAccount != nil,
+			aq.withDepositRequest != nil,
+			aq.withNotification != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -568,6 +642,20 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := aq.loadToAccount(ctx, query, nodes,
 			func(n *Account) { n.Edges.ToAccount = []*Transaction{} },
 			func(n *Account, e *Transaction) { n.Edges.ToAccount = append(n.Edges.ToAccount, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withDepositRequest; query != nil {
+		if err := aq.loadDepositRequest(ctx, query, nodes,
+			func(n *Account) { n.Edges.DepositRequest = []*DepositRequest{} },
+			func(n *Account, e *DepositRequest) { n.Edges.DepositRequest = append(n.Edges.DepositRequest, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withNotification; query != nil {
+		if err := aq.loadNotification(ctx, query, nodes,
+			func(n *Account) { n.Edges.Notification = []*Notification{} },
+			func(n *Account, e *Notification) { n.Edges.Notification = append(n.Edges.Notification, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -781,6 +869,68 @@ func (aq *AccountQuery) loadToAccount(ctx context.Context, query *TransactionQue
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "account_to_account" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadDepositRequest(ctx context.Context, query *DepositRequestQuery, nodes []*Account, init func(*Account), assign func(*Account, *DepositRequest)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.DepositRequest(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.DepositRequestColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.account_deposit_request
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "account_deposit_request" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_deposit_request" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadNotification(ctx context.Context, query *NotificationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Notification)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[string]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Notification(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.NotificationColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.account_notification
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "account_notification" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_notification" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

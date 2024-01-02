@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/ricardoraposo/gopherbank/ent/account"
+	"github.com/ricardoraposo/gopherbank/ent/depositrequest"
+	"github.com/ricardoraposo/gopherbank/ent/notification"
 	"github.com/ricardoraposo/gopherbank/ent/schema"
 	"github.com/ricardoraposo/gopherbank/ent/transactiondetails"
 	"github.com/ricardoraposo/gopherbank/ent/user"
@@ -29,6 +31,36 @@ func init() {
 	accountDescAdmin := accountFields[4].Descriptor()
 	// account.DefaultAdmin holds the default value on creation for the admin field.
 	account.DefaultAdmin = accountDescAdmin.Default.(bool)
+	depositrequestFields := schema.DepositRequest{}.Fields()
+	_ = depositrequestFields
+	// depositrequestDescAmount is the schema descriptor for amount field.
+	depositrequestDescAmount := depositrequestFields[0].Descriptor()
+	// depositrequest.AmountValidator is a validator for the "amount" field. It is called by the builders before save.
+	depositrequest.AmountValidator = depositrequestDescAmount.Validators[0].(func(float64) error)
+	// depositrequestDescStatus is the schema descriptor for status field.
+	depositrequestDescStatus := depositrequestFields[1].Descriptor()
+	// depositrequest.DefaultStatus holds the default value on creation for the status field.
+	depositrequest.DefaultStatus = depositrequestDescStatus.Default.(string)
+	// depositrequest.StatusValidator is a validator for the "status" field. It is called by the builders before save.
+	depositrequest.StatusValidator = depositrequestDescStatus.Validators[0].(func(string) error)
+	notificationFields := schema.Notification{}.Fields()
+	_ = notificationFields
+	// notificationDescTitle is the schema descriptor for title field.
+	notificationDescTitle := notificationFields[0].Descriptor()
+	// notification.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	notification.TitleValidator = notificationDescTitle.Validators[0].(func(string) error)
+	// notificationDescContent is the schema descriptor for content field.
+	notificationDescContent := notificationFields[1].Descriptor()
+	// notification.ContentValidator is a validator for the "content" field. It is called by the builders before save.
+	notification.ContentValidator = notificationDescContent.Validators[0].(func(string) error)
+	// notificationDescRead is the schema descriptor for read field.
+	notificationDescRead := notificationFields[2].Descriptor()
+	// notification.DefaultRead holds the default value on creation for the read field.
+	notification.DefaultRead = notificationDescRead.Default.(bool)
+	// notificationDescCreatedAt is the schema descriptor for created_at field.
+	notificationDescCreatedAt := notificationFields[3].Descriptor()
+	// notification.DefaultCreatedAt holds the default value on creation for the created_at field.
+	notification.DefaultCreatedAt = notificationDescCreatedAt.Default.(func() time.Time)
 	transactiondetailsFields := schema.TransactionDetails{}.Fields()
 	_ = transactiondetailsFields
 	// transactiondetailsDescType is the schema descriptor for type field.
@@ -49,4 +81,8 @@ func init() {
 	userDescLastName := userFields[1].Descriptor()
 	// user.LastNameValidator is a validator for the "last_name" field. It is called by the builders before save.
 	user.LastNameValidator = userDescLastName.Validators[0].(func(string) error)
+	// userDescPictureURL is the schema descriptor for picture_url field.
+	userDescPictureURL := userFields[3].Descriptor()
+	// user.DefaultPictureURL holds the default value on creation for the picture_url field.
+	user.DefaultPictureURL = userDescPictureURL.Default.(string)
 }

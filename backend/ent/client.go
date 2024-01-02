@@ -16,6 +16,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ricardoraposo/gopherbank/ent/account"
+	"github.com/ricardoraposo/gopherbank/ent/depositrequest"
+	"github.com/ricardoraposo/gopherbank/ent/notification"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
 	"github.com/ricardoraposo/gopherbank/ent/transactiondetails"
 	"github.com/ricardoraposo/gopherbank/ent/user"
@@ -28,6 +30,10 @@ type Client struct {
 	Schema *migrate.Schema
 	// Account is the client for interacting with the Account builders.
 	Account *AccountClient
+	// DepositRequest is the client for interacting with the DepositRequest builders.
+	DepositRequest *DepositRequestClient
+	// Notification is the client for interacting with the Notification builders.
+	Notification *NotificationClient
 	// Transaction is the client for interacting with the Transaction builders.
 	Transaction *TransactionClient
 	// TransactionDetails is the client for interacting with the TransactionDetails builders.
@@ -46,6 +52,8 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Account = NewAccountClient(c.config)
+	c.DepositRequest = NewDepositRequestClient(c.config)
+	c.Notification = NewNotificationClient(c.config)
 	c.Transaction = NewTransactionClient(c.config)
 	c.TransactionDetails = NewTransactionDetailsClient(c.config)
 	c.User = NewUserClient(c.config)
@@ -142,6 +150,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:                ctx,
 		config:             cfg,
 		Account:            NewAccountClient(cfg),
+		DepositRequest:     NewDepositRequestClient(cfg),
+		Notification:       NewNotificationClient(cfg),
 		Transaction:        NewTransactionClient(cfg),
 		TransactionDetails: NewTransactionDetailsClient(cfg),
 		User:               NewUserClient(cfg),
@@ -165,6 +175,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:                ctx,
 		config:             cfg,
 		Account:            NewAccountClient(cfg),
+		DepositRequest:     NewDepositRequestClient(cfg),
+		Notification:       NewNotificationClient(cfg),
 		Transaction:        NewTransactionClient(cfg),
 		TransactionDetails: NewTransactionDetailsClient(cfg),
 		User:               NewUserClient(cfg),
@@ -196,19 +208,23 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Account.Use(hooks...)
-	c.Transaction.Use(hooks...)
-	c.TransactionDetails.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Account, c.DepositRequest, c.Notification, c.Transaction,
+		c.TransactionDetails, c.User,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Account.Intercept(interceptors...)
-	c.Transaction.Intercept(interceptors...)
-	c.TransactionDetails.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Account, c.DepositRequest, c.Notification, c.Transaction,
+		c.TransactionDetails, c.User,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -216,6 +232,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AccountMutation:
 		return c.Account.mutate(ctx, m)
+	case *DepositRequestMutation:
+		return c.DepositRequest.mutate(ctx, m)
+	case *NotificationMutation:
+		return c.Notification.mutate(ctx, m)
 	case *TransactionMutation:
 		return c.Transaction.mutate(ctx, m)
 	case *TransactionDetailsMutation:
@@ -415,6 +435,38 @@ func (c *AccountClient) QueryToAccount(a *Account) *TransactionQuery {
 	return query
 }
 
+// QueryDepositRequest queries the deposit_request edge of a Account.
+func (c *AccountClient) QueryDepositRequest(a *Account) *DepositRequestQuery {
+	query := (&DepositRequestClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(depositrequest.Table, depositrequest.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.DepositRequestTable, account.DepositRequestColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNotification queries the notification edge of a Account.
+func (c *AccountClient) QueryNotification(a *Account) *NotificationQuery {
+	query := (&NotificationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(notification.Table, notification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.NotificationTable, account.NotificationColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AccountClient) Hooks() []Hook {
 	return c.hooks.Account
@@ -437,6 +489,304 @@ func (c *AccountClient) mutate(ctx context.Context, m *AccountMutation) (Value, 
 		return (&AccountDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Account mutation op: %q", m.Op())
+	}
+}
+
+// DepositRequestClient is a client for the DepositRequest schema.
+type DepositRequestClient struct {
+	config
+}
+
+// NewDepositRequestClient returns a client for the DepositRequest from the given config.
+func NewDepositRequestClient(c config) *DepositRequestClient {
+	return &DepositRequestClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `depositrequest.Hooks(f(g(h())))`.
+func (c *DepositRequestClient) Use(hooks ...Hook) {
+	c.hooks.DepositRequest = append(c.hooks.DepositRequest, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `depositrequest.Intercept(f(g(h())))`.
+func (c *DepositRequestClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DepositRequest = append(c.inters.DepositRequest, interceptors...)
+}
+
+// Create returns a builder for creating a DepositRequest entity.
+func (c *DepositRequestClient) Create() *DepositRequestCreate {
+	mutation := newDepositRequestMutation(c.config, OpCreate)
+	return &DepositRequestCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DepositRequest entities.
+func (c *DepositRequestClient) CreateBulk(builders ...*DepositRequestCreate) *DepositRequestCreateBulk {
+	return &DepositRequestCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DepositRequestClient) MapCreateBulk(slice any, setFunc func(*DepositRequestCreate, int)) *DepositRequestCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DepositRequestCreateBulk{err: fmt.Errorf("calling to DepositRequestClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DepositRequestCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DepositRequestCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DepositRequest.
+func (c *DepositRequestClient) Update() *DepositRequestUpdate {
+	mutation := newDepositRequestMutation(c.config, OpUpdate)
+	return &DepositRequestUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DepositRequestClient) UpdateOne(dr *DepositRequest) *DepositRequestUpdateOne {
+	mutation := newDepositRequestMutation(c.config, OpUpdateOne, withDepositRequest(dr))
+	return &DepositRequestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DepositRequestClient) UpdateOneID(id int) *DepositRequestUpdateOne {
+	mutation := newDepositRequestMutation(c.config, OpUpdateOne, withDepositRequestID(id))
+	return &DepositRequestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DepositRequest.
+func (c *DepositRequestClient) Delete() *DepositRequestDelete {
+	mutation := newDepositRequestMutation(c.config, OpDelete)
+	return &DepositRequestDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DepositRequestClient) DeleteOne(dr *DepositRequest) *DepositRequestDeleteOne {
+	return c.DeleteOneID(dr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DepositRequestClient) DeleteOneID(id int) *DepositRequestDeleteOne {
+	builder := c.Delete().Where(depositrequest.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DepositRequestDeleteOne{builder}
+}
+
+// Query returns a query builder for DepositRequest.
+func (c *DepositRequestClient) Query() *DepositRequestQuery {
+	return &DepositRequestQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDepositRequest},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a DepositRequest entity by its id.
+func (c *DepositRequestClient) Get(ctx context.Context, id int) (*DepositRequest, error) {
+	return c.Query().Where(depositrequest.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DepositRequestClient) GetX(ctx context.Context, id int) *DepositRequest {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a DepositRequest.
+func (c *DepositRequestClient) QueryAccount(dr *DepositRequest) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := dr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(depositrequest.Table, depositrequest.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, depositrequest.AccountTable, depositrequest.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(dr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *DepositRequestClient) Hooks() []Hook {
+	return c.hooks.DepositRequest
+}
+
+// Interceptors returns the client interceptors.
+func (c *DepositRequestClient) Interceptors() []Interceptor {
+	return c.inters.DepositRequest
+}
+
+func (c *DepositRequestClient) mutate(ctx context.Context, m *DepositRequestMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DepositRequestCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DepositRequestUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DepositRequestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DepositRequestDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown DepositRequest mutation op: %q", m.Op())
+	}
+}
+
+// NotificationClient is a client for the Notification schema.
+type NotificationClient struct {
+	config
+}
+
+// NewNotificationClient returns a client for the Notification from the given config.
+func NewNotificationClient(c config) *NotificationClient {
+	return &NotificationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `notification.Hooks(f(g(h())))`.
+func (c *NotificationClient) Use(hooks ...Hook) {
+	c.hooks.Notification = append(c.hooks.Notification, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `notification.Intercept(f(g(h())))`.
+func (c *NotificationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Notification = append(c.inters.Notification, interceptors...)
+}
+
+// Create returns a builder for creating a Notification entity.
+func (c *NotificationClient) Create() *NotificationCreate {
+	mutation := newNotificationMutation(c.config, OpCreate)
+	return &NotificationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Notification entities.
+func (c *NotificationClient) CreateBulk(builders ...*NotificationCreate) *NotificationCreateBulk {
+	return &NotificationCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *NotificationClient) MapCreateBulk(slice any, setFunc func(*NotificationCreate, int)) *NotificationCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &NotificationCreateBulk{err: fmt.Errorf("calling to NotificationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*NotificationCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &NotificationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Notification.
+func (c *NotificationClient) Update() *NotificationUpdate {
+	mutation := newNotificationMutation(c.config, OpUpdate)
+	return &NotificationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *NotificationClient) UpdateOne(n *Notification) *NotificationUpdateOne {
+	mutation := newNotificationMutation(c.config, OpUpdateOne, withNotification(n))
+	return &NotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *NotificationClient) UpdateOneID(id int) *NotificationUpdateOne {
+	mutation := newNotificationMutation(c.config, OpUpdateOne, withNotificationID(id))
+	return &NotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Notification.
+func (c *NotificationClient) Delete() *NotificationDelete {
+	mutation := newNotificationMutation(c.config, OpDelete)
+	return &NotificationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *NotificationClient) DeleteOne(n *Notification) *NotificationDeleteOne {
+	return c.DeleteOneID(n.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *NotificationClient) DeleteOneID(id int) *NotificationDeleteOne {
+	builder := c.Delete().Where(notification.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &NotificationDeleteOne{builder}
+}
+
+// Query returns a query builder for Notification.
+func (c *NotificationClient) Query() *NotificationQuery {
+	return &NotificationQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeNotification},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Notification entity by its id.
+func (c *NotificationClient) Get(ctx context.Context, id int) (*Notification, error) {
+	return c.Query().Where(notification.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *NotificationClient) GetX(ctx context.Context, id int) *Notification {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a Notification.
+func (c *NotificationClient) QueryAccount(n *Notification) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(notification.Table, notification.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, notification.AccountTable, notification.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *NotificationClient) Hooks() []Hook {
+	return c.hooks.Notification
+}
+
+// Interceptors returns the client interceptors.
+func (c *NotificationClient) Interceptors() []Interceptor {
+	return c.inters.Notification
+}
+
+func (c *NotificationClient) mutate(ctx context.Context, m *NotificationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&NotificationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&NotificationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&NotificationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&NotificationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Notification mutation op: %q", m.Op())
 	}
 }
 
@@ -922,9 +1272,11 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Account, Transaction, TransactionDetails, User []ent.Hook
+		Account, DepositRequest, Notification, Transaction, TransactionDetails,
+		User []ent.Hook
 	}
 	inters struct {
-		Account, Transaction, TransactionDetails, User []ent.Interceptor
+		Account, DepositRequest, Notification, Transaction, TransactionDetails,
+		User []ent.Interceptor
 	}
 )

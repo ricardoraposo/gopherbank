@@ -2,13 +2,10 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
 	c "github.com/ricardoraposo/gopherbank/config"
 	"github.com/ricardoraposo/gopherbank/ent"
-	"github.com/ricardoraposo/gopherbank/ent/account"
 	"github.com/ricardoraposo/gopherbank/internal/utils"
 )
 
@@ -20,30 +17,19 @@ func main() {
 
 	ctx := context.Background()
 
-	// client.User.Delete().ExecX(ctx)
-	// client.Account.Delete().ExecX(ctx)
-	//
-	// if err := client.Schema.Create(ctx); err != nil {
-	// 	panic(err)
-	// }
-	//
-	// for _, p := range Params {
-	// 	acc := createAccount(client, ctx, p)
-	// 	createUser(client, ctx, p, acc)
-	// }
-	//
-	// createAdmin(client, ctx)
+	client.User.Delete().ExecX(ctx)
+	client.Account.Delete().ExecX(ctx)
 
-	fav := client.Account.
-		Query().
-		Where(account.ID("08533436")).
-		WithFavorites(func(q *ent.AccountQuery) {
-			q.WithUser()
-		}).
-		OnlyX(ctx)
+	if err := client.Schema.Create(ctx); err != nil {
+		panic(err)
+	}
 
-	fb, _ := json.Marshal(fav)
-	fmt.Println(string(fb))
+	for _, p := range Params {
+		acc := createAccount(client, ctx, p)
+		createUser(client, ctx, p, acc)
+	}
+
+	createAdmin(client, ctx)
 }
 
 func createAccount(client *ent.Client, ctx context.Context, p NewAccountParams) *ent.Account {
@@ -77,7 +63,7 @@ func createAdmin(client *ent.Client, ctx context.Context) {
 		SetFirstName("Rick").
 		SetLastName("Raposo").
 		SetEmail("admin@gopher.com").
-		SetPictureURL("https://i.imgur.com/eSQ3jw3.png").
+		SetPictureURL("https://i.imgur.com/Zzh48Cg.jpg").
 		SetAccount(acc).
 		ExecX(ctx)
 }
@@ -114,7 +100,7 @@ var Params = []NewAccountParams{
 		Password:   "123456789",
 		Email:      "willy@gopher.com",
 		Number:     utils.GenerateAccountNumber(),
-		PictureUrl: "https://i.imgur.com/2Mq70Sx.png",
+		PictureUrl: "https://i.imgur.com/LHPhorw.png",
 	},
 	{
 		FirstName:  "Tito",

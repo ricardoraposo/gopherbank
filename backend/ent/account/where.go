@@ -355,6 +355,52 @@ func HasToAccountWith(preds ...predicate.Transaction) predicate.Account {
 	})
 }
 
+// HasDepositRequest applies the HasEdge predicate on the "deposit_request" edge.
+func HasDepositRequest() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DepositRequestTable, DepositRequestColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDepositRequestWith applies the HasEdge predicate on the "deposit_request" edge with a given conditions (other predicates).
+func HasDepositRequestWith(preds ...predicate.DepositRequest) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newDepositRequestStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasNotification applies the HasEdge predicate on the "notification" edge.
+func HasNotification() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, NotificationTable, NotificationColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNotificationWith applies the HasEdge predicate on the "notification" edge with a given conditions (other predicates).
+func HasNotificationWith(preds ...predicate.Notification) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newNotificationStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Account) predicate.Account {
 	return predicate.Account(sql.AndPredicates(predicates...))

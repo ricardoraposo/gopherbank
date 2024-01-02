@@ -323,6 +323,16 @@ func PictureURLHasSuffix(v string) predicate.User {
 	return predicate.User(sql.FieldHasSuffix(FieldPictureURL, v))
 }
 
+// PictureURLIsNil applies the IsNil predicate on the "picture_url" field.
+func PictureURLIsNil() predicate.User {
+	return predicate.User(sql.FieldIsNull(FieldPictureURL))
+}
+
+// PictureURLNotNil applies the NotNil predicate on the "picture_url" field.
+func PictureURLNotNil() predicate.User {
+	return predicate.User(sql.FieldNotNull(FieldPictureURL))
+}
+
 // PictureURLEqualFold applies the EqualFold predicate on the "picture_url" field.
 func PictureURLEqualFold(v string) predicate.User {
 	return predicate.User(sql.FieldEqualFold(FieldPictureURL, v))

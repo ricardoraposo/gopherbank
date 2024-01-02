@@ -1,15 +1,15 @@
 type Props = {
-  label: string;
   name: string;
   id: string;
   type: string;
   value: string;
   onChangeFn: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  label?: string;
   inputMode?: 'numeric' | 'text';
 };
 
 function FormInput({
-  label,
+  label = '',
   type,
   name,
   id,
@@ -32,7 +32,7 @@ function FormInput({
         name={ name }
         value={ value }
         onChange={ onChangeFn }
-        className="h-12 rounded-xl text-2xl px-2 w-60"
+        className="h-12 rounded-xl text-xl px-2 w-60"
       />
     </div>
   );

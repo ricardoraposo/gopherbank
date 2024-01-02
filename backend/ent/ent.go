@@ -13,6 +13,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ricardoraposo/gopherbank/ent/account"
+	"github.com/ricardoraposo/gopherbank/ent/depositrequest"
+	"github.com/ricardoraposo/gopherbank/ent/notification"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
 	"github.com/ricardoraposo/gopherbank/ent/transactiondetails"
 	"github.com/ricardoraposo/gopherbank/ent/user"
@@ -77,6 +79,8 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			account.Table:            account.ValidColumn,
+			depositrequest.Table:     depositrequest.ValidColumn,
+			notification.Table:       notification.ValidColumn,
 			transaction.Table:        transaction.ValidColumn,
 			transactiondetails.Table: transactiondetails.ValidColumn,
 			user.Table:               user.ValidColumn,

@@ -14,6 +14,7 @@ func (s *FiberServer) RegisterRoutes() {
 	transactionHandler := handlers.NewTransactionHandler(s.db)
 	authHandler := handlers.NewAuthHandler(s.db)
 	favoritehandler := handlers.NewFavoriteHandler(s.db)
+	depositRequestHandler := handlers.NewDepositRequestHandler(s.db)
 
 	s.Use(logger.New())
 	s.Use(cors.New())
@@ -37,6 +38,9 @@ func (s *FiberServer) RegisterRoutes() {
 	api.Get("/transaction/:id", transactionHandler.GetAccountTransactions)
 	api.Post("/transfer", middlewares.ValidateTransferParams, transactionHandler.Transfer)
 	api.Post("/withdraw", middlewares.ValidateWithdrawParams, transactionHandler.Withdraw)
+
+    // deposit request routes
+    api.Post("/deposit-request", depositRequestHandler.CreateDepositRequest)
 
 	// favorite routes
 	api.Get("/favorite", favoritehandler.GetFavorites)

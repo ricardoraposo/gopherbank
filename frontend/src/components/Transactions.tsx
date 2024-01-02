@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAtom } from 'jotai';
 import Line from './Line';
 import Transaction from './Transaction';
+import WarningIcon from '../assets/warning.svg';
 import { chooseName, choosePicture, makeCapitalized } from '../utils/transactionHelpers';
 import { apiURL, queryParams } from '../consts';
 import { accountAtom, tokenAtom } from '../store/atom';
@@ -31,16 +32,23 @@ function Transactions() {
         <br />
         <div className="flex flex-col gap-2">
           {
-            data?.map((transaction: any) => (
-              <Transaction
-                key={ transaction.id }
-                name={ chooseName(transaction.edges) }
-                profileURL={ choosePicture(transaction.edges) }
-                amount={ transaction.edges.detail.amount }
-                date={ usFormat.format(new Date(transaction.edges.detail.transactedAt)) }
-                type={ makeCapitalized(transaction.edges.detail.type) as 'Transfer' | 'Withdraw' | 'Deposit' }
-              />
-            ))
+            data.length === 0 ? (
+              <div className="text-2xl text-center font-bold text-gray-200">
+                <p className="my-8">No transactions</p>
+                <img src={ WarningIcon } alt="warning symbol" className="w-12 h-12 mx-auto" />
+              </div>
+            ) : (
+              data?.map((transaction: any) => (
+                <Transaction
+                  key={ transaction.id }
+                  name={ chooseName(transaction.edges) }
+                  profileURL={ choosePicture(transaction.edges) }
+                  amount={ transaction.edges.detail.amount }
+                  date={ usFormat.format(new Date(transaction.edges.detail.transactedAt)) }
+                  type={ makeCapitalized(transaction.edges.detail.type) as 'Transfer' | 'Withdraw' | 'Deposit' }
+                />
+              ))
+            )
           }
         </div>
       </div>

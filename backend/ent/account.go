@@ -19,11 +19,11 @@ type Account struct {
 	// ID of the ent.
 	ID string `json:"number"`
 	// Password holds the value of the "password" field.
-	Password string `json:"password"`
+	Password string `json:"-"`
 	// Balance holds the value of the "balance" field.
 	Balance float64 `json:"balance"`
 	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"createdAt"`
+	CreatedAt time.Time `json:"-"`
 	// Admin holds the value of the "admin" field.
 	Admin bool `json:"admin"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -44,9 +44,13 @@ type AccountEdges struct {
 	FromAccount []*Transaction `json:"from_account,omitempty"`
 	// ToAccount holds the value of the to_account edge.
 	ToAccount []*Transaction `json:"to_account,omitempty"`
+	// DepositRequest holds the value of the deposit_request edge.
+	DepositRequest []*DepositRequest `json:"deposit_request,omitempty"`
+	// Notification holds the value of the notification edge.
+	Notification []*Notification `json:"notification,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [7]bool
 }
 
 // UserOrErr returns the User value or an error if the edge
@@ -96,6 +100,24 @@ func (e AccountEdges) ToAccountOrErr() ([]*Transaction, error) {
 		return e.ToAccount, nil
 	}
 	return nil, &NotLoadedError{edge: "to_account"}
+}
+
+// DepositRequestOrErr returns the DepositRequest value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) DepositRequestOrErr() ([]*DepositRequest, error) {
+	if e.loadedTypes[5] {
+		return e.DepositRequest, nil
+	}
+	return nil, &NotLoadedError{edge: "deposit_request"}
+}
+
+// NotificationOrErr returns the Notification value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) NotificationOrErr() ([]*Notification, error) {
+	if e.loadedTypes[6] {
+		return e.Notification, nil
+	}
+	return nil, &NotLoadedError{edge: "notification"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -192,6 +214,16 @@ func (a *Account) QueryFromAccount() *TransactionQuery {
 // QueryToAccount queries the "to_account" edge of the Account entity.
 func (a *Account) QueryToAccount() *TransactionQuery {
 	return NewAccountClient(a.config).QueryToAccount(a)
+}
+
+// QueryDepositRequest queries the "deposit_request" edge of the Account entity.
+func (a *Account) QueryDepositRequest() *DepositRequestQuery {
+	return NewAccountClient(a.config).QueryDepositRequest(a)
+}
+
+// QueryNotification queries the "notification" edge of the Account entity.
+func (a *Account) QueryNotification() *NotificationQuery {
+	return NewAccountClient(a.config).QueryNotification(a)
 }
 
 // Update returns a builder for updating this Account.

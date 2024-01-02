@@ -12,6 +12,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ricardoraposo/gopherbank/ent/account"
+	"github.com/ricardoraposo/gopherbank/ent/depositrequest"
+	"github.com/ricardoraposo/gopherbank/ent/notification"
 	"github.com/ricardoraposo/gopherbank/ent/predicate"
 	"github.com/ricardoraposo/gopherbank/ent/transaction"
 	"github.com/ricardoraposo/gopherbank/ent/transactiondetails"
@@ -28,6 +30,8 @@ const (
 
 	// Node types.
 	TypeAccount            = "Account"
+	TypeDepositRequest     = "DepositRequest"
+	TypeNotification       = "Notification"
 	TypeTransaction        = "Transaction"
 	TypeTransactionDetails = "TransactionDetails"
 	TypeUser               = "User"
@@ -36,32 +40,38 @@ const (
 // AccountMutation represents an operation that mutates the Account nodes in the graph.
 type AccountMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *string
-	password            *string
-	balance             *float64
-	addbalance          *float64
-	createdAt           *time.Time
-	admin               *bool
-	clearedFields       map[string]struct{}
-	user                *int
-	cleareduser         bool
-	favoriteds          map[string]struct{}
-	removedfavoriteds   map[string]struct{}
-	clearedfavoriteds   bool
-	favorites           map[string]struct{}
-	removedfavorites    map[string]struct{}
-	clearedfavorites    bool
-	from_account        map[int]struct{}
-	removedfrom_account map[int]struct{}
-	clearedfrom_account bool
-	to_account          map[int]struct{}
-	removedto_account   map[int]struct{}
-	clearedto_account   bool
-	done                bool
-	oldValue            func(context.Context) (*Account, error)
-	predicates          []predicate.Account
+	op                     Op
+	typ                    string
+	id                     *string
+	password               *string
+	balance                *float64
+	addbalance             *float64
+	createdAt              *time.Time
+	admin                  *bool
+	clearedFields          map[string]struct{}
+	user                   *int
+	cleareduser            bool
+	favoriteds             map[string]struct{}
+	removedfavoriteds      map[string]struct{}
+	clearedfavoriteds      bool
+	favorites              map[string]struct{}
+	removedfavorites       map[string]struct{}
+	clearedfavorites       bool
+	from_account           map[int]struct{}
+	removedfrom_account    map[int]struct{}
+	clearedfrom_account    bool
+	to_account             map[int]struct{}
+	removedto_account      map[int]struct{}
+	clearedto_account      bool
+	deposit_request        map[int]struct{}
+	removeddeposit_request map[int]struct{}
+	cleareddeposit_request bool
+	notification           map[int]struct{}
+	removednotification    map[int]struct{}
+	clearednotification    bool
+	done                   bool
+	oldValue               func(context.Context) (*Account, error)
+	predicates             []predicate.Account
 }
 
 var _ ent.Mutation = (*AccountMutation)(nil)
@@ -587,6 +597,114 @@ func (m *AccountMutation) ResetToAccount() {
 	m.removedto_account = nil
 }
 
+// AddDepositRequestIDs adds the "deposit_request" edge to the DepositRequest entity by ids.
+func (m *AccountMutation) AddDepositRequestIDs(ids ...int) {
+	if m.deposit_request == nil {
+		m.deposit_request = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.deposit_request[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDepositRequest clears the "deposit_request" edge to the DepositRequest entity.
+func (m *AccountMutation) ClearDepositRequest() {
+	m.cleareddeposit_request = true
+}
+
+// DepositRequestCleared reports if the "deposit_request" edge to the DepositRequest entity was cleared.
+func (m *AccountMutation) DepositRequestCleared() bool {
+	return m.cleareddeposit_request
+}
+
+// RemoveDepositRequestIDs removes the "deposit_request" edge to the DepositRequest entity by IDs.
+func (m *AccountMutation) RemoveDepositRequestIDs(ids ...int) {
+	if m.removeddeposit_request == nil {
+		m.removeddeposit_request = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.deposit_request, ids[i])
+		m.removeddeposit_request[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDepositRequest returns the removed IDs of the "deposit_request" edge to the DepositRequest entity.
+func (m *AccountMutation) RemovedDepositRequestIDs() (ids []int) {
+	for id := range m.removeddeposit_request {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DepositRequestIDs returns the "deposit_request" edge IDs in the mutation.
+func (m *AccountMutation) DepositRequestIDs() (ids []int) {
+	for id := range m.deposit_request {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDepositRequest resets all changes to the "deposit_request" edge.
+func (m *AccountMutation) ResetDepositRequest() {
+	m.deposit_request = nil
+	m.cleareddeposit_request = false
+	m.removeddeposit_request = nil
+}
+
+// AddNotificationIDs adds the "notification" edge to the Notification entity by ids.
+func (m *AccountMutation) AddNotificationIDs(ids ...int) {
+	if m.notification == nil {
+		m.notification = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.notification[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNotification clears the "notification" edge to the Notification entity.
+func (m *AccountMutation) ClearNotification() {
+	m.clearednotification = true
+}
+
+// NotificationCleared reports if the "notification" edge to the Notification entity was cleared.
+func (m *AccountMutation) NotificationCleared() bool {
+	return m.clearednotification
+}
+
+// RemoveNotificationIDs removes the "notification" edge to the Notification entity by IDs.
+func (m *AccountMutation) RemoveNotificationIDs(ids ...int) {
+	if m.removednotification == nil {
+		m.removednotification = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.notification, ids[i])
+		m.removednotification[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNotification returns the removed IDs of the "notification" edge to the Notification entity.
+func (m *AccountMutation) RemovedNotificationIDs() (ids []int) {
+	for id := range m.removednotification {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NotificationIDs returns the "notification" edge IDs in the mutation.
+func (m *AccountMutation) NotificationIDs() (ids []int) {
+	for id := range m.notification {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNotification resets all changes to the "notification" edge.
+func (m *AccountMutation) ResetNotification() {
+	m.notification = nil
+	m.clearednotification = false
+	m.removednotification = nil
+}
+
 // Where appends a list predicates to the AccountMutation builder.
 func (m *AccountMutation) Where(ps ...predicate.Account) {
 	m.predicates = append(m.predicates, ps...)
@@ -786,7 +904,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
 	if m.user != nil {
 		edges = append(edges, account.EdgeUser)
 	}
@@ -801,6 +919,12 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.to_account != nil {
 		edges = append(edges, account.EdgeToAccount)
+	}
+	if m.deposit_request != nil {
+		edges = append(edges, account.EdgeDepositRequest)
+	}
+	if m.notification != nil {
+		edges = append(edges, account.EdgeNotification)
 	}
 	return edges
 }
@@ -837,13 +961,25 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeDepositRequest:
+		ids := make([]ent.Value, 0, len(m.deposit_request))
+		for id := range m.deposit_request {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeNotification:
+		ids := make([]ent.Value, 0, len(m.notification))
+		for id := range m.notification {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
 	if m.removedfavoriteds != nil {
 		edges = append(edges, account.EdgeFavoriteds)
 	}
@@ -855,6 +991,12 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedto_account != nil {
 		edges = append(edges, account.EdgeToAccount)
+	}
+	if m.removeddeposit_request != nil {
+		edges = append(edges, account.EdgeDepositRequest)
+	}
+	if m.removednotification != nil {
+		edges = append(edges, account.EdgeNotification)
 	}
 	return edges
 }
@@ -887,13 +1029,25 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeDepositRequest:
+		ids := make([]ent.Value, 0, len(m.removeddeposit_request))
+		for id := range m.removeddeposit_request {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeNotification:
+		ids := make([]ent.Value, 0, len(m.removednotification))
+		for id := range m.removednotification {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
 	if m.cleareduser {
 		edges = append(edges, account.EdgeUser)
 	}
@@ -908,6 +1062,12 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedto_account {
 		edges = append(edges, account.EdgeToAccount)
+	}
+	if m.cleareddeposit_request {
+		edges = append(edges, account.EdgeDepositRequest)
+	}
+	if m.clearednotification {
+		edges = append(edges, account.EdgeNotification)
 	}
 	return edges
 }
@@ -926,6 +1086,10 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedfrom_account
 	case account.EdgeToAccount:
 		return m.clearedto_account
+	case account.EdgeDepositRequest:
+		return m.cleareddeposit_request
+	case account.EdgeNotification:
+		return m.clearednotification
 	}
 	return false
 }
@@ -960,8 +1124,1052 @@ func (m *AccountMutation) ResetEdge(name string) error {
 	case account.EdgeToAccount:
 		m.ResetToAccount()
 		return nil
+	case account.EdgeDepositRequest:
+		m.ResetDepositRequest()
+		return nil
+	case account.EdgeNotification:
+		m.ResetNotification()
+		return nil
 	}
 	return fmt.Errorf("unknown Account edge %s", name)
+}
+
+// DepositRequestMutation represents an operation that mutates the DepositRequest nodes in the graph.
+type DepositRequestMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *int
+	amount         *float64
+	addamount      *float64
+	status         *string
+	clearedFields  map[string]struct{}
+	account        *string
+	clearedaccount bool
+	done           bool
+	oldValue       func(context.Context) (*DepositRequest, error)
+	predicates     []predicate.DepositRequest
+}
+
+var _ ent.Mutation = (*DepositRequestMutation)(nil)
+
+// depositrequestOption allows management of the mutation configuration using functional options.
+type depositrequestOption func(*DepositRequestMutation)
+
+// newDepositRequestMutation creates new mutation for the DepositRequest entity.
+func newDepositRequestMutation(c config, op Op, opts ...depositrequestOption) *DepositRequestMutation {
+	m := &DepositRequestMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDepositRequest,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withDepositRequestID sets the ID field of the mutation.
+func withDepositRequestID(id int) depositrequestOption {
+	return func(m *DepositRequestMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *DepositRequest
+		)
+		m.oldValue = func(ctx context.Context) (*DepositRequest, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().DepositRequest.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withDepositRequest sets the old DepositRequest of the mutation.
+func withDepositRequest(node *DepositRequest) depositrequestOption {
+	return func(m *DepositRequestMutation) {
+		m.oldValue = func(context.Context) (*DepositRequest, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DepositRequestMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DepositRequestMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *DepositRequestMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *DepositRequestMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().DepositRequest.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetAmount sets the "amount" field.
+func (m *DepositRequestMutation) SetAmount(f float64) {
+	m.amount = &f
+	m.addamount = nil
+}
+
+// Amount returns the value of the "amount" field in the mutation.
+func (m *DepositRequestMutation) Amount() (r float64, exists bool) {
+	v := m.amount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAmount returns the old "amount" field's value of the DepositRequest entity.
+// If the DepositRequest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DepositRequestMutation) OldAmount(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAmount is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAmount requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAmount: %w", err)
+	}
+	return oldValue.Amount, nil
+}
+
+// AddAmount adds f to the "amount" field.
+func (m *DepositRequestMutation) AddAmount(f float64) {
+	if m.addamount != nil {
+		*m.addamount += f
+	} else {
+		m.addamount = &f
+	}
+}
+
+// AddedAmount returns the value that was added to the "amount" field in this mutation.
+func (m *DepositRequestMutation) AddedAmount() (r float64, exists bool) {
+	v := m.addamount
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetAmount resets all changes to the "amount" field.
+func (m *DepositRequestMutation) ResetAmount() {
+	m.amount = nil
+	m.addamount = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *DepositRequestMutation) SetStatus(s string) {
+	m.status = &s
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *DepositRequestMutation) Status() (r string, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the DepositRequest entity.
+// If the DepositRequest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DepositRequestMutation) OldStatus(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *DepositRequestMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetAccountID sets the "account" edge to the Account entity by id.
+func (m *DepositRequestMutation) SetAccountID(id string) {
+	m.account = &id
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *DepositRequestMutation) ClearAccount() {
+	m.clearedaccount = true
+}
+
+// AccountCleared reports if the "account" edge to the Account entity was cleared.
+func (m *DepositRequestMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountID returns the "account" edge ID in the mutation.
+func (m *DepositRequestMutation) AccountID() (id string, exists bool) {
+	if m.account != nil {
+		return *m.account, true
+	}
+	return
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *DepositRequestMutation) AccountIDs() (ids []string) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *DepositRequestMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
+// Where appends a list predicates to the DepositRequestMutation builder.
+func (m *DepositRequestMutation) Where(ps ...predicate.DepositRequest) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the DepositRequestMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *DepositRequestMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.DepositRequest, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *DepositRequestMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *DepositRequestMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (DepositRequest).
+func (m *DepositRequestMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DepositRequestMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.amount != nil {
+		fields = append(fields, depositrequest.FieldAmount)
+	}
+	if m.status != nil {
+		fields = append(fields, depositrequest.FieldStatus)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DepositRequestMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case depositrequest.FieldAmount:
+		return m.Amount()
+	case depositrequest.FieldStatus:
+		return m.Status()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DepositRequestMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case depositrequest.FieldAmount:
+		return m.OldAmount(ctx)
+	case depositrequest.FieldStatus:
+		return m.OldStatus(ctx)
+	}
+	return nil, fmt.Errorf("unknown DepositRequest field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DepositRequestMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case depositrequest.FieldAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAmount(v)
+		return nil
+	case depositrequest.FieldStatus:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown DepositRequest field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DepositRequestMutation) AddedFields() []string {
+	var fields []string
+	if m.addamount != nil {
+		fields = append(fields, depositrequest.FieldAmount)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DepositRequestMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case depositrequest.FieldAmount:
+		return m.AddedAmount()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DepositRequestMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case depositrequest.FieldAmount:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAmount(v)
+		return nil
+	}
+	return fmt.Errorf("unknown DepositRequest numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DepositRequestMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DepositRequestMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DepositRequestMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown DepositRequest nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DepositRequestMutation) ResetField(name string) error {
+	switch name {
+	case depositrequest.FieldAmount:
+		m.ResetAmount()
+		return nil
+	case depositrequest.FieldStatus:
+		m.ResetStatus()
+		return nil
+	}
+	return fmt.Errorf("unknown DepositRequest field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DepositRequestMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.account != nil {
+		edges = append(edges, depositrequest.EdgeAccount)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DepositRequestMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case depositrequest.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DepositRequestMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DepositRequestMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DepositRequestMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedaccount {
+		edges = append(edges, depositrequest.EdgeAccount)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DepositRequestMutation) EdgeCleared(name string) bool {
+	switch name {
+	case depositrequest.EdgeAccount:
+		return m.clearedaccount
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DepositRequestMutation) ClearEdge(name string) error {
+	switch name {
+	case depositrequest.EdgeAccount:
+		m.ClearAccount()
+		return nil
+	}
+	return fmt.Errorf("unknown DepositRequest unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DepositRequestMutation) ResetEdge(name string) error {
+	switch name {
+	case depositrequest.EdgeAccount:
+		m.ResetAccount()
+		return nil
+	}
+	return fmt.Errorf("unknown DepositRequest edge %s", name)
+}
+
+// NotificationMutation represents an operation that mutates the Notification nodes in the graph.
+type NotificationMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *int
+	title          *string
+	content        *string
+	read           *bool
+	created_at     *time.Time
+	clearedFields  map[string]struct{}
+	account        *string
+	clearedaccount bool
+	done           bool
+	oldValue       func(context.Context) (*Notification, error)
+	predicates     []predicate.Notification
+}
+
+var _ ent.Mutation = (*NotificationMutation)(nil)
+
+// notificationOption allows management of the mutation configuration using functional options.
+type notificationOption func(*NotificationMutation)
+
+// newNotificationMutation creates new mutation for the Notification entity.
+func newNotificationMutation(c config, op Op, opts ...notificationOption) *NotificationMutation {
+	m := &NotificationMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeNotification,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withNotificationID sets the ID field of the mutation.
+func withNotificationID(id int) notificationOption {
+	return func(m *NotificationMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Notification
+		)
+		m.oldValue = func(ctx context.Context) (*Notification, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Notification.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withNotification sets the old Notification of the mutation.
+func withNotification(node *Notification) notificationOption {
+	return func(m *NotificationMutation) {
+		m.oldValue = func(context.Context) (*Notification, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m NotificationMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m NotificationMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *NotificationMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *NotificationMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Notification.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTitle sets the "title" field.
+func (m *NotificationMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *NotificationMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the Notification entity.
+// If the Notification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *NotificationMutation) ResetTitle() {
+	m.title = nil
+}
+
+// SetContent sets the "content" field.
+func (m *NotificationMutation) SetContent(s string) {
+	m.content = &s
+}
+
+// Content returns the value of the "content" field in the mutation.
+func (m *NotificationMutation) Content() (r string, exists bool) {
+	v := m.content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContent returns the old "content" field's value of the Notification entity.
+// If the Notification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationMutation) OldContent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContent: %w", err)
+	}
+	return oldValue.Content, nil
+}
+
+// ResetContent resets all changes to the "content" field.
+func (m *NotificationMutation) ResetContent() {
+	m.content = nil
+}
+
+// SetRead sets the "read" field.
+func (m *NotificationMutation) SetRead(b bool) {
+	m.read = &b
+}
+
+// Read returns the value of the "read" field in the mutation.
+func (m *NotificationMutation) Read() (r bool, exists bool) {
+	v := m.read
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRead returns the old "read" field's value of the Notification entity.
+// If the Notification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationMutation) OldRead(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRead is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRead requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRead: %w", err)
+	}
+	return oldValue.Read, nil
+}
+
+// ResetRead resets all changes to the "read" field.
+func (m *NotificationMutation) ResetRead() {
+	m.read = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *NotificationMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *NotificationMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Notification entity.
+// If the Notification object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NotificationMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *NotificationMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetAccountID sets the "account" edge to the Account entity by id.
+func (m *NotificationMutation) SetAccountID(id string) {
+	m.account = &id
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *NotificationMutation) ClearAccount() {
+	m.clearedaccount = true
+}
+
+// AccountCleared reports if the "account" edge to the Account entity was cleared.
+func (m *NotificationMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountID returns the "account" edge ID in the mutation.
+func (m *NotificationMutation) AccountID() (id string, exists bool) {
+	if m.account != nil {
+		return *m.account, true
+	}
+	return
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *NotificationMutation) AccountIDs() (ids []string) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *NotificationMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
+// Where appends a list predicates to the NotificationMutation builder.
+func (m *NotificationMutation) Where(ps ...predicate.Notification) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the NotificationMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *NotificationMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Notification, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *NotificationMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *NotificationMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Notification).
+func (m *NotificationMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *NotificationMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.title != nil {
+		fields = append(fields, notification.FieldTitle)
+	}
+	if m.content != nil {
+		fields = append(fields, notification.FieldContent)
+	}
+	if m.read != nil {
+		fields = append(fields, notification.FieldRead)
+	}
+	if m.created_at != nil {
+		fields = append(fields, notification.FieldCreatedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *NotificationMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case notification.FieldTitle:
+		return m.Title()
+	case notification.FieldContent:
+		return m.Content()
+	case notification.FieldRead:
+		return m.Read()
+	case notification.FieldCreatedAt:
+		return m.CreatedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *NotificationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case notification.FieldTitle:
+		return m.OldTitle(ctx)
+	case notification.FieldContent:
+		return m.OldContent(ctx)
+	case notification.FieldRead:
+		return m.OldRead(ctx)
+	case notification.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Notification field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *NotificationMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case notification.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case notification.FieldContent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContent(v)
+		return nil
+	case notification.FieldRead:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRead(v)
+		return nil
+	case notification.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Notification field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *NotificationMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *NotificationMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *NotificationMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Notification numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *NotificationMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *NotificationMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *NotificationMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Notification nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *NotificationMutation) ResetField(name string) error {
+	switch name {
+	case notification.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case notification.FieldContent:
+		m.ResetContent()
+		return nil
+	case notification.FieldRead:
+		m.ResetRead()
+		return nil
+	case notification.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Notification field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *NotificationMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.account != nil {
+		edges = append(edges, notification.EdgeAccount)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *NotificationMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case notification.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *NotificationMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *NotificationMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *NotificationMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedaccount {
+		edges = append(edges, notification.EdgeAccount)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *NotificationMutation) EdgeCleared(name string) bool {
+	switch name {
+	case notification.EdgeAccount:
+		return m.clearedaccount
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *NotificationMutation) ClearEdge(name string) error {
+	switch name {
+	case notification.EdgeAccount:
+		m.ClearAccount()
+		return nil
+	}
+	return fmt.Errorf("unknown Notification unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *NotificationMutation) ResetEdge(name string) error {
+	switch name {
+	case notification.EdgeAccount:
+		m.ResetAccount()
+		return nil
+	}
+	return fmt.Errorf("unknown Notification edge %s", name)
 }
 
 // TransactionMutation represents an operation that mutates the Transaction nodes in the graph.
@@ -2205,9 +3413,22 @@ func (m *UserMutation) OldPictureURL(ctx context.Context) (v string, err error) 
 	return oldValue.PictureURL, nil
 }
 
+// ClearPictureURL clears the value of the "picture_url" field.
+func (m *UserMutation) ClearPictureURL() {
+	m.picture_url = nil
+	m.clearedFields[user.FieldPictureURL] = struct{}{}
+}
+
+// PictureURLCleared returns if the "picture_url" field was cleared in this mutation.
+func (m *UserMutation) PictureURLCleared() bool {
+	_, ok := m.clearedFields[user.FieldPictureURL]
+	return ok
+}
+
 // ResetPictureURL resets all changes to the "picture_url" field.
 func (m *UserMutation) ResetPictureURL() {
 	m.picture_url = nil
+	delete(m.clearedFields, user.FieldPictureURL)
 }
 
 // SetAccountID sets the "account" edge to the Account entity by id.
@@ -2395,7 +3616,11 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(user.FieldPictureURL) {
+		fields = append(fields, user.FieldPictureURL)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2408,6 +3633,11 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
+	switch name {
+	case user.FieldPictureURL:
+		m.ClearPictureURL()
+		return nil
+	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 

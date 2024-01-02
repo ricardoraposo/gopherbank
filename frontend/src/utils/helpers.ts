@@ -13,3 +13,14 @@ const date = new Date();
 export const getHourAndMinutes = () => {
   return `${date.getHours()}h${date.getMinutes()}`;
 };
+
+export const getVerbFromType = (type: string) => {
+  switch (type) {
+    case 'transfer':
+      return 'Send';
+    case 'withdraw':
+      return 'Withdraw';
+    default:
+      return 'Deposit';
+  }
+};
