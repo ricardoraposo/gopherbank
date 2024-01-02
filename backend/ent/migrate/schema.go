@@ -27,6 +27,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "amount", Type: field.TypeFloat64},
 		{Name: "status", Type: field.TypeString, Default: "pending"},
+		{Name: "created_at", Type: field.TypeTime},
 		{Name: "account_deposit_request", Type: field.TypeString, Nullable: true},
 	}
 	// DepositRequestsTable holds the schema information for the "deposit_requests" table.
@@ -37,7 +38,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "deposit_requests_accounts_deposit_request",
-				Columns:    []*schema.Column{DepositRequestsColumns[3]},
+				Columns:    []*schema.Column{DepositRequestsColumns[4]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

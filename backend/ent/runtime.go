@@ -43,6 +43,10 @@ func init() {
 	depositrequest.DefaultStatus = depositrequestDescStatus.Default.(string)
 	// depositrequest.StatusValidator is a validator for the "status" field. It is called by the builders before save.
 	depositrequest.StatusValidator = depositrequestDescStatus.Validators[0].(func(string) error)
+	// depositrequestDescCreatedAt is the schema descriptor for created_at field.
+	depositrequestDescCreatedAt := depositrequestFields[2].Descriptor()
+	// depositrequest.DefaultCreatedAt holds the default value on creation for the created_at field.
+	depositrequest.DefaultCreatedAt = depositrequestDescCreatedAt.Default.(func() time.Time)
 	notificationFields := schema.Notification{}.Fields()
 	_ = notificationFields
 	// notificationDescTitle is the schema descriptor for title field.

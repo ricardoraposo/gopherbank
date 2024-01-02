@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/ricardoraposo/gopherbank/internal/db"
@@ -37,7 +40,7 @@ func (h *DepositRequestHandler) CreateDepositRequest(c *fiber.Ctx) error {
 	params.AccountId = number
 
 	if err := h.db.CreateDepositRequest(c.Context(), params); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "error creating deposit request")
+		return fiber.NewError(fiber.StatusInternalServerError, fmt.Sprintln("error creating deposit request:", err))
 	}
 
 	return c.JSON(fiber.Map{"message": "deposit request created"})
@@ -69,4 +72,39 @@ func (h *DepositRequestHandler) GetDepositRequestsByAccount(c *fiber.Ctx) error 
 	}
 
 	return c.JSON(fiber.Map{"requests": requests})
+}
+
+func (h *DepositRequestHandler) ApproveRequest(c *fiber.Ctx) error {
+	idString := c.Params("id")
+	id, err := strconv.Atoi(idString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
+	}
+
+	p := &models.DepositParam{}
+	if err := c.BodyParser(p); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
+	}
+    fmt.Println(p)
+
+	if err := h.db.ApproveDepositRequest(c.Context(), id, p.Account); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, fmt.Sprintln("error approving deposit request:", err))
+	}
+
+	return c.JSON(fiber.Map{"message": "deposit request approved"})
+}
+
+func (h *DepositRequestHandler) RejectRequest(c *fiber.Ctx) error {
+	idString := c.Params("id")
+
+	id, err := strconv.Atoi(idString)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid id")
+	}
+
+	if err := h.db.RejectDepositRequest(c.Context(), id); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "error rejecting deposit request")
+	}
+
+	return c.JSON(fiber.Map{"message": "deposit request rejected"})
 }

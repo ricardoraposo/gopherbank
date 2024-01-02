@@ -2,6 +2,7 @@ package schema
 
 import (
 	"regexp"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
@@ -20,6 +21,7 @@ func (DepositRequest) Fields() []ent.Field {
 	return []ent.Field {
         field.Float("amount").Positive().StructTag(`json:"amount"`),
         field.String("status").Default("pending").Match(status).StructTag(`json:"status"`),
+        field.Time("created_at").Immutable().Default(time.Now).StructTag(`json:"created_at"`),
     }
 }
 

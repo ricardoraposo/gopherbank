@@ -39,8 +39,8 @@ func (s *FiberServer) RegisterRoutes() {
 	api.Post("/transfer", middlewares.ValidateTransferParams, transactionHandler.Transfer)
 	api.Post("/withdraw", middlewares.ValidateWithdrawParams, transactionHandler.Withdraw)
 
-    // deposit request routes
-    api.Post("/deposit-request", depositRequestHandler.CreateDepositRequest)
+	// deposit request routes
+	api.Post("/deposit-request", depositRequestHandler.CreateDepositRequest)
 
 	// favorite routes
 	api.Get("/favorite", favoritehandler.GetFavorites)
@@ -55,5 +55,8 @@ func (s *FiberServer) RegisterRoutes() {
 	// api.Get("/accounts", middlewares.IsAdmin, accountsHandler.GetAllAccounts)
 	api.Get("/accounts", middlewares.IsAdmin, accountsHandler.GetAllAccounts)
 	api.Get("/transaction", middlewares.IsAdmin, transactionHandler.GetAllTransactions)
+	api.Get("/deposit-request", middlewares.IsAdmin, depositRequestHandler.GetAllDepositRequests)
+    api.Post("/deposit-request/approve/:id", middlewares.IsAdmin, depositRequestHandler.ApproveRequest)
+    api.Patch("/deposit-request/reject/:id", middlewares.IsAdmin, depositRequestHandler.RejectRequest)
 	api.Post("/deposit", middlewares.IsAdmin, transactionHandler.Deposit)
 }

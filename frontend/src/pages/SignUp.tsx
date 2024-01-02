@@ -40,7 +40,7 @@ function SignUp() {
     >
       <form
         className="bg-gray-500 rounded-[40px] opacity-85
-        flex flex-col justify-center items-center gap-2
+        flex flex-col justify-center items-center gap-6
         w-4/5 h-[90%]"
       >
         <h1 className="text-white text-3xl font-bold">REGISTER</h1>

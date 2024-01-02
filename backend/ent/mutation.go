@@ -1143,6 +1143,7 @@ type DepositRequestMutation struct {
 	amount         *float64
 	addamount      *float64
 	status         *string
+	created_at     *time.Time
 	clearedFields  map[string]struct{}
 	account        *string
 	clearedaccount bool
@@ -1341,6 +1342,42 @@ func (m *DepositRequestMutation) ResetStatus() {
 	m.status = nil
 }
 
+// SetCreatedAt sets the "created_at" field.
+func (m *DepositRequestMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *DepositRequestMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the DepositRequest entity.
+// If the DepositRequest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DepositRequestMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *DepositRequestMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
 // SetAccountID sets the "account" edge to the Account entity by id.
 func (m *DepositRequestMutation) SetAccountID(id string) {
 	m.account = &id
@@ -1414,12 +1451,15 @@ func (m *DepositRequestMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DepositRequestMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 3)
 	if m.amount != nil {
 		fields = append(fields, depositrequest.FieldAmount)
 	}
 	if m.status != nil {
 		fields = append(fields, depositrequest.FieldStatus)
+	}
+	if m.created_at != nil {
+		fields = append(fields, depositrequest.FieldCreatedAt)
 	}
 	return fields
 }
@@ -1433,6 +1473,8 @@ func (m *DepositRequestMutation) Field(name string) (ent.Value, bool) {
 		return m.Amount()
 	case depositrequest.FieldStatus:
 		return m.Status()
+	case depositrequest.FieldCreatedAt:
+		return m.CreatedAt()
 	}
 	return nil, false
 }
@@ -1446,6 +1488,8 @@ func (m *DepositRequestMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldAmount(ctx)
 	case depositrequest.FieldStatus:
 		return m.OldStatus(ctx)
+	case depositrequest.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown DepositRequest field %s", name)
 }
@@ -1468,6 +1512,13 @@ func (m *DepositRequestMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatus(v)
+		return nil
+	case depositrequest.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown DepositRequest field %s", name)
@@ -1538,6 +1589,9 @@ func (m *DepositRequestMutation) ResetField(name string) error {
 		return nil
 	case depositrequest.FieldStatus:
 		m.ResetStatus()
+		return nil
+	case depositrequest.FieldCreatedAt:
+		m.ResetCreatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown DepositRequest field %s", name)

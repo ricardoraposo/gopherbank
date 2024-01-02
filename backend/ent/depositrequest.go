@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -21,6 +22,8 @@ type DepositRequest struct {
 	Amount float64 `json:"amount"`
 	// Status holds the value of the "status" field.
 	Status string `json:"status"`
+	// CreatedAt holds the value of the "created_at" field.
+	CreatedAt time.Time `json:"created_at"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DepositRequestQuery when eager-loading is set.
 	Edges                   DepositRequestEdges `json:"edges"`
@@ -61,6 +64,8 @@ func (*DepositRequest) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case depositrequest.FieldStatus:
 			values[i] = new(sql.NullString)
+		case depositrequest.FieldCreatedAt:
+			values[i] = new(sql.NullTime)
 		case depositrequest.ForeignKeys[0]: // account_deposit_request
 			values[i] = new(sql.NullString)
 		default:
@@ -95,6 +100,12 @@ func (dr *DepositRequest) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
 				dr.Status = value.String
+			}
+		case depositrequest.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+			} else if value.Valid {
+				dr.CreatedAt = value.Time
 			}
 		case depositrequest.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -149,6 +160,9 @@ func (dr *DepositRequest) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(dr.Status)
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(dr.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -75,7 +75,7 @@ function SignIn() {
       </div>
       <form
         className="bg-gray-500 rounded-[40px] opacity-85
-        flex flex-col justify-center items-center gap-2
+        flex flex-col justify-center items-center gap-4
         w-4/5 h-96 mt-16"
       >
         <h1 className="text-white text-3xl font-bold">LOGIN</h1>

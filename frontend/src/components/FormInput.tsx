@@ -19,12 +19,6 @@ function FormInput({
 }: Props) {
   return (
     <div className="flex flex-col items-center w-4/5">
-      <label
-        htmlFor="number"
-        className="text-white text-base self-start pl-2 pb-1"
-      >
-        {label}
-      </label>
       <input
         type={ type }
         id={ id }
@@ -32,7 +26,8 @@ function FormInput({
         name={ name }
         value={ value }
         onChange={ onChangeFn }
-        className="h-12 rounded-xl text-xl px-2 w-60"
+        placeholder={ label }
+        className="h-12 rounded-none text-lg px-2 w-60 bg-transparent border-b-2 border-white text-white placeholder:text-gray-200"
       />
     </div>
   );

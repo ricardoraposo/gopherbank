@@ -9,6 +9,7 @@ import Operation from './pages/Operation';
 import AddPicture from './pages/AddPicture';
 import OperationAccount from './pages/OperationAccount';
 import SignUpSuccess from './pages/SignUpSuccess';
+import Admin from './pages/Admin';
 
 function App() {
   const location = useLocation();
@@ -17,6 +18,7 @@ function App() {
     <AnimatePresence>
       <Routes location={ location } key={ location.pathname }>
         <Route path="/" Component={ Dashboard } />
+        <Route path="/admin" Component={ Admin } />
         <Route path="/signin" Component={ SignIn } />
         <Route path="/signup" Component={ SignUp } />
         <Route path="/signup/picture" Component={ AddPicture } />

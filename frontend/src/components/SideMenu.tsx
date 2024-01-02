@@ -24,6 +24,16 @@ function SideMenu() {
     navigate('/signin');
   };
 
+  const goToDashboard = () => {
+    navigate('/');
+    setShowMenu(false);
+  };
+
+  const goToAdmin = () => {
+    navigate('/admin');
+    setShowMenu(false);
+  };
+
   return (
     <motion.div
       className={ `fixed z-40 bg-black opacity-90 h-dvh w-full top-0 right-0 origin-top-right transition-all
@@ -34,12 +44,26 @@ function SideMenu() {
         text-white text-2xl font-bold"
       >
         <li>
+          <button
+            onClick={ goToDashboard }
+          >
+            Dashboard
+          </button>
+        </li>
+        <Division />
+        <li>
           <button>Profile</button>
         </li>
         <Division />
         {admin && (
           <>
-            <li>Admin</li>
+            <li>
+              <button
+                onClick={ goToAdmin }
+              >
+                Admin
+              </button>
+            </li>
             <Division />
           </>
         )}

@@ -4,19 +4,16 @@ import { useAtom } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { apiURL, queryParams } from '../consts';
 import { accountAtom, tokenAtom } from '../store/atom';
 
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import SideMenu from '../components/SideMenu';
-import InvestBanner from '../components/InvestBanner';
-import Transactions from '../components/Transactions';
-import BalanceDisplay from '../components/BalanceDisplay';
-import OperationSection from '../components/OperationSection';
-import RecentTransactions from '../components/RecentTransactions';
+import Requests from '../components/Requests';
 
-function Dashboard() {
+function Admin() {
   const navigate = useNavigate();
   const [, setID] = useAtom(accountAtom);
   const [token, setToken] = useAtom(tokenAtom);
@@ -48,16 +45,10 @@ function Dashboard() {
       <SideMenu />
       <div className="mx-5 py-2">
         <Header />
-        <BalanceDisplay />
-        <OperationSection />
-        <div className="flex gap-4 mt-6">
-          <InvestBanner />
-          <RecentTransactions />
-        </div>
       </div>
-      <Transactions />
+      <Requests />
     </motion.div>
   );
 }
 
-export default Dashboard;
+export default Admin;

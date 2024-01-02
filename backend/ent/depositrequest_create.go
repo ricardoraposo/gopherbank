@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -36,6 +37,20 @@ func (drc *DepositRequestCreate) SetStatus(s string) *DepositRequestCreate {
 func (drc *DepositRequestCreate) SetNillableStatus(s *string) *DepositRequestCreate {
 	if s != nil {
 		drc.SetStatus(*s)
+	}
+	return drc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (drc *DepositRequestCreate) SetCreatedAt(t time.Time) *DepositRequestCreate {
+	drc.mutation.SetCreatedAt(t)
+	return drc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (drc *DepositRequestCreate) SetNillableCreatedAt(t *time.Time) *DepositRequestCreate {
+	if t != nil {
+		drc.SetCreatedAt(*t)
 	}
 	return drc
 }
@@ -98,6 +113,10 @@ func (drc *DepositRequestCreate) defaults() {
 		v := depositrequest.DefaultStatus
 		drc.mutation.SetStatus(v)
 	}
+	if _, ok := drc.mutation.CreatedAt(); !ok {
+		v := depositrequest.DefaultCreatedAt()
+		drc.mutation.SetCreatedAt(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -117,6 +136,9 @@ func (drc *DepositRequestCreate) check() error {
 		if err := depositrequest.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "DepositRequest.status": %w`, err)}
 		}
+	}
+	if _, ok := drc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "DepositRequest.created_at"`)}
 	}
 	return nil
 }
@@ -151,6 +173,10 @@ func (drc *DepositRequestCreate) createSpec() (*DepositRequest, *sqlgraph.Create
 	if value, ok := drc.mutation.Status(); ok {
 		_spec.SetField(depositrequest.FieldStatus, field.TypeString, value)
 		_node.Status = value
+	}
+	if value, ok := drc.mutation.CreatedAt(); ok {
+		_spec.SetField(depositrequest.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
 	}
 	if nodes := drc.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

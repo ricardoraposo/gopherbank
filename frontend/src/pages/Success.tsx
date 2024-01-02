@@ -11,7 +11,6 @@ import { getHourAndMinutes, usFormat } from '../utils/helpers';
 
 function Success() {
   const { type } = useParams();
-  console.log('type: ', type);
   const navigate = useNavigate();
   const [accountNumber, setAccountNumber] = useAtom(accountNumberAtom);
   const [amount, setAmount] = useAtom(amountAtom);
