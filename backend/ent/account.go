@@ -41,9 +41,9 @@ type AccountEdges struct {
 	// Favorites holds the value of the favorites edge.
 	Favorites []*Account `json:"favorites,omitempty"`
 	// FromAccount holds the value of the from_account edge.
-	FromAccount []*Transaction `json:"from_account,omitempty"`
+	FromAccount []*Transaction `json:"fromAccount"`
 	// ToAccount holds the value of the to_account edge.
-	ToAccount []*Transaction `json:"to_account,omitempty"`
+	ToAccount []*Transaction `json:"toAccount"`
 	// DepositRequest holds the value of the deposit_request edge.
 	DepositRequest []*DepositRequest `json:"deposit_request,omitempty"`
 	// Notification holds the value of the notification edge.

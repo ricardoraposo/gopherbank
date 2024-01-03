@@ -4,7 +4,7 @@ import { useAtom } from 'jotai';
 import Line from './Line';
 import Transaction from './Transaction';
 import WarningIcon from '../assets/warning.svg';
-import { chooseName, choosePicture, makeCapitalized } from '../utils/transactionHelpers';
+import { chooseName, makeCapitalized } from '../utils/transactionHelpers';
 import { apiURL, queryParams } from '../consts';
 import { accountAtom, tokenAtom } from '../store/atom';
 
@@ -16,8 +16,6 @@ function Transactions() {
     queryFn: () => axios.get(`${apiURL}/api/transaction/${id}`, queryParams(token)),
     select: ({ data: { transactions } }) => transactions,
   });
-
-  const usFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' });
 
   if (isLoading) return <div>Let him cook</div>;
 
@@ -41,11 +39,7 @@ function Transactions() {
               data?.map((transaction: any) => (
                 <Transaction
                   key={ transaction.id }
-                  name={ chooseName(transaction.edges) }
-                  profileURL={ choosePicture(transaction.edges) }
-                  amount={ transaction.edges.detail.amount }
-                  date={ usFormat.format(new Date(transaction.edges.detail.transactedAt)) }
-                  type={ makeCapitalized(transaction.edges.detail.type) as 'Transfer' | 'Withdraw' | 'Deposit' }
+                  edges={ transaction.edges }
                 />
               ))
             )

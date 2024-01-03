@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
 import StatisticIcon from '../assets/statistics.svg';
-import DownArrow from '../assets/down_arrow.svg';
 import instance from '../api/axiosIstance';
 import { apiURL, queryParams } from '../consts';
 import { accountAtom, tokenAtom } from '../store/atom';
@@ -10,6 +10,7 @@ import { usFormat } from '../utils/helpers';
 function BalanceDisplay() {
   const [id] = useAtom(accountAtom);
   const [token] = useAtom(tokenAtom);
+  const navigate = useNavigate();
 
   const { data } = useQuery({
     queryKey: ['user', token],
@@ -31,13 +32,14 @@ function BalanceDisplay() {
           type="button"
           className="w-28 h-9 bg-gray-500 text-sm text-white
           flex justify-center items-center gap-1 rounded-full"
+          onClick={ () => navigate('/todo') }
         >
           <img src={ StatisticIcon } alt="statistics icon" />
           <p>Statistics</p>
         </button>
-        <div className="flex mb-1">
+        <div className="flex">
           <p className="text-white text-base">USD</p>
-          <img src={ DownArrow } alt="down arrow" />
+          {/* <img src={ DownArrow } alt="down arrow" /> */}
         </div>
       </div>
     </div>

@@ -29,8 +29,8 @@ func (Account) Edges() []ent.Edge {
 	return []ent.Edge{
         edge.To("user", User.Type).Unique(),
         edge.To("favorites", Account.Type).From("favoriteds"),
-        edge.To("from_account", Transaction.Type),
-        edge.To("to_account", Transaction.Type),
+        edge.To("from_account", Transaction.Type).StructTag(`json:"fromAccount"`),
+        edge.To("to_account", Transaction.Type).StructTag(`json:"toAccount"`),
         edge.To("deposit_request", DepositRequest.Type),
         edge.To("notification", Notification.Type),
     }

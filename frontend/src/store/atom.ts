@@ -21,3 +21,5 @@ export const initialFormValues = {
 };
 
 export const signUpAtom = atom(initialFormValues);
+
+export const selectedAtom = atom('');

@@ -20,7 +20,7 @@ func NewFavoriteHandler(client *db.DB) *FavoriteHandler {
 	}
 }
 
-func (f *FavoriteHandler) AddToFavorite(c *fiber.Ctx) error {
+func (f *FavoriteHandler) ToggleFavorite(c *fiber.Ctx) error {
 	p := models.NewFavoriteParams{}
 	if err := c.BodyParser(&p); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "invalid request body")
@@ -32,9 +32,11 @@ func (f *FavoriteHandler) AddToFavorite(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "authentication error")
 	}
 
-	if claims["number"] != p.AccountID {
-		return fiber.NewError(fiber.StatusUnauthorized, "Not enough credentials")
-	}
+    p.AccountID, ok = claims["number"].(string)
+    if !ok {
+        fmt.Println("could not get the account number")
+        return fiber.NewError(fiber.StatusInternalServerError, "authentication error")
+    }
 
 	if err := f.db.ToggleFavorite(c.Context(), p); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())

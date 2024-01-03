@@ -11,11 +11,11 @@ import (
 )
 
 func GetJWTAccount(c *fiber.Ctx) error {
-    claims, ok := c.Context().UserValue("claims").(jwt.MapClaims)
-    if !ok {
-        return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")
-    }
-    return c.JSON(fiber.Map{"number": claims["number"]})
+	claims, ok := c.Context().UserValue("claims").(jwt.MapClaims)
+	if !ok {
+		return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")
+	}
+	return c.JSON(fiber.Map{"number": claims["number"], "admin": claims["admin"]})
 }
 
 func JWTAuthentication(c *fiber.Ctx) error {
@@ -27,11 +27,11 @@ func JWTAuthentication(c *fiber.Ctx) error {
 
 	tokenFields := strings.Fields(authHeader[0])
 
-    if len(tokenFields) != 2 || tokenFields[0] != "Bearer" {
-        return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")
-    }
+	if len(tokenFields) != 2 || tokenFields[0] != "Bearer" {
+		return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")
+	}
 
-    token := tokenFields[1]
+	token := tokenFields[1]
 	claims, err := getClaimsFromJWT(token)
 	if err != nil {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")

@@ -33,10 +33,7 @@ function RecentTransactions() {
             ) : (
               data?.map((transaction: any) => (
                 <TProfilePic key={ transaction.id } profileURL={ choosePicture(transaction.edges) } />
-              ))
-
-            )
-
+              )))
           }
         </div>
       </div>

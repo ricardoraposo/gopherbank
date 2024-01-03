@@ -10,6 +10,7 @@ import AddPicture from './pages/AddPicture';
 import OperationAccount from './pages/OperationAccount';
 import SignUpSuccess from './pages/SignUpSuccess';
 import Admin from './pages/Admin';
+import Error from './pages/Error';
 
 function App() {
   const location = useLocation();
@@ -26,6 +27,7 @@ function App() {
         <Route path="/operation/:type" Component={ Operation } />
         <Route path="/operation/:type/account" Component={ OperationAccount } />
         <Route path="/operation/:type/success" Component={ Success } />
+        <Route path="*" Component={ Error } />
       </Routes>
     </AnimatePresence>
   );

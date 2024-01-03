@@ -37,7 +37,7 @@ function SideMenu() {
   return (
     <motion.div
       className={ `fixed z-40 bg-black opacity-90 h-dvh w-full top-0 right-0 origin-top-right transition-all
-      ${showMenu ? '' : 'translate-x-full'}` }
+      ${showMenu ? '' : 'translate-x-full'} duration-700` }
     >
       <ul
         className="flex flex-col items-center gap-12 mt-20

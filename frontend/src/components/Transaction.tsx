@@ -1,36 +1,35 @@
 import { usFormat } from '../utils/helpers';
-import TProfilePic from './TProfilePic';
+import { chooseName, makeCapitalized } from '../utils/transactionHelpers';
+import UserPopover from './UserPopover';
 
 type Props = {
-  name: string;
-  profileURL: string;
-  amount: number;
-  date: string;
-  type: 'Transfer' | 'Deposit' | 'Withdraw';
+  edges: any;
 };
 
-function Transaction({ name, profileURL, date, amount, type }: Props) {
+function Transaction({ edges }: Props) {
+  const usDateFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+
   return (
     <div className="px-5 py-4 flex bg-white w-full justify-between">
       <div className="flex gap-2">
-        <TProfilePic profileURL={ profileURL } className="h-10 w-10" />
+        <UserPopover edges={ edges } />
         <div className="flex flex-col">
-          <h3 className="font-semibold">{name}</h3>
-          <p className="text-gray-200">{date}</p>
+          <h3 className="font-semibold">{chooseName(edges)}</h3>
+          <p className="text-gray-200">{usDateFormat.format(new Date(edges.detail.transactedAt))}</p>
         </div>
       </div>
       <div className="flex flex-col items-end">
-        {amount > 0 ? (
+        {edges.detail.amount > 0 ? (
           <p className="text-green">
             +
-            {usFormat.format(amount)}
+            {usFormat.format(edges.detail.amount)}
           </p>
         ) : (
           <p className="text-red">
-            {(usFormat.format(amount))}
+            {(usFormat.format(edges.detail.amount))}
           </p>
         )}
-        <p className="text-gray-200">{type}</p>
+        <p className="text-gray-200">{makeCapitalized(edges.detail.type)}</p>
       </div>
     </div>
   );

@@ -23,9 +23,9 @@ function Dashboard() {
   const { isLoading, error } = useQuery({
     queryKey: ['user', token],
     queryFn: async () => {
-      const { data: { number } } = await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
-      setID(number);
-      return axios.get(`${apiURL}/api/accounts/${number}`, queryParams(token));
+      const { data } = await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
+      setID(data.number);
+      return axios.get(`${apiURL}/api/accounts/${data.number}`, queryParams(token));
     },
     retry: 2,
   });

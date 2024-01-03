@@ -15,7 +15,6 @@ type Props = {
   profileURL: string;
   status: 'approved' | 'pending' | 'rejected';
   date: string;
-  refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<any, Error>>
 };
 
 type Params = {
@@ -23,7 +22,7 @@ type Params = {
   account: string;
 };
 
-function Request({ id, account, name, profileURL, date, status, refetch }: Props) {
+function Request({ id, account, name, profileURL, date, status }: Props) {
   const [token] = useAtom(tokenAtom);
   const queryClient = useQueryClient();
   const approvalMutation = useMutation({
@@ -40,7 +39,7 @@ function Request({ id, account, name, profileURL, date, status, refetch }: Props
       return axios.patch(`${apiURL}/api/deposit-request/reject/${id}`, {}, queryParams(token));
     },
     onSuccess: () => {
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
     },
   });
 

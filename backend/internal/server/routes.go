@@ -44,7 +44,7 @@ func (s *FiberServer) RegisterRoutes() {
 
 	// favorite routes
 	api.Get("/favorite", favoritehandler.GetFavorites)
-	api.Post("/favorite", favoritehandler.AddToFavorite)
+	api.Post("/favorite", favoritehandler.ToggleFavorite)
 
 	// auth routes
 	auth := s.App.Group("/auth")

@@ -17,22 +17,27 @@ function Admin() {
   const navigate = useNavigate();
   const [, setID] = useAtom(accountAtom);
   const [token, setToken] = useAtom(tokenAtom);
-  const { isLoading, error } = useQuery({
+  const { isLoading, error, data } = useQuery({
     queryKey: ['user', token],
     queryFn: async () => {
-      const { data: { number } } = await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
-      setID(number);
-      return axios.get(`${apiURL}/api/accounts/${number}`, queryParams(token));
+      const { data } = await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
+      setID(data.number);
+      return axios.get(`${apiURL}/api/accounts/${data.number}`, queryParams(token));
     },
+    select: ({ data }) => data,
     retry: 2,
   });
 
   useEffect(() => {
+    if (data && data.admin === false) {
+      navigate('/unauth');
+    }
+
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       setToken('');
       navigate('/signin');
     }
-  }, [error]);
+  }, [error, data]);
 
   if (isLoading) return <Loading />;
 
