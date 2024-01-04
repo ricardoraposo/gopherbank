@@ -32,11 +32,11 @@ func (f *FavoriteHandler) ToggleFavorite(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, "authentication error")
 	}
 
-    p.AccountID, ok = claims["number"].(string)
-    if !ok {
-        fmt.Println("could not get the account number")
-        return fiber.NewError(fiber.StatusInternalServerError, "authentication error")
-    }
+	p.AccountID, ok = claims["number"].(string)
+	if !ok {
+		fmt.Println("could not get the account number")
+		return fiber.NewError(fiber.StatusInternalServerError, "authentication error")
+	}
 
 	if err := f.db.ToggleFavorite(c.Context(), p); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
@@ -48,24 +48,24 @@ func (f *FavoriteHandler) ToggleFavorite(c *fiber.Ctx) error {
 }
 
 func (f *FavoriteHandler) GetFavorites(c *fiber.Ctx) error {
-    claims, ok := c.Context().Value("claims").(jwt.MapClaims)
-    if !ok {
-        fmt.Println("could not get the claims")
-        return fiber.NewError(fiber.StatusInternalServerError, "authentication error")
-    }
+	claims, ok := c.Context().Value("claims").(jwt.MapClaims)
+	if !ok {
+		fmt.Println("could not get the claims")
+		return fiber.NewError(fiber.StatusInternalServerError, "authentication error")
+	}
 
-    accountNumber, ok := claims["number"].(string)
-    if !ok {
-        fmt.Println("could not get the account number")
-        return fiber.NewError(fiber.StatusInternalServerError, "authentication error")
-    }
+	accountNumber, ok := claims["number"].(string)
+	if !ok {
+		fmt.Println("could not get the account number")
+		return fiber.NewError(fiber.StatusInternalServerError, "authentication error")
+	}
 
-    favorites, err := f.db.GetFavoritedsByAccount(c.Context(), accountNumber)
-    if err != nil {
-        return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-    }
+	favorites, err := f.db.GetFavoritedsByAccount(c.Context(), accountNumber)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
 
-    return c.JSON(fiber.Map{
-        "favorites": favorites,
-    })
+	return c.JSON(fiber.Map{
+		"favorites": favorites,
+	})
 }

@@ -12,11 +12,14 @@ export const accountNumberAtom = atom('');
 
 export const showMenuAtom = atom(false);
 
+export const showNotificationAtom = atom(false);
+
 export const initialFormValues = {
   firstName: '',
   lastName: '',
   email: '',
   password: '',
+  confirm: '',
   pictureUrl: defaultPic,
 };
 

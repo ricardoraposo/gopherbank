@@ -4,7 +4,6 @@ import { useAtom } from 'jotai';
 import Line from './Line';
 import Transaction from './Transaction';
 import WarningIcon from '../assets/warning.svg';
-import { chooseName, makeCapitalized } from '../utils/transactionHelpers';
 import { apiURL, queryParams } from '../consts';
 import { accountAtom, tokenAtom } from '../store/atom';
 

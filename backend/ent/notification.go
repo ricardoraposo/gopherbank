@@ -23,7 +23,7 @@ type Notification struct {
 	// Content holds the value of the "content" field.
 	Content string `json:"content,omitempty"`
 	// Read holds the value of the "read" field.
-	Read bool `json:"read,omitempty"`
+	Read bool `json:"read"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"createdAt"`
 	// Edges holds the relations/edges for other nodes in the graph.

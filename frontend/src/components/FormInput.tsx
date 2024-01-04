@@ -4,6 +4,7 @@ type Props = {
   type: string;
   value: string;
   onChangeFn: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string | null;
   label?: string;
   inputMode?: 'numeric' | 'text';
 };
@@ -16,6 +17,7 @@ function FormInput({
   value,
   onChangeFn,
   inputMode = 'text',
+  error = null,
 }: Props) {
   return (
     <div className="flex flex-col items-center w-4/5">
@@ -27,7 +29,8 @@ function FormInput({
         value={ value }
         onChange={ onChangeFn }
         placeholder={ label }
-        className="h-12 rounded-none text-lg px-2 w-60 bg-transparent border-b-2 border-white text-white placeholder:text-gray-200"
+        className={ `h-12 rounded-none text-lg px-2 mx-auto w-60 bg-transparent border-b-2 text-white placeholder:text-gray-200 
+        ${error ? 'border-red' : 'border-white'}` }
       />
     </div>
   );

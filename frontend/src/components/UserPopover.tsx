@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useAtom } from 'jotai';
 import axios from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -47,9 +47,9 @@ function UserPopover({ edges }: Props) {
       </button>
       <div
         onMouseLeave={ () => setShow(false) }
-        className={ `absolute w-72 h-72 bg-gray-600 -top-72 left-10 rounded-t-3xl rounded-br-3xl drop-shadow-md
-        shadow-lg flex flex-col items-center justify-center px-8 py-4 origin-bottom-left z-50 overflow-hidden
-        ${show ? 'scale-100' : 'scale-0'} transition-all duration-300 ease-in-out will-change-transform` }
+        className={ `absolute w-72 h-72 bg-gray-600 -top-72 left-10 rounded-t-3xl rounded-br-3xl shadow-2xl
+        flex flex-col items-center justify-center px-8 py-4 origin-bottom-left z-50 overflow-hidden
+        ${show ? 'scale-100' : 'scale-0'} transition-all ease-in` }
       >
         <div className="absolute -top-10 bg-orange h-28 w-full z-20 rounded-2xl" />
         <img

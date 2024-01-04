@@ -19,18 +19,21 @@ type DepositRequestDB interface {
 }
 
 type depositRequestDB struct {
-    transactionStore TransactionDB
-	accountStore AccountDB
-	store        *DB
+	transactionStore  TransactionDB
+	notificationStore NotificationDB
+	accountStore      AccountDB
+	store             *DB
 }
 
 func NewDepositRequestDB(store *DB) DepositRequestDB {
 	accountDB := NewAccountStore(store)
-    transactionDB := NewTransactionDB(store)
+	transactionDB := NewTransactionDB(store)
+	notificationDB := NewNotificationDB(store)
 	return &depositRequestDB{
-		accountStore: accountDB,
-		transactionStore: transactionDB,
-		store:        store,
+		accountStore:      accountDB,
+		transactionStore:  transactionDB,
+		notificationStore: notificationDB,
+		store:             store,
 	}
 }
 
@@ -72,26 +75,60 @@ func (db *depositRequestDB) GetRequestsByAccount(ctx context.Context, accountNum
 	return requests, nil
 }
 
-func (db *depositRequestDB) ApproveDepositRequest(ctx context.Context, id int, account string) error {
-	deposit, err := db.store.client.DepositRequest.UpdateOneID(id).SetStatus("approved").Save(ctx)
+func (db *depositRequestDB) ApproveDepositRequest(ctx context.Context, id int, accountNumber string) error {
+	deposit, err := db.store.client.DepositRequest.
+		UpdateOneID(id).
+		SetStatus("approved").
+		Save(ctx)
+
 	if err != nil {
 		fmt.Println("here")
 		return err
 	}
 
-    p := &models.DepositParams{
-        ToAccountNumber: account,
-        Amount: deposit.Amount,
-        Type: "deposit",
-    }
+	p := &models.DepositParams{
+		ToAccountNumber: accountNumber,
+		Amount:          deposit.Amount,
+		Type:            "deposit",
+	}
 
-    if err := db.transactionStore.CreateDepositTransaction(ctx, p); err != nil {
-        return err
-    }
+	if err := db.transactionStore.CreateDepositTransaction(ctx, p); err != nil {
+		return err
+	}
+
+	rp := &models.NewNotificationParams{
+		AccountID: accountNumber,
+		Title:     "Deposit Approved",
+		Content:   fmt.Sprintf("Your deposit request of $%.2f was approved", deposit.Amount),
+	}
+
+	if err := db.notificationStore.CreateNotification(ctx, rp); err != nil {
+		return err
+	}
 
 	return nil
 }
 
 func (db *depositRequestDB) RejectDepositRequest(ctx context.Context, id int) error {
-	return db.store.client.DepositRequest.UpdateOneID(id).SetStatus("rejected").Exec(ctx)
+	deposit, err := db.store.client.DepositRequest.UpdateOneID(id).SetStatus("rejected").Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	acc, err := db.store.client.Account.Query().Where(account.HasDepositRequestWith(depositrequest.ID(id))).Only(ctx)
+	if err != nil {
+		return err
+	}
+
+	rp := &models.NewNotificationParams{
+		AccountID: acc.ID,
+		Title:     "Deposit Rejected",
+		Content:   fmt.Sprintf("Your deposit request of $%.2f was rejected", deposit.Amount),
+	}
+
+	if err := db.notificationStore.CreateNotification(ctx, rp); err != nil {
+		return err
+	}
+
+	return nil
 }

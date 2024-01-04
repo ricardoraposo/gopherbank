@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useAtom } from 'jotai';
-import { QueryObserverResult, RefetchOptions, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import TProfilePic from './TProfilePic';
 import Check from '../assets/checkmark.svg';
 import Cancel from '../assets/cancel.svg';

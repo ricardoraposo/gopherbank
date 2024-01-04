@@ -7,7 +7,7 @@
     "build": "tsc && vite build",
     "dev": "vite --open --host",
     "lint": "eslint -c .eslintrc.json . --ext .js,.jsx,.ts,.tsx",
-    "preview": "vite preview"
+    "preview": "vite preview --host"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.15.3",
@@ -17,7 +17,8 @@
     "jotai": "^2.6.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.15.0"
+    "react-router-dom": "^6.15.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@trybe/eslint-config-frontend": "^1.11.4",

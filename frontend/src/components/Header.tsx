@@ -3,14 +3,14 @@ import axios from 'axios';
 import { useAtom } from 'jotai';
 import { Outlet } from 'react-router-dom';
 import { apiURL, queryParams } from '../consts';
-import { accountAtom, showMenuAtom, tokenAtom } from '../store/atom';
+import { accountAtom, tokenAtom } from '../store/atom';
 import Loading from './Loading';
 import ToggleMenu from './ToggleMenu';
+import ToggleNotifications from './ToggleNotifications';
 
 function Header() {
   const [id] = useAtom(accountAtom);
   const [token] = useAtom(tokenAtom);
-  const [, setShowMenu] = useAtom(showMenuAtom);
   const { data, isLoading } = useQuery({
     queryKey: ['user', token],
     queryFn: () => axios.get(`${apiURL}/api/accounts/${id}`, queryParams(token)),
@@ -35,12 +35,10 @@ function Header() {
             <p className="text-white text-lg font-semibold">{data ? data?.edges.user.firstName : ''}</p>
           </div>
         </div>
-        <button
-          className="bg-gray-500 w-11 h-11 flex justify-center items-center rounded-full z-50"
-          onClick={ () => setShowMenu((prev) => !prev) }
-        >
+        <div className="flex gap-6">
+          <ToggleNotifications />
           <ToggleMenu />
-        </button>
+        </div>
       </header>
       <Outlet />
     </>

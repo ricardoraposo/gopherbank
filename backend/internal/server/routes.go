@@ -15,6 +15,7 @@ func (s *FiberServer) RegisterRoutes() {
 	authHandler := handlers.NewAuthHandler(s.db)
 	favoritehandler := handlers.NewFavoriteHandler(s.db)
 	depositRequestHandler := handlers.NewDepositRequestHandler(s.db)
+    notificationHandler := handlers.NewNotificationHandler(s.db)
 
 	s.Use(logger.New())
 	s.Use(cors.New())
@@ -45,6 +46,10 @@ func (s *FiberServer) RegisterRoutes() {
 	// favorite routes
 	api.Get("/favorite", favoritehandler.GetFavorites)
 	api.Post("/favorite", favoritehandler.ToggleFavorite)
+
+    // notification routes
+    api.Get("/notification", notificationHandler.GetAccountNotifications)
+    api.Delete("/notification/:id", notificationHandler.RemoveNotification)
 
 	// auth routes
 	auth := s.App.Group("/auth")

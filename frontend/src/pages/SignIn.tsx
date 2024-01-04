@@ -11,6 +11,7 @@ import { tokenAtom } from '../store/atom';
 function SignIn() {
   const navigate = useNavigate();
   const [token, setToken] = useAtom(tokenAtom);
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     number: '',
@@ -28,13 +29,14 @@ function SignIn() {
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post(`${apiURL}/auth`, formValues);
-      const { token } = data;
       setIsLoading(true);
+      const { data: { token } } = await axios.post(`${apiURL}/auth`, formValues);
       setToken(token);
       navigate('/');
     } catch (error: any) {
-      console.error(error.response.data);
+      setError("Couldn't sign in. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,6 +89,7 @@ function SignIn() {
           value={ formValues.number }
           onChangeFn={ handleFormChange }
           inputMode="numeric"
+          error={ error }
         />
         <FormInput
           label="Password"
@@ -95,7 +98,9 @@ function SignIn() {
           type="password"
           value={ formValues.password }
           onChangeFn={ handleFormChange }
+          error={ error }
         />
+        {error && <p className="text-red text-sm w-4/5 px-2">{error}</p>}
         <FormButton label="Sign in" onSubmitFn={ handleSubmit } isLoading={ isLoading } />
         <div>
           <div className="flex justify-between gap-4 text-xs text-white my-1">

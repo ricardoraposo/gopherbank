@@ -18,7 +18,7 @@ func (Notification) Fields() []ent.Field {
 	return []ent.Field{
         field.String("title").NotEmpty(),
         field.String("content").NotEmpty(),
-        field.Bool("read").Default(false),
+        field.Bool("read").Default(false).StructTag(`json:"read"`),
         field.Time("created_at").Default(time.Now).Immutable().StructTag(`json:"createdAt"`),
     }
 }

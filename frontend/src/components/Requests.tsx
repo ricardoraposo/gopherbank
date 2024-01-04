@@ -12,7 +12,7 @@ import { usFormat } from '../utils/helpers';
 
 function Requests() {
   const [token] = useAtom(tokenAtom);
-  const { data, refetch } = useQuery({
+  const { data } = useQuery({
     queryKey: ['requests'],
     queryFn: () => axios.get(`${apiURL}/api/deposit-request`, queryParams(token)),
     select: ({ data: { requests } }) => requests,
@@ -40,7 +40,6 @@ function Requests() {
               profileURL={ request.edges.account.edges.user.pictureUrl }
               date={ usFormat.format(request.amount) }
               status={ request.status }
-              refetch={ refetch }
             />
           ))
 
