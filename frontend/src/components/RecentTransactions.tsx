@@ -4,15 +4,14 @@ import { useAtom } from 'jotai';
 import vector from '../assets/vector.svg';
 import TProfilePic from './TProfilePic';
 import { choosePicture } from '../utils/transactionHelpers';
-import { apiURL, queryParams } from '../consts';
-import { accountAtom, tokenAtom } from '../store/atom';
+import { apiURL } from '../consts';
+import { accountAtom } from '../store/atom';
 
 function RecentTransactions() {
   const [id] = useAtom(accountAtom);
-  const [token] = useAtom(tokenAtom);
   const { data, isLoading } = useQuery({
     queryKey: ['transactions'],
-    queryFn: () => axios.get(`${apiURL}/api/transaction/${id}`, queryParams(token)),
+    queryFn: () => axios.get(`${apiURL}/api/transaction/${id}`),
     select: ({ data: { transactions } }) => transactions.slice(0, 5),
   });
 

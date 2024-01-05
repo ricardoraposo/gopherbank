@@ -18,7 +18,7 @@ function EditInput({ label, onChange, name, value, type = 'picture', error = nul
       name={ name }
       value={ value }
       className={ `text-gray-100 text-center border-b-2 border-gray-300 bg-transparent
-        focus:outline-none placeholder:text-gray-300 ${className} ${errorClass}` }
+        focus:outline-none placeholder:text-gray-300 ${className} ${errorClass} rounded-none` }
       type="text"
     />
   );

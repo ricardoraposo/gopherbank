@@ -3,18 +3,17 @@ import { useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import StatisticIcon from '../assets/statistics.svg';
 import instance from '../api/axiosIstance';
-import { apiURL, queryParams } from '../consts';
-import { accountAtom, tokenAtom } from '../store/atom';
+import { apiURL } from '../consts';
+import { accountAtom } from '../store/atom';
 import { usFormat } from '../utils/helpers';
 
 function BalanceDisplay() {
   const [id] = useAtom(accountAtom);
-  const [token] = useAtom(tokenAtom);
   const navigate = useNavigate();
 
   const { data } = useQuery({
-    queryKey: ['user', token],
-    queryFn: () => instance.get(`${apiURL}/api/accounts/${id}`, queryParams(token)),
+    queryKey: ['user'],
+    queryFn: () => instance.get(`${apiURL}/api/accounts/${id}`),
     select: ({ data }) => data,
   });
 

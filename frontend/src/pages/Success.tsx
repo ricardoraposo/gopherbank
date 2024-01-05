@@ -5,8 +5,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 
 import SuccessImg from '../assets/success.png';
-import { apiURL, queryParams } from '../consts';
-import { accountNumberAtom, amountAtom, selectedAtom, tokenAtom } from '../store/atom';
+import { apiURL } from '../consts';
+import { accountNumberAtom, amountAtom, selectedAtom } from '../store/atom';
 import { getHourAndMinutes, usFormat } from '../utils/helpers';
 
 function Success() {
@@ -15,11 +15,10 @@ function Success() {
   const [accountNumber, setAccountNumber] = useAtom(accountNumberAtom);
   const [amount, setAmount] = useAtom(amountAtom);
   const [, setSelected] = useAtom(selectedAtom);
-  const [token] = useAtom(tokenAtom);
 
   const { data } = useQuery({
-    queryKey: ['toUser', token],
-    queryFn: () => axios.get(`${apiURL}/api/user/${accountNumber}`, queryParams(token)),
+    queryKey: ['toUser'],
+    queryFn: () => axios.get(`${apiURL}/api/user/${accountNumber}`),
     select: ({ data: { user } }) => user,
     enabled: type === 'transfer',
   });

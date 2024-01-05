@@ -20,7 +20,6 @@ const recoverySchema = z.object({
 
 function Recover() {
   const navigate = useNavigate();
-  const [token] = useAtom(tokenAtom);
   const [formValues, setFormValues] = useState({
     accountNumber: '',
     password: '',
@@ -42,7 +41,7 @@ function Recover() {
     e.preventDefault();
     try {
       recoverySchema.parse(formValues);
-      await axios.patch(`${apiURL}/auth/recover`, formValues, queryParams(token));
+      await axios.patch(`${apiURL}/auth/recover`, formValues);
       navigate('/signin');
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 404) {

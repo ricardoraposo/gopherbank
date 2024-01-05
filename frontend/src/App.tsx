@@ -1,22 +1,34 @@
-import { Route, Routes, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import { AnimatePresence } from 'framer-motion';
+import { Route, Routes, useLocation } from 'react-router-dom';
 
+import { useEffect } from 'react';
+
+import Admin from './pages/Admin';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
+import Profile from './pages/Profile';
 import Success from './pages/Success';
+import Recover from './pages/Recover';
+import ErrorPage from './pages/Error';
 import Dashboard from './pages/Dashboard';
 import Operation from './pages/Operation';
 import AddPicture from './pages/AddPicture';
-import OperationAccount from './pages/OperationAccount';
-import SignUpSuccess from './pages/SignUpSuccess';
-import Admin from './pages/Admin';
-import Error from './pages/Error';
-import Recover from './pages/Recover';
-import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
+import SignUpSuccess from './pages/SignUpSuccess';
+import OperationAccount from './pages/OperationAccount';
 
 function App() {
   const location = useLocation();
+
+  useEffect(() => {
+    axios.interceptors.request.use((config) => {
+      const token = localStorage.getItem('token')?.replace(/"/g, '');
+      config.headers['Content-Type'] = 'application/json';
+      config.headers.Authorization = `Bearer ${token}`;
+      return config;
+    });
+  }, []);
 
   return (
     <AnimatePresence>
@@ -33,7 +45,7 @@ function App() {
         <Route path="/operation/:type" Component={ Operation } />
         <Route path="/operation/:type/account" Component={ OperationAccount } />
         <Route path="/operation/:type/success" Component={ Success } />
-        <Route path="*" Component={ Error } />
+        <Route path="*" Component={ ErrorPage } />
       </Routes>
     </AnimatePresence>
   );

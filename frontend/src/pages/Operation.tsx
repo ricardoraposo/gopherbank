@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { apiURL, queryParams } from '../consts';
+import { apiURL } from '../consts';
 import { accountAtom, tokenAtom } from '../store/atom';
 
 import SavedAccounts from '../components/SavedAccounts';
@@ -16,14 +16,14 @@ import Loading from '../components/Loading';
 function Operation() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [token, setToken] = useAtom(tokenAtom);
+  const [, setToken] = useAtom(tokenAtom);
   const [, setID] = useAtom(accountAtom);
   const { isLoading, error } = useQuery({
-    queryKey: ['user', token],
+    queryKey: ['user'],
     queryFn: async () => {
-      const { data: { number } } = await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
+      const { data: { number } } = await axios.get(`${apiURL}/api/jwt/`);
       setID(number);
-      return axios.get(`${apiURL}/api/accounts/${number}`, queryParams(token));
+      return axios.get(`${apiURL}/api/accounts/${number}`);
     },
     retry: 2,
   });
@@ -33,7 +33,7 @@ function Operation() {
       setToken('');
       navigate('/signin');
     }
-  }, [token]);
+  }, []);
 
   if (isLoading) return <Loading />;
 

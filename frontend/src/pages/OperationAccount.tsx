@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { apiURL, queryParams } from '../consts';
-import { accountNumberAtom, amountAtom, tokenAtom } from '../store/atom';
+import { apiURL } from '../consts';
+import { accountNumberAtom, amountAtom } from '../store/atom';
 import { usFormat } from '../utils/helpers';
 
 function OperationAccount() {
@@ -13,18 +13,17 @@ function OperationAccount() {
 
   const [accountNumber, setAccountNumber] = useAtom(accountNumberAtom);
   const [amount] = useAtom(amountAtom);
-  const [token] = useAtom(tokenAtom);
 
   const { type } = useParams();
 
   const handleSend = async () => {
     try {
-      const { data: { number } } = await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
+      const { data: { number } } = await axios.get(`${apiURL}/api/jwt/`);
       await axios.post(`${apiURL}/api/${type}`, {
         fromAccountNumber: number,
         toAccountNumber: accountNumber,
         amount: parseFloat(amount),
-      }, queryParams(token));
+      });
       navigate('/operation/transfer/success');
     } catch (e: any) {
       setErrorMsg(e.response.data);

@@ -41,14 +41,14 @@ function EditProfile() {
   const navigate = useNavigate();
   const [show] = useAtom(showNotificationAtom);
   const [, setID] = useAtom(accountAtom);
-  const [token, setToken] = useAtom(tokenAtom);
+  const [, setToken] = useAtom(tokenAtom);
 
   const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user', token],
+    queryKey: ['user'],
     queryFn: async () => {
-      const { data } = await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
+      const { data } = await axios.get(`${apiURL}/api/jwt/`);
       setID(data.number);
-      return axios.get(`${apiURL}/api/accounts/${data.number}`, queryParams(token));
+      return axios.get(`${apiURL}/api/accounts/${data.number}`);
     },
     select: ({ data }) => {
       return { number: data.number, join: data.createdAt, ...data.edges.user } as User;
@@ -78,7 +78,7 @@ function EditProfile() {
     e.preventDefault();
     try {
       editSchema.parse(form);
-      await axios.put(`${apiURL}/api/user`, form, queryParams(token));
+      await axios.put(`${apiURL}/api/user`, form);
       navigate('/profile');
     } catch (e: any) {
       if (e instanceof z.ZodError) {
