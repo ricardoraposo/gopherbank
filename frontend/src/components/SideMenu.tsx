@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Division from './Division';
 import { accountAtom, showMenuAtom, tokenAtom } from '../store/atom';
 import { apiURL, queryParams } from '../consts';
 
 function SideMenu() {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [id] = useAtom(accountAtom);
   const [token, setToken] = useAtom(tokenAtom);
   const [showMenu, setShowMenu] = useAtom(showMenuAtom);
-  const navigate = useNavigate();
   const { data: admin } = useQuery({
     queryKey: ['user'],
     queryFn: () => axios.get(`${apiURL}/api/accounts/${id}`, queryParams(token)),
@@ -24,13 +25,8 @@ function SideMenu() {
     navigate('/signin');
   };
 
-  const goToDashboard = () => {
-    navigate('/');
-    setShowMenu(false);
-  };
-
-  const goToAdmin = () => {
-    navigate('/admin');
+  const goToPage = (page: string) => {
+    navigate(page);
     setShowMenu(false);
   };
 
@@ -43,23 +39,27 @@ function SideMenu() {
         className="flex flex-col items-center gap-12 mt-20
         text-white text-2xl font-bold"
       >
-        <li>
-          <button
-            onClick={ goToDashboard }
-          >
-            Dashboard
-          </button>
-        </li>
-        <Division />
-        <li>
-          <button>Profile</button>
-        </li>
-        <Division />
-        {admin && (
+        {
+          pathname !== '/' && (
+            <>
+              <li><button onClick={ () => goToPage('/') }> Dashboard </button></li>
+              <Division />
+            </>
+          )
+        }
+        {
+          pathname !== '/profile' && (
+            <>
+              <li><button onClick={ () => goToPage('/profile') }>Profile</button></li>
+              <Division />
+            </>
+          )
+        }
+        {admin && pathname !== '/admin' && (
           <>
             <li>
               <button
-                onClick={ goToAdmin }
+                onClick={ () => goToPage('/admin') }
               >
                 Admin
               </button>

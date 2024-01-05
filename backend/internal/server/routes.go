@@ -29,11 +29,10 @@ func (s *FiberServer) RegisterRoutes() {
 	// accounts routes
 	api.Get("/accounts/:id", accountsHandler.GetAccountByNumber)
 	api.Delete("/accounts/:id", accountsHandler.DeleteAccount)
-	api.Patch("/accounts/", accountsHandler.RecoverAccountPassword)
 
 	// user routes
 	api.Get("/user/:id", userHandler.GetUser)
-	api.Put("/user/:id", userHandler.EditUser)
+	api.Put("/user", userHandler.EditUser)
 
 	// transactions routes
 	api.Get("/transaction/:id", transactionHandler.GetAccountTransactions)
@@ -55,6 +54,7 @@ func (s *FiberServer) RegisterRoutes() {
 	auth := s.App.Group("/auth")
 	auth.Post("/", middlewares.ValidateLoginParams, authHandler.Authenticate)
 	auth.Post("/new", middlewares.ValidateNewAccountParams, accountsHandler.CreateAccount)
+	auth.Patch("/recover", middlewares.ValidateNewPasswordParams, accountsHandler.RecoverAccountPassword)
 
 	// admin routes
 	// api.Get("/accounts", middlewares.IsAdmin, accountsHandler.GetAllAccounts)

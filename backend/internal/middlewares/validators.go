@@ -28,6 +28,18 @@ func ValidateNewAccountParams(c *fiber.Ctx) error {
 	return c.Next()
 }
 
+func ValidateNewPasswordParams(c *fiber.Ctx) error {
+	var np models.NewPasswordParams
+	if err := c.BodyParser(&np); err != nil {
+		return err
+	}
+	if len(np.Password) < minPasswordLength {
+		return fiber.NewError(fiber.StatusBadRequest, "Password must have at least 8 characters")
+	}
+
+	return c.Next()
+}
+
 func ValidateLoginParams(c *fiber.Ctx) error {
 	var login models.LoginParams
 	if err := c.BodyParser(&login); err != nil {
@@ -67,18 +79,18 @@ func ValidateTransferParams(c *fiber.Ctx) error {
 }
 
 func ValidateWithdrawParams(c *fiber.Ctx) error {
-    var withdraw models.WithdrawParams
-    if err := c.BodyParser(&withdraw); err != nil {
-        return err
-    }
+	var withdraw models.WithdrawParams
+	if err := c.BodyParser(&withdraw); err != nil {
+		return err
+	}
 
-    if len(withdraw.FromAccountNumber) < 1 {
-        return fiber.NewError(fiber.StatusBadRequest, "Origin account number must be provided")
-    }
+	if len(withdraw.FromAccountNumber) < 1 {
+		return fiber.NewError(fiber.StatusBadRequest, "Origin account number must be provided")
+	}
 
-    if withdraw.Amount <= 0 {
-        return fiber.NewError(fiber.StatusBadRequest, "Invalid amount")
-    }
+	if withdraw.Amount <= 0 {
+		return fiber.NewError(fiber.StatusBadRequest, "Invalid amount")
+	}
 
-    return c.Next()
+	return c.Next()
 }

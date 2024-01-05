@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import SuccessImg from '../assets/success.png';
 import { apiURL, queryParams } from '../consts';
-import { accountNumberAtom, amountAtom, tokenAtom } from '../store/atom';
+import { accountNumberAtom, amountAtom, selectedAtom, tokenAtom } from '../store/atom';
 import { getHourAndMinutes, usFormat } from '../utils/helpers';
 
 function Success() {
@@ -14,6 +14,7 @@ function Success() {
   const navigate = useNavigate();
   const [accountNumber, setAccountNumber] = useAtom(accountNumberAtom);
   const [amount, setAmount] = useAtom(amountAtom);
+  const [, setSelected] = useAtom(selectedAtom);
   const [token] = useAtom(tokenAtom);
 
   const { data } = useQuery({
@@ -25,6 +26,7 @@ function Success() {
 
   const handleClick = () => {
     setAccountNumber('');
+    setSelected('');
     setAmount('');
     navigate('/');
   };

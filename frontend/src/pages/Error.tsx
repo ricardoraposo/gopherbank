@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Unhauthorized from '../assets/unhauthorized.png';
+import MyBad from '../assets/error.png';
 import NotFound from '../assets/not_found.png';
 import ToDo from '../assets/to_be_done.png';
 
@@ -14,6 +15,8 @@ function Error() {
         return Unhauthorized;
       case '/todo':
         return ToDo;
+      case '/sorry':
+        return MyBad;
       default:
         return NotFound;
     }
@@ -36,6 +39,15 @@ function Error() {
             <p className="font-bold text-orange text-2xl">Error "I'm lazy"</p>
             <p className="font-bold text-white text-2xl">
               This is yet to be done
+            </p>
+          </div>
+        );
+      case '/sorry':
+        return (
+          <div className="w-80 text-center my-4">
+            <p className="font-bold text-orange text-2xl">Error 500</p>
+            <p className="font-bold text-white text-2xl">
+              Something went wrong on our end, try again later 😭
             </p>
           </div>
         );

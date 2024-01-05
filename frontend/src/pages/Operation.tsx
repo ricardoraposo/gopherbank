@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { apiURL, queryParams } from '../consts';
 import { accountAtom, tokenAtom } from '../store/atom';
@@ -15,6 +15,7 @@ import Loading from '../components/Loading';
 
 function Operation() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [token, setToken] = useAtom(tokenAtom);
   const [, setID] = useAtom(accountAtom);
   const { isLoading, error } = useQuery({
@@ -43,7 +44,7 @@ function Operation() {
       animate={ { x: 0, opacity: 1 } }
       exit={ { x: -300, opacity: 0, transition: { duration: 0.1 } } }
     >
-      <SavedAccounts />
+      {pathname.includes('transfer') ? <SavedAccounts /> : <div />}
       <AmountDisplay />
       <SendBtn />
     </motion.div>

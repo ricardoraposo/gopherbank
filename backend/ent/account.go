@@ -23,7 +23,7 @@ type Account struct {
 	// Balance holds the value of the "balance" field.
 	Balance float64 `json:"balance"`
 	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt time.Time `json:"-"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// Admin holds the value of the "admin" field.
 	Admin bool `json:"admin"`
 	// Edges holds the relations/edges for other nodes in the graph.

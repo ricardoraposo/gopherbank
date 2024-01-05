@@ -12,7 +12,7 @@ function ToggleNotifications() {
   const [, setShow] = useAtom(showNotificationAtom);
   const [token] = useAtom(tokenAtom);
   const { data } = useQuery({
-    queryKey: ['notifications'],
+    queryKey: ['notifications', token],
     queryFn: () => axios.get(`${apiURL}/api/notification`, queryParams(token)),
     select: ({ data: { notifications } }) => notifications,
   });
@@ -26,7 +26,7 @@ function ToggleNotifications() {
       </button>
       <div
         className={ `absolute text-xs w-5 h-5 bg-red top-0 -right-2 rounded-full flex
-        justify-center items-center active:animate-pulse ${data ? 'block' : 'hidden'}}` }
+        justify-center items-center active:animate-pulse ${data?.length > 0 ? 'block' : 'hidden'}` }
       >
         {data?.length}
       </div>

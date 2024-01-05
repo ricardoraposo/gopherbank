@@ -61,6 +61,7 @@ func (u *userDB) EditUser(ctx context.Context, p models.EditUserParams, accountN
 		SetFirstName(p.FirstName).
 		SetLastName(p.LastName).
 		SetEmail(p.Email).
+		SetPictureURL(p.PictureURL).
 		Save(ctx)
 
 	if err != nil {

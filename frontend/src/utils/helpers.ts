@@ -8,6 +8,8 @@ export const sleep = (time: number) => {
 
 export const usFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
+export const usDateFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+
 const date = new Date();
 
 export const getHourAndMinutes = () => {

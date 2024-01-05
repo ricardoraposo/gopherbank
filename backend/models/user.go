@@ -9,7 +9,8 @@ type User struct {
 }
 
 type EditUserParams struct {
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Email     string `json:"email"`
+	FirstName  string `json:"firstName"`
+	LastName   string `json:"lastName"`
+	Email      string `json:"email"`
+	PictureURL string `json:"pictureURL"`
 }

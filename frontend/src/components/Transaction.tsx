@@ -1,4 +1,4 @@
-import { usFormat } from '../utils/helpers';
+import { usDateFormat, usFormat } from '../utils/helpers';
 import { chooseName, makeCapitalized } from '../utils/transactionHelpers';
 import UserPopover from './UserPopover';
 
@@ -7,8 +7,6 @@ type Props = {
 };
 
 function Transaction({ edges }: Props) {
-  const usDateFormat = new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' });
-
   return (
     <div className="px-5 py-4 flex bg-white w-full justify-between">
       <div className="flex gap-2">

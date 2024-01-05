@@ -120,6 +120,7 @@ function SignIn() {
             <button
               className="text-purple font-semibold"
               type="button"
+              onClick={ () => navigate('/recover') }
             >
               Recover it
             </button>

@@ -26,7 +26,7 @@ function NotificationMenu() {
       flex flex-col py-4 gap-4 overflow-scroll ${show ? 'scale-100' : 'scale-0'} transition-all origin-[80%_0%]` }
     >
       {
-        data ? (
+        data?.length ? (
           data?.map((notification: any) => (
             <Notification
               key={ notification.id }
