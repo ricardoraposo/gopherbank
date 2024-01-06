@@ -3,7 +3,7 @@
 Gopherbank is a simple bank application witt the backend written in Go and frontend in React.
 It is a learning project for me to learn Go and to learn how to write a web application in Go.
 
-Showcase video: https://www.linkedin.com/feed/update/urn:li:activity:7149169538620723200/
+Showcase video(in portuguese): https://www.linkedin.com/feed/update/urn:li:activity:7149169538620723200/
 
 ## How to Run
 
