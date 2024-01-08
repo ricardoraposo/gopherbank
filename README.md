@@ -3,13 +3,13 @@
 Gopherbank is a simple bank application with the backend written in Go and frontend in React.
 It is a learning project for me to learn Go and to learn how to write a web application in Go.
 
-Showcase video(in portuguese): https://www.linkedin.com/feed/update/urn:li:activity:7149169538620723200/
+Showcase video(in Portuguese): https://www.linkedin.com/feed/update/urn:li:activity:7149169538620723200/
 
 ## How to Run
 
 There is a docker compose file in the project, in order to use it you gotta follow the steps below
 
-1. Create a .env file, there's a .env.example file inside the project that you can use in order to create you own
+1. Create a .env file, there's a .env.example file inside the project that you can use in order to create your own
 2. Run the command bellow:
 ```sh
 docker-compose up --build -d
