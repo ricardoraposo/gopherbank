@@ -25,4 +25,4 @@ docker exec gopherbank-backend-1 go run cmd/seed/main.go
 
 4. Go to your favorite browser and the application should be good and running on *localhost:5173/signin*
 
-Obs.: So far this is a mobile only app, future additions will be made to support other layouts
+P.S.: So far this is a mobile only app, future additions will be made to support other layouts
