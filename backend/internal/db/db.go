@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -17,6 +18,10 @@ func New() *DB {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+    ctx := context.Background()
+
+    client.Schema.Create(ctx)
 
 	return &DB{client}
 }
