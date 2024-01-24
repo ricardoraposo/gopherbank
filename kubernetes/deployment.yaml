@@ -1,8 +1,8 @@
 # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
-  name:  gopherbank-replicaset
+  name:  gopherbank
 spec:
   selector:
     matchLabels:
@@ -24,7 +24,7 @@ spec:
         - name: DB_NAME
           value: gopherbank
         - name: DB_HOST
-          value: db
+          value: mysql-db-service
         - name: JWT_SECRET
           value: 9S5Pz3vEtdRA7qJXK6Mx8w2fD1Lb0oYH
         ports:
