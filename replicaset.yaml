@@ -1,0 +1,31 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name:  gopherbank-replicaset
+spec:
+  selector:
+    matchLabels:
+      app: gopherbank
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: gopherbank
+    spec:
+      containers:
+      - name: gopherbank
+        image: "ricardo2110/gopherbank_backend:latest"
+        env:
+        - name: DB_USERNAME
+          value: root
+        - name: DB_PASSWORD
+          value: supersecret
+        - name: DB_NAME
+          value: gopherbank
+        - name: DB_HOST
+          value: db
+        - name: JWT_SECRET
+          value: 9S5Pz3vEtdRA7qJXK6Mx8w2fD1Lb0oYH
+        ports:
+        - containerPort: 5432

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -41,6 +42,7 @@ func (h *AuthHandler) Authenticate(c *fiber.Ctx) error {
 
 	account, err := h.store.GetAccountByNumber(c.Context(), params.AccountNumber)
 	if err != nil {
+		log.Println(err)
 		return fiber.NewError(fiber.StatusNotFound, "Account not found")
 	}
 
