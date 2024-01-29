@@ -25,6 +25,10 @@ spec:
           value: gopherbank
         - name: DB_HOST
           value: mysql-db-service
+        - name: DB_PORT
+          value: "3306"
+        - name: APP_PORT
+          value: "5432"
         - name: JWT_SECRET
           value: 9S5Pz3vEtdRA7qJXK6Mx8w2fD1Lb0oYH
         ports:
