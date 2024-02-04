@@ -70,7 +70,7 @@ function Profile() {
         </div>
       </header>
       <div className="flex flex-col items-center gap-5 mt-24 mb-8">
-        <img src={ user?.pictureUrl } alt="user profile" className="w-52 h-52" />
+        <img src={ user?.pictureUrl } alt="user profile" className="w-52 h-52 rounded-full" />
         <p className="text-white text-lg font-semibold">{`${user?.firstName} ${user?.lastName}`}</p>
       </div>
       <div
