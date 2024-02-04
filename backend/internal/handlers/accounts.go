@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -26,8 +27,33 @@ func NewAccountHandler(client *db.DB) *AccountHandler {
 }
 
 func (a *AccountHandler) CreateAccount(c *fiber.Ctx) error {
+	file, err := c.FormFile("file")
+	if err != nil {
+		return err
+	}
+	f, err := file.Open()
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	uploaded, err := utils.UploadToS3(f, file.Filename)
+	if err != nil {
+		return err
+	}
+
+	form, err := c.FormFile("formValues")
+	if err != nil {
+		return err
+	}
+	formContent, err := form.Open()
+	if err != nil {
+		return err
+	}
+	defer formContent.Close()
+
 	var params models.NewAccountParams
-	if err := c.BodyParser(&params); err != nil {
+	if err := json.NewDecoder(formContent).Decode(&params); err != nil {
 		return err
 	}
 
@@ -39,6 +65,7 @@ func (a *AccountHandler) CreateAccount(c *fiber.Ctx) error {
 
 	params.Number = num
 	params.Password = encryptedPassword
+	params.PictureURL = uploaded.Location
 
 	account, err := a.accountDB.CreateAccount(c.Context(), &params)
 	if err != nil {
@@ -50,9 +77,9 @@ func (a *AccountHandler) CreateAccount(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-        "number": num,
-        "message": fmt.Sprintf("Account created successfully with number %s", num),
-    })
+		"number":  num,
+		"message": fmt.Sprintf("Account created successfully with number %s", num),
+	})
 }
 
 func (a *AccountHandler) GetAllAccounts(c *fiber.Ctx) error {

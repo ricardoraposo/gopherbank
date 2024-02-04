@@ -15,7 +15,7 @@ func (s *FiberServer) RegisterRoutes() {
 	authHandler := handlers.NewAuthHandler(s.db)
 	favoritehandler := handlers.NewFavoriteHandler(s.db)
 	depositRequestHandler := handlers.NewDepositRequestHandler(s.db)
-    notificationHandler := handlers.NewNotificationHandler(s.db)
+	notificationHandler := handlers.NewNotificationHandler(s.db)
 
 	s.Use(logger.New())
 	s.Use(cors.New())
@@ -46,9 +46,9 @@ func (s *FiberServer) RegisterRoutes() {
 	api.Get("/favorite", favoritehandler.GetFavorites)
 	api.Post("/favorite", favoritehandler.ToggleFavorite)
 
-    // notification routes
-    api.Get("/notification", notificationHandler.GetAccountNotifications)
-    api.Delete("/notification/:id", notificationHandler.RemoveNotification)
+	// notification routes
+	api.Get("/notification", notificationHandler.GetAccountNotifications)
+	api.Delete("/notification/:id", notificationHandler.RemoveNotification)
 
 	// auth routes
 	auth := s.App.Group("/auth")
@@ -61,7 +61,7 @@ func (s *FiberServer) RegisterRoutes() {
 	api.Get("/accounts", middlewares.IsAdmin, accountsHandler.GetAllAccounts)
 	api.Get("/transaction", middlewares.IsAdmin, transactionHandler.GetAllTransactions)
 	api.Get("/deposit-request", middlewares.IsAdmin, depositRequestHandler.GetAllDepositRequests)
-    api.Post("/deposit-request/approve/:id", middlewares.IsAdmin, depositRequestHandler.ApproveRequest)
-    api.Patch("/deposit-request/reject/:id", middlewares.IsAdmin, depositRequestHandler.RejectRequest)
+	api.Post("/deposit-request/approve/:id", middlewares.IsAdmin, depositRequestHandler.ApproveRequest)
+	api.Patch("/deposit-request/reject/:id", middlewares.IsAdmin, depositRequestHandler.RejectRequest)
 	api.Post("/deposit", middlewares.IsAdmin, transactionHandler.Deposit)
 }

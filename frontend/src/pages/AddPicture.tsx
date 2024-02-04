@@ -14,11 +14,23 @@ function AddPicture() {
   const [, setAccount] = useAtom(accountAtom);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [file, setFile] = useState<File | null>(null);
+
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      formData.append('file', file as File);
+      formData.append(
+        'formValues',
+        new Blob([JSON.stringify(formValues)], { type: 'application/json' }),
+      );
+
       setIsLoading(true);
-      const { data: { number } } = await axios.post(`${apiURL}/auth/new`, formValues);
+      const { data: { number } } = await axios.post(`${apiURL}/auth/new`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        transformRequest: [(data) => data],
+      });
       setAccount(number);
       setFormValues(initialFormValues);
       navigate('/signup/success');
@@ -26,6 +38,12 @@ function AddPicture() {
       console.error(error.response.data);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
     }
   };
 
@@ -44,20 +62,22 @@ function AddPicture() {
       >
         <div className="flex flex-col justify-center items-center gap-4">
           <img
-            src={ formValues.pictureUrl || defaultPic }
+            src={ URL.createObjectURL(file as File) || defaultPic }
             alt="default user profile"
             className="w-60 h-60 bg-white border-8 border-black rounded-full opacity-100"
           />
           <form className="flex flex-col items-center gap-4">
-            <label htmlFor="profilePicture" className="text-white text-lg">
+            <label
+              htmlFor="profilePicture"
+              className="text-white text-lg bg-purple p-2 rounded-lg cursor-pointer"
+            >
               Add a profile picture
             </label>
-            <FormInput
-              name="profilePicture"
+            <input
+              type="file"
+              onChange={ handleChange }
               id="profilePicture"
-              type="text"
-              value={ formValues.pictureUrl }
-              onChangeFn={ (e) => setFormValues((prev) => ({ ...prev, pictureUrl: e.target.value })) }
+              className="hidden"
             />
             <FormButton
               label="Add picture"

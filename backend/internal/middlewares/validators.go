@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"encoding/json"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/ricardoraposo/gopherbank/models"
 )
@@ -12,9 +14,16 @@ const (
 
 func ValidateNewAccountParams(c *fiber.Ctx) error {
 	var account models.NewAccountParams
-	if err := c.BodyParser(&account); err != nil {
-		return err
+	form, err := c.FormFile("formValues")
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Bad request")
 	}
+	f, _ := form.Open()
+	defer f.Close()
+	if err := json.NewDecoder(f).Decode(&account); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Bad request")
+	}
+
 	if len(account.FirstName) < minNameLength {
 		return fiber.NewError(fiber.StatusBadRequest, "First name must be at least 2 characters long")
 	}
