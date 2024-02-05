@@ -62,7 +62,7 @@ function AddPicture() {
       >
         <div className="flex flex-col justify-center items-center gap-4">
           <img
-            src={ URL.createObjectURL(file as File) || defaultPic }
+            src={ file ? URL.createObjectURL(file) : defaultPic }
             alt="default user profile"
             className="w-60 h-60 bg-white border-8 border-black rounded-full opacity-100"
           />
