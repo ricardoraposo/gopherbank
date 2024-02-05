@@ -37,10 +37,8 @@ func (a *AccountHandler) CreateAccount(c *fiber.Ctx) error {
 	}
 	defer f.Close()
 
-	uploaded, err := utils.UploadToS3(f, file.Filename)
-	if err != nil {
-		return err
-	}
+	ch := make(chan string)
+	go utils.UploadToS3Async(f, file.Filename, ch)
 
 	form, err := c.FormFile("formValues")
 	if err != nil {
@@ -65,7 +63,7 @@ func (a *AccountHandler) CreateAccount(c *fiber.Ctx) error {
 
 	params.Number = num
 	params.Password = encryptedPassword
-	params.PictureURL = uploaded.Location
+	params.PictureURL = <-ch
 
 	account, err := a.accountDB.CreateAccount(c.Context(), &params)
 	if err != nil {

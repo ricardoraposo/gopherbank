@@ -34,10 +34,31 @@ func UploadToS3(file io.Reader, key string) (*manager.UploadOutput, error) {
 	}
 
 	return uploader.Upload(context.TODO(), &s3.PutObjectInput{
-		Bucket: aws.String("gopherbankblobs"),
-		Key:    aws.String(key),
-		Body:   file,
-        ContentType: aws.String("image/png"),
-		ACL:    "public-read",
+		Bucket:      aws.String("gopherbankblobs"),
+		Key:         aws.String(key),
+		Body:        file,
+		ContentType: aws.String("image/png"),
+		ACL:         "public-read",
 	})
+}
+
+func UploadToS3Async(file io.Reader, key string, ch chan<- string) {
+	uploader, err := newS3Uploader()
+	if err != nil {
+		ch <- "https://i.imgur.com/fLjGgnc.png"
+	}
+
+	uploaded, err := uploader.Upload(context.TODO(), &s3.PutObjectInput{
+		Bucket:      aws.String("gopherbankblobs"),
+		Key:         aws.String(key),
+		Body:        file,
+		ContentType: aws.String("image/png"),
+		ACL:         "public-read",
+	})
+
+	if err != nil {
+		ch <- "https://i.imgur.com/fLjGgnc.png"
+	}
+
+	ch <- uploaded.Location
 }
