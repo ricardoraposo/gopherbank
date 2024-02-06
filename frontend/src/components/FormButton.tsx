@@ -1,5 +1,3 @@
-import Loading from './Loading';
-
 type Props = {
   label: string;
   onSubmitFn: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -14,7 +12,13 @@ function FormButton({ label, onSubmitFn: handleSubmit, isLoading }: Props) {
       className="mt-2 h-12 w-40 rounded-xl bg-orange
       text-white text-2xl font-semibold"
     >
-      {isLoading ? <Loading /> : label}
+      {isLoading ? (
+        <div
+          className="h-6 w-6 border-4 rounded-full mx-auto
+          border-t-white border-l-white border-r-orange border-b-orange
+          animate-spin"
+        />
+      ) : label}
     </button>
   );
 }
