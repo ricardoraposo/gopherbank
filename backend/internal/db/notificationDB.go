@@ -52,6 +52,7 @@ func (db *notificationDB) GetNotifications(ctx context.Context, accountNumber st
         Query().
         Where(notification.HasAccountWith(account.ID(acc.ID))).
         Order(ent.Desc(notification.FieldCreatedAt)).
+        Limit(5).
         All(ctx)
 }
 
