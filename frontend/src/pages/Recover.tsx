@@ -2,12 +2,10 @@ import { z } from 'zod';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import axios, { AxiosError } from 'axios';
-import { useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
-import { apiURL, queryParams } from '../consts';
-import { tokenAtom } from '../store/atom';
+import { apiURL } from '../consts';
 
 const recoverySchema = z.object({
   accountNumber: z.string(),

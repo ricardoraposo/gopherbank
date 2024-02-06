@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { apiURL, defaultPic } from '../consts';
-import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
 import { accountAtom, initialFormValues, signUpAtom } from '../store/atom';
 

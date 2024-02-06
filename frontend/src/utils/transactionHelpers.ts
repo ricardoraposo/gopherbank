@@ -1,16 +1,16 @@
 export const chooseName = (edges: any) => {
-  const { detail, from_account, to_account } = edges;
+  const { detail, from_account: fromAccount, to_account: toAccount } = edges;
   switch (detail.type) {
     case 'transfer':
       if (detail.amount > 0) {
-        return `${from_account.edges.user.firstName} ${from_account.edges.user.lastName}`;
+        return `${fromAccount.edges.user.firstName} ${fromAccount.edges.user.lastName}`;
       }
-      return `${to_account.edges.user.firstName} ${to_account.edges.user.lastName}`;
+      return `${toAccount.edges.user.firstName} ${toAccount.edges.user.lastName}`;
 
     case 'deposit':
-      return `${to_account.edges.user.firstName} ${to_account.edges.user.lastName}`;
+      return `${toAccount.edges.user.firstName} ${toAccount.edges.user.lastName}`;
     case 'withdraw':
-      return `${from_account.edges.user.firstName} ${from_account.edges.user.lastName}`;
+      return `${fromAccount.edges.user.firstName} ${fromAccount.edges.user.lastName}`;
     default:
       return 'Unknown';
   }

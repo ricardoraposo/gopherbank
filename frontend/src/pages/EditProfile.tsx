@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { EditError, type User } from '../types';
-import { apiURL, queryParams } from '../consts';
+import { apiURL } from '../consts';
 import { accountAtom, showNotificationAtom, tokenAtom } from '../store/atom';
 
 import Blur from '../components/Blur';
