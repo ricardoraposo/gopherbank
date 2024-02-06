@@ -12,9 +12,9 @@ function OpButton({ icon, label, onClick, className = '' }: Props) {
         type="button"
         className="w-16 h-16 rounded-full bg-gray-500 text-white text-lg font-semibold
         flex justify-center items-center gap-2"
-        onClick={onClick}
+        onClick={ onClick }
       >
-        <img src={icon} alt="transfer icon" className={`w-6 h-6 ${className}`} />
+        <img src={ icon } alt="transfer icon" className={ `w-6 h-6 ${className}` } />
       </button>
       <p className="text-white">{label}</p>
     </div>
