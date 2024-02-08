@@ -16,7 +16,7 @@ func main() {
 	app := server.New()
 	app.RegisterRoutes()
 
-	port := fmt.Sprintf("0.0.0.0:%s", os.Getenv("APP_PORT"))
+	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
 	go func() {
 		if err := app.Listen(port); err != nil {
 			panic(err)
