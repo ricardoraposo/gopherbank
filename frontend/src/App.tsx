@@ -1,8 +1,5 @@
-import axios from 'axios';
 import { AnimatePresence } from 'framer-motion';
 import { Route, Routes, useLocation } from 'react-router-dom';
-
-import { useEffect } from 'react';
 
 import Admin from './pages/Admin';
 import SignIn from './pages/SignIn';
@@ -20,15 +17,6 @@ import OperationAccount from './pages/OperationAccount';
 
 function App() {
   const location = useLocation();
-
-  useEffect(() => {
-    axios.interceptors.request.use((config) => {
-      const token = localStorage.getItem('token')?.replace(/"/g, '');
-      config.headers['Content-Type'] = 'application/json';
-      config.headers.Authorization = `Bearer ${token}`;
-      return config;
-    });
-  }, []);
 
   return (
     <AnimatePresence>

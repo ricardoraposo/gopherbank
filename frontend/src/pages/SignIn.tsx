@@ -32,7 +32,7 @@ function SignIn() {
       setIsLoading(true);
       const { data: { token } } = await axios.post(`${apiURL}/auth`, formValues);
       setToken(token);
-      localStorage.setItem('token', token);
+      // localStorage.setItem('token', token);
       navigate('/');
     } catch (error: any) {
       setError("Couldn't sign in. Please check your credentials.");

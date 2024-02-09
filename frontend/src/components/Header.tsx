@@ -1,17 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useAtom } from 'jotai';
-import { apiURL } from '../consts';
-import { accountAtom } from '../store/atom';
+import { apiURL, queryParams } from '../consts';
+import { accountAtom, tokenAtom } from '../store/atom';
 import Loading from './Loading';
 import ToggleMenu from './ToggleMenu';
 import ToggleNotifications from './ToggleNotifications';
 
 function Header() {
   const [id] = useAtom(accountAtom);
+  const [token] = useAtom(tokenAtom);
   const { data, isLoading } = useQuery({
     queryKey: ['user'],
-    queryFn: () => axios.get(`${apiURL}/api/accounts/${id}`),
+    queryFn: () => axios.get(`${apiURL}/api/accounts/${id}`, queryParams(token)),
     select: ({ data }) => data,
   });
 

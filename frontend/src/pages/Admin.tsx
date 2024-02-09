@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { apiURL } from '../consts';
+import { apiURL, queryParams } from '../consts';
 import { accountAtom, tokenAtom } from '../store/atom';
 
 import Header from '../components/Header';
@@ -16,13 +16,13 @@ import Requests from '../components/Requests';
 function Admin() {
   const navigate = useNavigate();
   const [, setID] = useAtom(accountAtom);
-  const [, setToken] = useAtom(tokenAtom);
+  const [token, setToken] = useAtom(tokenAtom);
   const { isLoading, error, data } = useQuery({
     queryKey: ['user'],
     queryFn: async () => {
-      const { data } = await axios.get(`${apiURL}/api/jwt/`);
+      const { data } = await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
       setID(data.number);
-      return axios.get(`${apiURL}/api/accounts/${data.number}`);
+      return axios.get(`${apiURL}/api/accounts/${data.number}`, queryParams(token));
     },
     select: ({ data }) => data,
     retry: 2,

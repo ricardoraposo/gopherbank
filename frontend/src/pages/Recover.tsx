@@ -3,9 +3,11 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useAtom } from 'jotai';
 import FormInput from '../components/FormInput';
 import FormButton from '../components/FormButton';
-import { apiURL } from '../consts';
+import { apiURL, queryParams } from '../consts';
+import { tokenAtom } from '../store/atom';
 
 const recoverySchema = z.object({
   accountNumber: z.string(),
@@ -18,6 +20,7 @@ const recoverySchema = z.object({
 
 function Recover() {
   const navigate = useNavigate();
+  const [token] = useAtom(tokenAtom);
   const [formValues, setFormValues] = useState({
     accountNumber: '',
     password: '',
@@ -39,7 +42,7 @@ function Recover() {
     e.preventDefault();
     try {
       recoverySchema.parse(formValues);
-      await axios.patch(`${apiURL}/auth/recover`, formValues);
+      await axios.patch(`${apiURL}/auth/recover`, formValues, queryParams(token));
       navigate('/signin');
     } catch (error) {
       if (error instanceof AxiosError && error.response?.status === 404) {

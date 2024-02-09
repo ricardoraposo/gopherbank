@@ -4,14 +4,15 @@ import { useAtom } from 'jotai';
 import Line from './Line';
 import Transaction from './Transaction';
 import WarningIcon from '../assets/warning.svg';
-import { apiURL } from '../consts';
-import { accountAtom } from '../store/atom';
+import { apiURL, queryParams } from '../consts';
+import { accountAtom, tokenAtom } from '../store/atom';
 
 function Transactions() {
   const [id] = useAtom(accountAtom);
+  const [token] = useAtom(tokenAtom);
   const { data, isLoading } = useQuery({
     queryKey: ['transactions'],
-    queryFn: () => axios.get(`${apiURL}/api/transaction/${id}`),
+    queryFn: () => axios.get(`${apiURL}/api/transaction/${id}`, queryParams(token)),
     select: ({ data: { transactions } }) => transactions,
   });
 

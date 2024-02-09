@@ -11,6 +11,7 @@ import NotificationMenu from './NotificationMenu';
 function ToggleNotifications() {
   const [, setShow] = useAtom(showNotificationAtom);
   const [token] = useAtom(tokenAtom);
+  console.log('token: ', token);
   const { data } = useQuery({
     queryKey: ['notifications', token],
     queryFn: () => axios.get(`${apiURL}/api/notification`, queryParams(token)),

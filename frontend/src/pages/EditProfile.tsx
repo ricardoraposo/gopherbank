@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { EditError, type User } from '../types';
-import { apiURL } from '../consts';
+import { apiURL, queryParams } from '../consts';
 import { accountAtom, showNotificationAtom, tokenAtom } from '../store/atom';
 
 import Blur from '../components/Blur';
@@ -41,14 +41,14 @@ function EditProfile() {
   const navigate = useNavigate();
   const [show] = useAtom(showNotificationAtom);
   const [, setID] = useAtom(accountAtom);
-  const [, setToken] = useAtom(tokenAtom);
+  const [token, setToken] = useAtom(tokenAtom);
 
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['user'],
     queryFn: async () => {
-      const { data } = await axios.get(`${apiURL}/api/jwt/`);
+      const { data } = await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
       setID(data.number);
-      return axios.get(`${apiURL}/api/accounts/${data.number}`);
+      return axios.get(`${apiURL}/api/accounts/${data.number}`, queryParams(token));
     },
     select: ({ data }) => {
       return { number: data.number, join: data.createdAt, ...data.edges.user } as User;
@@ -78,7 +78,7 @@ function EditProfile() {
     e.preventDefault();
     try {
       editSchema.parse(form);
-      await axios.put(`${apiURL}/api/user`, form);
+      await axios.put(`${apiURL}/api/user`, form, queryParams(token));
       navigate('/profile');
     } catch (e: any) {
       if (e instanceof z.ZodError) {
@@ -101,18 +101,18 @@ function EditProfile() {
   return (
     <motion.div
       className="pt-2"
-      initial={ { x: 300, opacity: 0 } }
-      animate={ { x: 0, opacity: 1 } }
-      exit={ { x: -300, opacity: 0, transition: { duration: 0.1 } } }
+      initial={{ x: 300, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: -300, opacity: 0, transition: { duration: 0.1 } }}
     >
       {show && <Blur />}
       <SideMenu />
       <header className="flex justify-between items-center mx-5">
         <button
-          onClick={ () => navigate(-1) }
+          onClick={() => navigate(-1)}
           className="bg-gray-500 w-11 h-11 flex justify-center items-center rounded-full z-30"
         >
-          <img src={ Arrow } alt="go back" />
+          <img src={Arrow} alt="go back" />
         </button>
         <div className="flex gap-6">
           <ToggleNotifications />
@@ -120,37 +120,37 @@ function EditProfile() {
         </div>
       </header>
       <div className="flex flex-col items-center gap-5 mt-24 mb-8">
-        <img src={ user?.pictureUrl } alt="user profile" className="w-52 h-52 rounded-full" />
+        <img src={user?.pictureUrl} alt="user profile" className="w-52 h-52 rounded-full" />
         <div>
           <EditInput
             label="Picture URL"
-            onChange={ handleChange }
+            onChange={handleChange}
             name="pictureUrl"
-            value={ form.pictureUrl }
-            error={ errors.pictureUrl }
+            value={form.pictureUrl}
+            error={errors.pictureUrl}
           />
           {errors.pictureUrl && <p className="text-red">{errors.pictureUrl}</p>}
         </div>
         <div className="flex justify-center gap-4">
           <div>
             <EditInput
-              label={ `${user?.firstName}` }
-              onChange={ handleChange }
+              label={`${user?.firstName}`}
+              onChange={handleChange}
               type="name"
               name="firstName"
-              value={ form.firstName }
-              error={ errors.firstName }
+              value={form.firstName}
+              error={errors.firstName}
             />
             {errors.firstName && <p className="text-red">{errors.firstName}</p>}
           </div>
           <div>
             <EditInput
-              label={ `${user?.lastName}` }
-              onChange={ handleChange }
+              label={`${user?.lastName}`}
+              onChange={handleChange}
               type="name"
               name="lastName"
-              value={ form.lastName }
-              error={ errors.lastName }
+              value={form.lastName}
+              error={errors.lastName}
             />
             {errors.lastName && <p className="text-red text-sm">{errors.lastName}</p>}
           </div>
@@ -163,7 +163,7 @@ function EditProfile() {
         <button
           className="absolute top-2 right-4 bg-gray-100 w-11 h-11
           flex justify-center items-center rounded-full"
-          onClick={ handleSubmit }
+          onClick={handleSubmit }
         >
           <img src={ Check } alt="edit" />
         </button>

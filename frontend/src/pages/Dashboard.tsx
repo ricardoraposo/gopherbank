@@ -4,7 +4,7 @@ import { useAtom } from 'jotai';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiURL } from '../consts';
+import { apiURL, queryParams } from '../consts';
 import { accountAtom, showNotificationAtom, tokenAtom } from '../store/atom';
 
 import Header from '../components/Header';
@@ -20,14 +20,14 @@ import Blur from '../components/Blur';
 function Dashboard() {
   const navigate = useNavigate();
   const [, setID] = useAtom(accountAtom);
-  const [, setToken] = useAtom(tokenAtom);
+  const [token, setToken] = useAtom(tokenAtom);
   const [show] = useAtom(showNotificationAtom);
   const { isLoading, error } = useQuery({
-    queryKey: ['user'],
+    queryKey: ['user', token],
     queryFn: async () => {
-      const { data } = await axios.get(`${apiURL}/api/jwt/`);
+      const { data } = await axios.get(`${apiURL}/api/jwt/`, queryParams(token));
       setID(data.number);
-      return axios.get(`${apiURL}/api/accounts/${data.number}`);
+      return axios.get(`${apiURL}/api/accounts/${data.number}`, queryParams(token));
     },
     retry: 2,
   });
