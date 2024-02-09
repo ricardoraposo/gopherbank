@@ -5,6 +5,24 @@ It is a learning project for me to learn Go and to learn how to write a web appl
 
 Showcase video(in Portuguese): https://www.linkedin.com/feed/update/urn:li:activity:7149169538620723200/
 
+## Technologies used
+
+### Server-Side
+
+- Golang
+- Fiber
+- Ent.go
+- AWS S3
+- Docker & Kubernetes
+
+### Client-Side
+
+- React
+- Tailwind
+- React Query
+- Jotai
+- Zod
+
 ## How to Run
 
 There is a docker compose file in the project, in order to use it you gotta follow the steps below
