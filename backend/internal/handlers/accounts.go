@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -71,6 +72,40 @@ func (a *AccountHandler) CreateAccount(c *fiber.Ctx) error {
 	}
 
 	if err := a.userDB.CreateUser(c.Context(), &params, account); err != nil {
+		return err
+	}
+
+	return c.JSON(fiber.Map{
+		"number":  num,
+		"message": fmt.Sprintf("Account created successfully with number %s", num),
+	})
+}
+
+func (a *AccountHandler) CreateAccountNoS3(c *fiber.Ctx) error {
+	var params models.NewAccountParams
+	if err := c.BodyParser(&params); err != nil {
+		log.Println(err)
+		return err
+	}
+
+	num := utils.GenerateAccountNumber()
+	encryptedPassword, err := utils.EncryptPassword(params.Password)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	params.Number = num
+	params.Password = encryptedPassword
+
+	account, err := a.accountDB.CreateAccount(c.Context(), &params)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	if err := a.userDB.CreateUser(c.Context(), &params, account); err != nil {
+		log.Println(err)
 		return err
 	}
 

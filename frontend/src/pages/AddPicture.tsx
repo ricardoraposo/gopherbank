@@ -40,6 +40,21 @@ function AddPicture() {
     }
   };
 
+  const handleSubmitNoUpload = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      const { data: { number } } = await axios.post(`${apiURL}/auth/new/default`, formValues);
+      setAccount(number);
+      setFormValues(initialFormValues);
+      navigate('/signup/success');
+    } catch (error: any) {
+      console.error(error.response.data);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFile(e.target.files[0]);
@@ -87,6 +102,7 @@ function AddPicture() {
         </div>
         <button
           className="text-lg text-purple mt-12"
+          onClick={ handleSubmitNoUpload }
         >
           Or do it later...
         </button>

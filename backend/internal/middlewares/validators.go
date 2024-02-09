@@ -37,6 +37,24 @@ func ValidateNewAccountParams(c *fiber.Ctx) error {
 	return c.Next()
 }
 
+func ValidateNewAccountParamsNoS3(c *fiber.Ctx) error {
+	var account models.NewAccountParams
+	if err := c.BodyParser(&account); err != nil {
+		return err
+	}
+	if len(account.FirstName) < minNameLength {
+		return fiber.NewError(fiber.StatusBadRequest, "First name must be at least 2 characters long")
+	}
+	if len(account.LastName) < minNameLength {
+		return fiber.NewError(fiber.StatusBadRequest, "Last name must be at least 2 characters long")
+	}
+	if len(account.Password) < minPasswordLength {
+		return fiber.NewError(fiber.StatusBadRequest, "Password must have at least 8 characters")
+	}
+
+	return c.Next()
+}
+
 func ValidateNewPasswordParams(c *fiber.Ctx) error {
 	var np models.NewPasswordParams
 	if err := c.BodyParser(&np); err != nil {

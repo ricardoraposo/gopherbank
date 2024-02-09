@@ -54,6 +54,7 @@ func (s *FiberServer) RegisterRoutes() {
 	auth := s.App.Group("/auth")
 	auth.Post("/", middlewares.ValidateLoginParams, authHandler.Authenticate)
 	auth.Post("/new", middlewares.ValidateNewAccountParams, accountsHandler.CreateAccount)
+	auth.Post("/new/default", middlewares.ValidateNewAccountParamsNoS3, accountsHandler.CreateAccountNoS3)
 	auth.Patch("/recover", middlewares.ValidateNewPasswordParams, accountsHandler.RecoverAccountPassword)
 
 	// admin routes
