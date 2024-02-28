@@ -14,6 +14,7 @@ Showcase video(in Portuguese): https://www.linkedin.com/feed/update/urn:li:activ
 - Ent.go
 - AWS S3
 - Docker & Kubernetes
+- Prometheus
 
 ### Client-Side
 
