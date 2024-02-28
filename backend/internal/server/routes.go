@@ -1,10 +1,13 @@
 package server
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/ricardoraposo/gopherbank/internal/handlers"
 	"github.com/ricardoraposo/gopherbank/internal/middlewares"
+	"github.com/valyala/fasthttp/fasthttpadaptor"
 )
 
 func (s *FiberServer) RegisterRoutes() {
@@ -16,9 +19,15 @@ func (s *FiberServer) RegisterRoutes() {
 	favoritehandler := handlers.NewFavoriteHandler(s.db)
 	depositRequestHandler := handlers.NewDepositRequestHandler(s.db)
 	notificationHandler := handlers.NewNotificationHandler(s.db)
+	p := fasthttpadaptor.NewFastHTTPHandler(promhttp.Handler())
 
 	s.Use(logger.New())
 	s.Use(cors.New())
+
+	s.App.Get("/metrics", func(c *fiber.Ctx) error {
+		p(c.Context())
+        return nil
+	})
 
 	api := s.App.Group("/api")
 	api.Use(middlewares.JWTAuthentication)
